@@ -1069,6 +1069,15 @@
                             <label for="-rttsMoonName{{@index}}" class="fsc-hidden-label">{{localize 'FSC.Configuration.Moon.Name'}}</label>
                             <input id="-rttsMoonName{{@index}}" class="fsc-moon-name" value="{{name}}" type="text" aria-describedby="fsc-moon-name" />
                         </div>
+                        <div class="fsc-col">
+                            <label for="-rttsMoonCycles{{@index}}" class="fsc-hidden-label">Historic Cycles</label>
+                            <select id='-rttsMoonCycles' class='form-control'>
+                                <option>Choose Cycle</option>
+                                {{#each cycleLengths}}
+                                    <option value="{{this}}">{{@index}}</option>
+                                {{/each}}
+                            </select>
+                        </div>
                     </div>
                     {{/each}}
                 </div>
