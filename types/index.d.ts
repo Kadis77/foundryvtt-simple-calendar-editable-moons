@@ -1463,7 +1463,6 @@ declare global {
                 name: string;
                 cycleLengths: number[];
                 firstFullMoon: FirstFullMoonDate;
-                historicPhases: MoonPhase[][];
                 color: string;
                 firstFullMoonDateSelectorId: string;
                 firstFullMoonSelectedDate: DateTime;
@@ -2226,8 +2225,6 @@ declare global {
             cycleLengths: number[];
             /** The moon phase for the current date. */
             currentPhase?: MoonPhase;
-            /** The different historic phases of the moon. */
-            historicPhases: MoonPhase[][];
             /** The color associated with the moon. */
             color: string;
         }

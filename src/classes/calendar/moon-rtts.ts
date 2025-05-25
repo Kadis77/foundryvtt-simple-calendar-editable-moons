@@ -17,11 +17,6 @@ export default class RoadToTheSkyMoon extends ConfigurationItemBase {
      */
     cycleLengths: number[] = [];
     /**
-     * An array of the different historicPhases of the moon
-     * @type {Array<Array<MoonPhase>>}
-     */
-    historicPhases: SimpleCalendar.MoonPhase[][] = [];
-    /**
      * When the first new moon took place. Used as a reference for calculating the position of the current cycle
      */
     firstFullMoon: SimpleCalendar.FirstFullMoonDate = {
@@ -71,13 +66,6 @@ export default class RoadToTheSkyMoon extends ConfigurationItemBase {
 
         this.color = RoadToTheSkyMoonConfigs[this.rttsMoonId.valueOf()].color;
         this.cycleLengths.push(1);
-        this.historicPhases.push([]);
-        this.historicPhases[0].push({
-            name: GameSettings.Localize("FSC.Moon.Phase.Full"),
-            length: 3.69,
-            icon: Icons.Full,
-            singleDay: true
-        });
     }
 
     /**
@@ -87,11 +75,7 @@ export default class RoadToTheSkyMoon extends ConfigurationItemBase {
     clone(): RoadToTheSkyMoon {
         const c = new RoadToTheSkyMoon(this.rttsMoonId);
         c.id = this.id;
-        c.cycleLengths =  Object.assign([], this.cycleLengths);
-        c.historicPhases = [];
-        for (var i = 0; i < this.historicPhases.length; i++) {
-            c.historicPhases[i] = this.historicPhases[i].slice();
-        }
+        c.cycleLengths =  Object.assign([], this.cycleLengths); 
         c.firstFullMoon.yearReset = this.firstFullMoon.yearReset;
         c.firstFullMoon.yearX = this.firstFullMoon.yearX;
         c.firstFullMoon.year = this.firstFullMoon.year;
@@ -116,9 +100,6 @@ export default class RoadToTheSkyMoon extends ConfigurationItemBase {
                 month: this.firstFullMoon.month,
                 day: this.firstFullMoon.day
             },
-            historicPhases: this.historicPhases.map((p) => {
-                return p.slice();
-            }),
             color: this.color,
         };
     }
@@ -132,7 +113,6 @@ export default class RoadToTheSkyMoon extends ConfigurationItemBase {
             name: this.name,
             cycleLengths: this.cycleLengths,
             firstFullMoon: this.firstFullMoon,
-            historicPhases: this.historicPhases,
             color: this.color,
             firstFullMoonDateSelectorId: `sc_first_full_moon_date_${this.id}`,
             firstFullMoonSelectedDate: {
@@ -155,7 +135,6 @@ export default class RoadToTheSkyMoon extends ConfigurationItemBase {
             super.loadFromSettings(config);
             this.rttsMoonId = config.rttsMoonId;
             this.cycleLengths = config.cycleLengths;
-            this.historicPhases = config.historicPhases;
             this.firstFullMoon = {
                 yearReset: config.firstFullMoon.yearReset,
                 yearX: config.firstFullMoon.yearX,
