@@ -61,11 +61,17 @@ export default class RoadToTheSkyMoon extends ConfigurationItemBase {
      * @param rttsMoonId
      */
     constructor(rttsMoonId: RoadToTheSkyMoonIds = RoadToTheSkyMoonIds.harvest) {
-        super(RoadToTheSkyMoonConfigs[rttsMoonId.valueOf()].name);
+        console.log("RoadToTheSkyMoon ID", rttsMoonId);
+        console.log(RoadToTheSkyMoonConfigs);
+        console.log(RoadToTheSkyMoonConfigs[rttsMoonId]);
+        console.log(RoadToTheSkyMoonConfigs[rttsMoonId].name);
+        super(RoadToTheSkyMoonConfigs[rttsMoonId].name);
 
         this.rttsMoonId = rttsMoonId;
-        this.color = RoadToTheSkyMoonConfigs[rttsMoonId.valueOf()].color;
+
+        this.color = RoadToTheSkyMoonConfigs[this.rttsMoonId.valueOf()].color;
         this.cycleLengths.push(1);
+        this.historicPhases.push([]);
         this.historicPhases[0].push({
             name: GameSettings.Localize("FSC.Moon.Phase.Full"),
             length: 3.69,

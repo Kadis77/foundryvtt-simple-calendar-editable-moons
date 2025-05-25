@@ -1,6 +1,7 @@
 import {
     GameWorldTimeIntegrations,
     LeapYearRules,
+    RoadToTheSkyMoonCount,
     RoadToTheSkyMoonIds,
     SimpleCalendarHooks,
     TimeKeeperStatus
@@ -54,10 +55,7 @@ export default class Calendar extends ConfigurationItemBase {
     /**
      * All the RTTS moons for this calendar
      */
-    rttsMoons: RoadToTheSkyMoon[] = [
-        new RoadToTheSkyMoon(RoadToTheSkyMoonIds.harvest),
-        new RoadToTheSkyMoon(RoadToTheSkyMoonIds.lantern)
-    ];
+    rttsMoons: RoadToTheSkyMoon[] = [];
     /**
      * All the moons for this calendar
      */
@@ -100,6 +98,7 @@ export default class Calendar extends ConfigurationItemBase {
         this.id = id || generateUniqueId();
         this.time = new Time();
         this.year = new Year(0);
+        
         this.timeKeeper = new TimeKeeper(this.id, this.time.updateFrequency);
         if (Object.keys(configuration).length > 1) {
             this.loadFromSettings(configuration);
@@ -283,14 +282,33 @@ export default class Calendar extends ConfigurationItemBase {
         }
 
         const configRttsMoons: SimpleCalendar.RttsMoonData[] | undefined = config.rttsMoons;
+        this.rttsMoons = [
+            new RoadToTheSkyMoon(RoadToTheSkyMoonIds.harvest),
+            new RoadToTheSkyMoon(RoadToTheSkyMoonIds.lantern),
+            new RoadToTheSkyMoon(RoadToTheSkyMoonIds.foxfire),
+            new RoadToTheSkyMoon(RoadToTheSkyMoonIds.eye)
+        ];
+        
+        // Load any moons with saved configs
         if (Array.isArray(configRttsMoons)) {
-            this.rttsMoons = [];
-            for (let i = 0; i < configRttsMoons.length; i++) {
-                const newW = new RoadToTheSkyMoon();
-                newW.loadFromSettings(configRttsMoons[i]);
-                this.rttsMoons.push(newW);
+            if (configRttsMoons.length > 0) {
+                for (let i = 0; i < configRttsMoons.length; i++) {
+                    if (configRttsMoons[i].rttsMoonId == RoadToTheSkyMoonIds.harvest) {
+                        this.rttsMoons[0].loadFromSettings(configRttsMoons[i])
+                    }
+                    if (configRttsMoons[i].rttsMoonId == RoadToTheSkyMoonIds.lantern) {
+                        this.rttsMoons[1].loadFromSettings(configRttsMoons[i])
+                    }
+                    if (configRttsMoons[i].rttsMoonId == RoadToTheSkyMoonIds.foxfire) {
+                        this.rttsMoons[2].loadFromSettings(configRttsMoons[i])
+                    }
+                    if (configRttsMoons[i].rttsMoonId == RoadToTheSkyMoonIds.eye) {
+                        this.rttsMoons[3].loadFromSettings(configRttsMoons[i])
+                    }
+                }
             }
         }
+        console.log(this.rttsMoons);
         
         const configMoons: SimpleCalendar.MoonData[] | undefined = config.moons || config.moonSettings;
         if (Array.isArray(configMoons)) {

@@ -1,3 +1,5 @@
+import RoadToTheSkyMoon from "./classes/calendar/moon-rtts";
+
 /**
  * The name of this module
  * @internal
@@ -529,9 +531,13 @@ export enum TriggerParameters {
 export enum RoadToTheSkyMoonIds {
     harvest,
     lantern,
+    foxfire,
+    eye
 }
 
-export const RoadToTheSkyMoonConfigs = [
+export const RoadToTheSkyMoonCount = 4;
+
+export const RoadToTheSkyMoonConfigs: any[] = [
     {
         id: "harvest",
         name: "Harvest Moon",
@@ -540,6 +546,16 @@ export const RoadToTheSkyMoonConfigs = [
     {
         id: "lantern",
         name: "Azai's Lantern",
+        color: "#ffffff"
+    },
+    {
+        id: "foxfire",
+        name: "Foxfire Heart",
+        color: "#ffffff"
+    },
+    {
+        id: "eye",
+        name: "Vathek's Eye",
         color: "#ffffff"
     }
 ]

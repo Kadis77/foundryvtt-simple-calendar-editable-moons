@@ -196,6 +196,8 @@ export default class CalendarManager {
      * Gets the currently active calendar
      */
     public getActiveCalendar(): Calendar {
+        //console.log("calendars:");
+        //console.log(JSON.stringify(this));
         return this.calendars[this.activeId];
     }
 

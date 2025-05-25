@@ -1063,13 +1063,14 @@
                     <div class="fsc-hidden-label">
                         <label id="fsc-rtts-moon-name">{{localize 'FSC.Configuration.Moon.NameHelp'}}</label>
                     </div>
-                    <div class="fsc-row" data-index="0">
-                        <div class="fsc-col">Harvest Moon (To do - reference constant)</div>
+                    {{#each rttsMoons}}
+                    <div class="fsc-row" data-index="{{@index}}">
+                        <div class="fsc-col">
+                            <label for="-rttsMoonName{{@index}}" class="fsc-hidden-label">{{localize 'FSC.Configuration.Moon.Name'}}</label>
+                            <input id="-rttsMoonName{{@index}}" class="fsc-moon-name" value="{{name}}" type="text" aria-describedby="fsc-moon-name" />
+                        </div>
                     </div>
-                    <div class="fsc-row" data-index="1">
-                        <div class="fsc-col">Azai's Lantern</div>
-                    </div>
-                {{rttsMoons}}
+                    {{/each}}
                 </div>
             </div>
         </div>
