@@ -1,25 +1,32 @@
-import { GameWorldTimeIntegrations, LeapYearRules, SimpleCalendarHooks, TimeKeeperStatus } from "../../constants";
+import {
+    GameWorldTimeIntegrations,
+    LeapYearRules,
+    RoadToTheSkyMoonIds,
+    SimpleCalendarHooks,
+    TimeKeeperStatus
+} from "../../constants";
 import Year from "./year";
 import Month from "./month";
-import { Logger } from "../logging";
-import { GameSettings } from "../foundry-interfacing/game-settings";
-import { Weekday } from "./weekday";
+import {Logger} from "../logging";
+import {GameSettings} from "../foundry-interfacing/game-settings";
+import {Weekday} from "./weekday";
 import Season from "./season";
 import Moon from "./moon";
 import GeneralSettings from "../configuration/general-settings";
 import ConfigurationItemBase from "../configuration/configuration-item-base";
 import PF2E from "../systems/pf2e";
 import Renderer from "../renderer";
-import { generateUniqueId } from "../utilities/string";
-import { DateToTimestamp, DaysBetweenDates, FormatDateTime, ToSeconds } from "../utilities/date-time";
-import { canUser } from "../utilities/permissions";
-import { CalManager, MainApplication, NManager, SC } from "../index";
+import {generateUniqueId} from "../utilities/string";
+import {DateToTimestamp, DaysBetweenDates, FormatDateTime, ToSeconds} from "../utilities/date-time";
+import {canUser} from "../utilities/permissions";
+import {CalManager, MainApplication, NManager, SC} from "../index";
 import TimeKeeper from "../time/time-keeper";
 import NoteStub from "../notes/note-stub";
 import Time from "../time";
-import { deepMerge } from "../utilities/object";
-import { Hook } from "../api/hook";
+import {deepMerge} from "../utilities/object";
+import {Hook} from "../api/hook";
 import PF1E from "../systems/pf1e";
+import RoadToTheSkyMoon from "./moon-rtts";
 
 export default class Calendar extends ConfigurationItemBase {
     /**
@@ -44,6 +51,13 @@ export default class Calendar extends ConfigurationItemBase {
      * All the seasons for this calendar
      */
     seasons: Season[] = [];
+    /**
+     * All the RTTS moons for this calendar
+     */
+    rttsMoons: RoadToTheSkyMoon[] = [
+        new RoadToTheSkyMoon(RoadToTheSkyMoonIds.harvest),
+        new RoadToTheSkyMoon(RoadToTheSkyMoonIds.lantern)
+    ];
     /**
      * All the moons for this calendar
      */
@@ -109,6 +123,9 @@ export default class Calendar extends ConfigurationItemBase {
         });
         c.seasons = this.seasons.map((s) => {
             return s.clone();
+        });
+        c.rttsMoons = this.rttsMoons.map((m) => {
+            return m.clone();
         });
         c.moons = this.moons.map((m) => {
             return m.clone();
@@ -178,6 +195,9 @@ export default class Calendar extends ConfigurationItemBase {
             leapYear: this.year.leapYearRule.toConfig(),
             months: this.months.map((m) => {
                 return m.toConfig();
+            }),
+            rttsMoons: this.rttsMoons.map((r) => {
+                return r.toConfig();
             }),
             moons: this.moons.map((m) => {
                 return m.toConfig();
@@ -261,6 +281,17 @@ export default class Calendar extends ConfigurationItemBase {
                 this.seasons.push(newW);
             }
         }
+
+        const configRttsMoons: SimpleCalendar.RttsMoonData[] | undefined = config.rttsMoons;
+        if (Array.isArray(configRttsMoons)) {
+            this.rttsMoons = [];
+            for (let i = 0; i < configRttsMoons.length; i++) {
+                const newW = new RoadToTheSkyMoon();
+                newW.loadFromSettings(configRttsMoons[i]);
+                this.rttsMoons.push(newW);
+            }
+        }
+        
         const configMoons: SimpleCalendar.MoonData[] | undefined = config.moons || config.moonSettings;
         if (Array.isArray(configMoons)) {
             this.moons = [];

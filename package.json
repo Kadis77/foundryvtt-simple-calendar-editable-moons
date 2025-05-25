@@ -1,5 +1,5 @@
 {
-  "name": "foundryvtt-simple-calendar-editable-moons",
+  "name": "foundryvtt-simple-calendar",
   "description": "A simple calendar module for keeping track of game days and events. Custom version for use in Road to the Sky.",
   "version": "2.4.18",
   "author": "Dean Vigoren (vigorator)",
@@ -11,11 +11,11 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/Kadis77/foundryvtt-simple-calendar-editable-moons"
+    "url": "https://github.com/Kadis77/foundryvtt-simple-calendar"
   },
   "license": "MIT",
   "engines": {
-    "node": ">18.0.0 <21.0.0"
+    "node": ">18.0.0 "
   },
   "types": "types/index.d.ts",
   "scripts": {

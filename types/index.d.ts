@@ -16,7 +16,7 @@ import {
     NoteReminderNotificationType,
     NoteRepeat,
     PredefinedCalendars,
-    PresetTimeOfDay,
+    PresetTimeOfDay, RoadToTheSkyMoonIds,
     SimpleCalendarHooks,
     SocketTypes,
     TimeKeeperStatus,
@@ -1457,6 +1457,19 @@ declare global {
             }
 
             /**
+             * Interface for a RTTS Moon template
+             */
+            interface RttsMoon extends IDataItemBase {
+                name: string;
+                cycleLengths: number[];
+                firstFullMoon: FirstFullMoonDate;
+                historicPhases: MoonPhase[][];
+                color: string;
+                firstFullMoonDateSelectorId: string;
+                firstFullMoonSelectedDate: DateTime;
+            }
+
+            /**
              * Interface for a moons template
              */
             interface Moon extends IDataItemBase {
@@ -1889,6 +1902,8 @@ declare global {
             leapYear?: LeapYearData;
             /** An array of month settings for each month of the calendar. */
             months?: MonthData[];
+            /** An array of RTTS moon settings for each RTTS moon of the calendar. */
+            rttsMoons?: RttsMoonData[];
             /** An array of moon settings for each moon of the calendar. */
             moons?: MoonData[];
             /** An array of note categories for the calendar. */
@@ -2087,6 +2102,22 @@ declare global {
         }
 
         /**
+         * Interface for a RTTS moons first full moon date
+         */
+        interface FirstFullMoonDate {
+            /** If and when the year of the full moon should be reset. {@link SimpleCalendar.api.MoonYearResetOptions | List of options}*/
+            yearReset: MoonYearResetOptions;
+            /** The year of the first full moon. */
+            year: number;
+            /** Reset the new moon year every X years. */
+            yearX: number;
+            /** The month of the first full moon. */
+            month: number;
+            /** The day of the first full moon. */
+            day: number;
+        }
+        
+        /**
          * Interface for all general settings for a calendar in the Simple Calendar module
          */
         interface GeneralSettingsData extends IDataItemBase {
@@ -2179,6 +2210,26 @@ declare global {
             intercalaryInclude: boolean;
             /** The day of the week this month should always start on. */
             startingWeekday: number | null;
+        }
+
+        /**
+         * Interface for all information about a RTTS moon
+         */
+        interface RttsMoonData extends IDataItemBase {
+            /** The RTTS ID of the moon. */
+            rttsMoonId: RoadToTheSkyMoonIds;
+            /** The name of the moon. */
+            name: string;
+            /** When the first full moon was. This is used to calculate the current phase for a given day. */
+            firstFullMoon: FirstFullMoonDate;
+            /** An array of historic cycle lengths */
+            cycleLengths: number[];
+            /** The moon phase for the current date. */
+            currentPhase?: MoonPhase;
+            /** The different historic phases of the moon. */
+            historicPhases: MoonPhase[][];
+            /** The color associated with the moon. */
+            color: string;
         }
 
         /**

@@ -524,3 +524,22 @@ export enum TriggerParameters {
     After,
     Nth
 }
+
+// Custom constants for the RTTS Moons
+export enum RoadToTheSkyMoonIds {
+    harvest,
+    lantern,
+}
+
+export const RoadToTheSkyMoonConfigs = [
+    {
+        id: "harvest",
+        name: "Harvest Moon",
+        color: "#F9FF33",
+    },
+    {
+        id: "lantern",
+        name: "Azai's Lantern",
+        color: "#ffffff"
+    }
+]

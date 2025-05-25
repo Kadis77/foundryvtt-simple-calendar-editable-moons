@@ -248,6 +248,13 @@
             }
           }
 
+          .fsc-rttsmoons {
+            position: absolute;
+            right: 0;
+            display: flex;
+            flex-direction: row;
+          }
+
           .fsc-moons{
             position: absolute;
             right: 0;

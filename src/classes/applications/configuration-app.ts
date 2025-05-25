@@ -285,6 +285,9 @@ export default class ConfigurationApp extends FormApplication {
                 return m.toTemplate();
             }),
             monthStartingWeekdays: <{ [key: string]: string }>{},
+            rttsMoons: (<Calendar>this.object).rttsMoons.map((m) => {
+                return m.toTemplate();
+            }),
             moons: (<Calendar>this.object).moons.map((m) => {
                 return m.toTemplate();
             }),
