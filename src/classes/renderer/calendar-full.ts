@@ -263,6 +263,16 @@ export default class CalendarFull {
                                 i === weeks.length - 1
                             )}</div>`;
                         }
+                        if (options.showRttsMoonPhases) {
+                            html += `<div class="fsc-moons">${CalendarFull.MoonPhaseIcons(
+                                calendar,
+                                vYear,
+                                vMonthIndex,
+                                dayIndex,
+                                x !== 0 && x === weeks[i].length - 1,
+                                i === weeks.length - 1
+                            )}</div>`;
+                        }
                         html += "</div>";
                     } else {
                         html += '<div class="fsc-empty-day"></div>';

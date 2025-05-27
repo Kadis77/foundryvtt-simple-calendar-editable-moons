@@ -560,3 +560,14 @@ export const RoadToTheSkyMoonConfigs: any[] = [
         color: "#ffffff"
     }
 ]
+
+export enum RoadToTheSkyMoonPhaseIds { 
+    full,
+    waningG,
+    waningH,
+    waningC,
+    new,
+    waxingC,
+    waxingH,
+    waxingG
+}

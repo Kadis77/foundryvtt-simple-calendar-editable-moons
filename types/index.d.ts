@@ -1651,6 +1651,8 @@ declare global {
                 showDescriptions?: boolean;
                 /** If to show the different moon phases on the calendar */
                 showMoonPhases?: boolean;
+                /** If to show the different RTTS moon phases on the calendar */
+                showRttsMoonPhases?: boolean;
                 /** If to show any note counts on the calendar */
                 showNoteCount?: boolean;
                 /** If to show the season name */

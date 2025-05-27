@@ -1109,6 +1109,20 @@ export function getAllMoons(calendarId: string = "active"): SimpleCalendar.MoonD
     }
 }
 
+export function getAllRttsMoons(calendarId: string = "active"): SimpleCalendar.RttsMoonData[] {
+    const activeCalendar = calendarId === "active" ? CalManager.getActiveCalendar() : CalManager.getCalendar(calendarId);
+    if (activeCalendar) {
+        return activeCalendar.rttsMoons.map((m) => {
+            const c = m.toConfig();
+            c.currentPhase = m.getMoonPhase(activeCalendar);
+            return c;
+        });
+    } else {
+        Logger.error(`SimpleCalendar.api.getAllRttsMoons - Unable to find a calendar with the passed in ID of "${calendarId}"`);
+        return [];
+    }
+}
+
 /**
  * Gets the details for all the seasons for the specified calendar.
  *
