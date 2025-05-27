@@ -1062,28 +1062,35 @@
                 <div class="fsc-f-table fsc-rttsmoons">
                     {{#each rttsMoons}}
                     <h2><b> {{name}}</b></h2>
-                    <div class="fsc-row fsc-rttsmoon-cycle-select" data-index="{{@index}}">
-                        <div class="fsc-col">
-                            <label for="-rttsMoonCycles{{@index}}">Historic Cycles</label>
-                            <select id='-rttsMoonCycles{{@index}}' class='form-control fsc-rtts-moon-cycle-select-dropdown'>
-                                <option>Choose Cycle</option>
-                                {{#each cycleLengths}}
-                                    <option id="-rttsMoonCycles{{../data-index}}Cycle{{@index}}" value="{{@index}}">{{@index}}</option>
-                                {{/each}}
-                            </select>
-                        </div>
-                        <div class="fsc-col">
-                            <label for="-selectedMoonCycle{{@index}}" class="fsc-label">{{localize 'FSC.Configuration.Moon.CycleLength'}}</label>
-                        </div>
-                        <div class="fsc-col">
-                            <input id="-selectedMoonCycle{{@index}}" class="fsc-moon-cycle-length fsc-rtts-moon-selected-cycle-length" value="Select a Cycle" type="number" aria-describedby="fsc-moon-cycle" />
+                    <div class="fsc-row" data-index="{{@index}}">
+                        <div class="fsc-f-table fsc-options fsc-open fsc-rtts-moon-cycles">
+                            <div class="fsc-row fsc-head">
+                                <div class="fsc-col">Cycle</div>
+                                <div class="fsc-col">Length in Days</div>
+                                <div class="fsc-col">Start Date</div>
+                            </div>
+                            {{#each cycleLengths}}
+                            <div class="fsc-row" data-index="{{@index}}">
+                                <div class="fsc-col" data-rttsmoon-index="{{@../index}}">{{@index}}</div>
+                                <div class="fsc-col">
+                                    <input class="fsc-rtts-cycle-length" id="-cycle{{@index}}" value="{{this}}" data-rttsmoon-index="{{@../index}}" type="number" />
+                                </div>
+                                <div class="fsc-col">TBD</div>
+                                <div class="fsc-col">
+                                    <button class="fsc-control fsc-delete" data-type="rttsmoon-cycle" data-rttsmoon-index="{{@../index}}><span class="fa fa-trash"></span> {{localize 'FSC.Configuration.Month.Remove'}}</button>
+                                </div>
+                            </div>
+                            {{/each}}
+                            <div class="fsc-table-actions">
+                                <button class="fsc-control fsc-save" data-type="rttsmoon-cycle" data-rttsmoon-index="{{@index}}"><span class="fa fa-plus"></span> Add Cycle</button>
+                            </div>
                         </div>
                         <div class="fsc-options fsc-open">
                             <h3>First Full Moon</h3>
                             <div class="form-group fsc-open">
                                 <label for="-fnmyrx{{@index}}">Year</label>
                                 <div class="form-fields">
-                                    <input class="fsc-moon-year" value="{{firstFullMoon.year}}" type="number" id="-fnmyrx{{@index}}" />
+                                    <input class="fsc-rtts-moon-year" value="{{firstFullMoon.year}}" type="number" id="-fnmyrx{{@index}}" />
                                 </div>
                             </div>
                             <div class="form-group fsc-open" style="overflow: visible;">

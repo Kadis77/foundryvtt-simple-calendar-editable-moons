@@ -464,13 +464,6 @@ export default class ConfigurationApp extends FormApplication {
                 e.addEventListener("keyup", this.inputChange.bind(this));
             });
             //---------------------
-            // Road to the Sky Selection Changes
-            //---------------------
-            this.appWindow.querySelectorAll(".fsc-rttsmoon-cycle-select").forEach((e) => {
-                e.addEventListener("change", this.rttsSelectedCycleChange.bind(this));
-                e.addEventListener("keyup", this.rttsSelectedCycleChange.bind(this));
-            });
-            //---------------------
             // Date Format Table open/close
             //---------------------
             this.appWindow.querySelector(".fsc-date-format-token-show")?.addEventListener("click", this.dateFormatTableClick.bind(this));
@@ -502,30 +495,6 @@ export default class ConfigurationApp extends FormApplication {
     private inputChange() {
         this.writeInputValuesToObjects();
         this.updateUIFromObject();
-    }
-
-    /**
-     * Processes a newly selected Road to the Sky Moon Cycle
-     * @private
-     */
-    private rttsSelectedCycleChange(e: Event) {
-        const target = <HTMLElement>e.currentTarget;
-        const moonIndex = parseInt(target.getAttribute("data-index") || "");
-        if (target) {
-            const dropdown = <HTMLSelectElement>target.getElementsByClassName("fsc-rtts-moon-cycle-select-dropdown")[0];
-            const selected = <HTMLInputElement>target.getElementsByClassName("fsc-rtts-moon-selected-cycle-length")[0];
-            if (dropdown && selected) {
-                const selectedCycleIndex = dropdown.selectedIndex - 1;
-                if (selectedCycleIndex >= 0) {
-                    const calendar = `${(<Calendar>this.object)}`;
-                    selected.innerHTML = `${(<Calendar>this.object).rttsMoons[moonIndex].cycleLengths[selectedCycleIndex]} ${GameSettings.Localize("FSC.Days")}`;
-                }
-                else {
-                    selected.innerHTML = "";
-                }
-                console.log("did it!");
-            }
-        }
     }
 
     /**
@@ -985,6 +954,28 @@ export default class ConfigurationApp extends FormApplication {
             });
 
             //----------------------------------
+            // Calendar: Road to the Sky Moon Settings
+            //----------------------------------
+            this.appWindow.querySelectorAll(".fsc-moon-settings .fsc-rttsmoons>.fsc-row:not(.fsc-head)").forEach((e) => {
+                const index = parseInt((<HTMLElement>e).getAttribute("data-index") || "");
+                (<Calendar>this.object).rttsMoons[index].firstFullMoon.year = <number>getNumericInputValue(".fsc-rtts-moon-year", 0, false, e);
+                
+                console.log(1);
+                if (!isNaN(index) && index >= 0 && index < (<Calendar>this.object).rttsMoons.length) {
+                    console.log(2);
+                    e.querySelectorAll(".fsc-rtts-moon-cycles>.fsc-row:not(.fsc-head)").forEach((p) => {
+                        console.log(3);
+                        const cycleIndex = parseInt((<HTMLElement>p).getAttribute("data-index") || "");
+                        console.log(4);
+                        if (!isNaN(cycleIndex) && cycleIndex >= 0 && cycleIndex < (<Calendar>this.object).rttsMoons[index].cycleLengths.length) {
+                            console.log(5);
+                            (<Calendar>this.object).rttsMoons[index].cycleLengths[cycleIndex] = <number>getNumericInputValue(".fsc-rtts-cycle-length", 1, false, p);
+                        }
+                     });
+                }
+            });
+
+            //----------------------------------
             // Calendar: Time Settings
             //----------------------------------
             (<Calendar>this.object).time.hoursInDay = <number>getNumericInputValue("#scHoursInDay", 24, false, this.appWindow);
@@ -1166,16 +1157,16 @@ export default class ConfigurationApp extends FormApplication {
             // Calendar Config: RttsMoons
             //----------------------------------
             for (let i = 0; i < (<Calendar>this.object).rttsMoons.length; i++) {
-                const row = this.appWindow.querySelector(`.fsc-moon-settings .fsc-rttsmoons>.fsc-row[data-index="${i}"]`);
-                if (row) {
-                    animateFormGroup(".fsc-moon-year", (<Calendar>this.object).moons[i].firstNewMoon.yearReset === MoonYearResetOptions.None, row);
-                    for (let p = 0; p < (<Calendar>this.object).rttsMoons[i].phases.length; p++) {
-                        const pl = row.querySelector(`.fsc-phases>.fsc-row[data-index="${p}"] .fsc-moon-phase-length`);
-                        if (pl) {
-                            (<HTMLElement>pl).innerText = `${(<Calendar>this.object).moons[i].phases[p].length} ${GameSettings.Localize("FSC.Days")}`;
-                        }
-                    }
-                }
+                //const row = this.appWindow.querySelector(`.fsc-moon-settings .fsc-rttsmoons>.fsc-row[data-index="${i}"]`);
+                //if (row) {
+                //    animateFormGroup(".fsc-moon-year", (<Calendar>this.object).moons[i].firstNewMoon.yearReset === MoonYearResetOptions.None, row);
+                //    for (let p = 0; p < (<Calendar>this.object).rttsMoons[i].phases.length; p++) {
+                //        const pl = row.querySelector(`.fsc-phases>.fsc-row[data-index="${p}"] .fsc-moon-phase-length`);
+                //        if (pl) {
+                //            (<HTMLElement>pl).innerText = `${(<Calendar>this.object).moons[i].phases[p].length} ${GameSettings.Localize("FSC.Days")}`;
+                //        }
+                //    }
+                //}
             }
         }
     }
@@ -1310,6 +1301,16 @@ export default class ConfigurationApp extends FormApplication {
                     }
                     break;
                 }
+                case "rttsmoon-cycle": {
+                    const dataRttsMoonIndex = (<HTMLElement>e.currentTarget).getAttribute("data-rttsmoon-index");
+                    if (dataRttsMoonIndex) {
+                        const rttsMoonIndex = parseInt(dataRttsMoonIndex);
+                        if (!isNaN(rttsMoonIndex) && rttsMoonIndex < (<Calendar>this.object).rttsMoons.length) {
+                            (<Calendar>this.object).rttsMoons[rttsMoonIndex].cycleLengths.push(1);
+                        }
+                    }
+                    break;
+                }
                 case "year-name":
                     (<Calendar>this.object).year.yearNames.push("New Named Year");
                     break;
@@ -1372,6 +1373,19 @@ export default class ConfigurationApp extends FormApplication {
                                     (<Calendar>this.object).seasons.splice(index, 1);
                                 }
                                 break;
+                            case "rttsmoon-cycle":
+                                const dataRttsMoonIndex = target.getAttribute("data-rttsmoon-index");
+                                if (dataRttsMoonIndex) {
+                                    const rttsMoonIndex = parseInt(dataRttsMoonIndex);
+                                    if (rttsMoonIndex < (<Calendar>this.object).rttsMoons.length) {
+                                        console.log("1 " + (rttsMoonIndex < (<Calendar>this.object).rttsMoons.length) + " " +  (<Calendar>this.object).rttsMoons.length + " " + rttsMoonIndex);
+                                        console.log("2 " + (index < (<Calendar>this.object).rttsMoons[rttsMoonIndex].cycleLengths.length) + " " +  (<Calendar>this.object).rttsMoons[rttsMoonIndex].cycleLengths.length + " " + index);
+                                        if (index < (<Calendar>this.object).rttsMoons[rttsMoonIndex].cycleLengths.length) {
+                                            (<Calendar>this.object).rttsMoons[rttsMoonIndex].cycleLengths.splice(index, 1);
+                                        }
+                                    }
+                                }
+                                break;    
                             case "moon":
                                 if (index < (<Calendar>this.object).moons.length) {
                                     (<Calendar>this.object).moons.splice(index, 1);
