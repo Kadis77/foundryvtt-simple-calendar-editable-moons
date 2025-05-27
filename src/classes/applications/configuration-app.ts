@@ -406,6 +406,11 @@ export default class ConfigurationApp extends FormApplication {
                 onDateSelect: this.dateSelectorChange.bind(this, m.id, ConfigurationDateSelectors.moonFirstNewMoonDate)
             }).activateListeners();
         });
+        (<Calendar>this.object).rttsMoons.forEach((rm) => {
+            DateSelectorManager.GetSelector(`sc_first_full_moon_date_${rm.id}`, {
+                onDateSelect: this.dateSelectorChange.bind(this, rm.id, ConfigurationDateSelectors.moonFirstFullMoonDate)
+            }).activateListeners();
+        });
         this.appWindow = document.getElementById(ConfigurationApp.appWindowId);
         if (this.appWindow) {
             DateSelectorManager.ActivateSelector("quick-setup-predefined-calendar");
@@ -459,6 +464,13 @@ export default class ConfigurationApp extends FormApplication {
                 e.addEventListener("keyup", this.inputChange.bind(this));
             });
             //---------------------
+            // Road to the Sky Selection Changes
+            //---------------------
+            this.appWindow.querySelectorAll(".fsc-rttsmoon-cycle-select").forEach((e) => {
+                e.addEventListener("change", this.rttsSelectedCycleChange.bind(this));
+                e.addEventListener("keyup", this.rttsSelectedCycleChange.bind(this));
+            });
+            //---------------------
             // Date Format Table open/close
             //---------------------
             this.appWindow.querySelector(".fsc-date-format-token-show")?.addEventListener("click", this.dateFormatTableClick.bind(this));
@@ -490,6 +502,30 @@ export default class ConfigurationApp extends FormApplication {
     private inputChange() {
         this.writeInputValuesToObjects();
         this.updateUIFromObject();
+    }
+
+    /**
+     * Processes a newly selected Road to the Sky Moon Cycle
+     * @private
+     */
+    private rttsSelectedCycleChange(e: Event) {
+        const target = <HTMLElement>e.currentTarget;
+        const moonIndex = parseInt(target.getAttribute("data-index") || "");
+        if (target) {
+            const dropdown = <HTMLSelectElement>target.getElementsByClassName("fsc-rtts-moon-cycle-select-dropdown")[0];
+            const selected = <HTMLInputElement>target.getElementsByClassName("fsc-rtts-moon-selected-cycle-length")[0];
+            if (dropdown && selected) {
+                const selectedCycleIndex = dropdown.selectedIndex - 1;
+                if (selectedCycleIndex >= 0) {
+                    const calendar = `${(<Calendar>this.object)}`;
+                    selected.innerHTML = `${(<Calendar>this.object).rttsMoons[moonIndex].cycleLengths[selectedCycleIndex]} ${GameSettings.Localize("FSC.Days")}`;
+                }
+                else {
+                    selected.innerHTML = "";
+                }
+                console.log("did it!");
+            }
+        }
     }
 
     /**
@@ -1125,6 +1161,22 @@ export default class ConfigurationApp extends FormApplication {
                     }
                 }
             }
+
+            //----------------------------------
+            // Calendar Config: RttsMoons
+            //----------------------------------
+            for (let i = 0; i < (<Calendar>this.object).rttsMoons.length; i++) {
+                const row = this.appWindow.querySelector(`.fsc-moon-settings .fsc-rttsmoons>.fsc-row[data-index="${i}"]`);
+                if (row) {
+                    animateFormGroup(".fsc-moon-year", (<Calendar>this.object).moons[i].firstNewMoon.yearReset === MoonYearResetOptions.None, row);
+                    for (let p = 0; p < (<Calendar>this.object).rttsMoons[i].phases.length; p++) {
+                        const pl = row.querySelector(`.fsc-phases>.fsc-row[data-index="${p}"] .fsc-moon-phase-length`);
+                        if (pl) {
+                            (<HTMLElement>pl).innerText = `${(<Calendar>this.object).moons[i].phases[p].length} ${GameSettings.Localize("FSC.Days")}`;
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -1437,6 +1489,14 @@ export default class ConfigurationApp extends FormApplication {
             if (moon) {
                 moon.firstNewMoon.month = !selectedDate.startDate.month || selectedDate.startDate.month < 0 ? 0 : selectedDate.startDate.month;
                 moon.firstNewMoon.day = !selectedDate.startDate.day || selectedDate.startDate.day < 0 ? 0 : selectedDate.startDate.day;
+            }
+        } else if (dateSelectorType === ConfigurationDateSelectors.moonFirstFullMoonDate) {
+            const rttsMoon = (<Calendar>this.object).rttsMoons.find((rm) => {
+                return rm.id === itemId;
+            });
+            if (rttsMoon) {
+                rttsMoon.firstFullMoon.month = !selectedDate.startDate.month || selectedDate.startDate.month < 0 ? 0 : selectedDate.startDate.month;
+                rttsMoon.firstFullMoon.day = !selectedDate.startDate.day || selectedDate.startDate.day < 0 ? 0 : selectedDate.startDate.day;
             }
         }
     }

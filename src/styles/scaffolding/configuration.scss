@@ -314,6 +314,25 @@
                   }
                 }
               }
+
+              &.fsc-rttsmoons{
+                .fsc-row{
+                  .fsc-options{
+                    &.fsc-open{
+                      max-height: fit-content;
+                    }
+                  }
+                  &.fsc-rttsmoon-cycle-select{
+                    .fsc-rtts-moon-cycle-select-dropdown {
+
+                    }
+                    .fsc-rtts-moon-selected-cycle-length {
+                      
+                    }
+                  }
+                }
+              }
+              
             }
 
             .fsc-table-actions{

@@ -21,16 +21,6 @@ export default class RoadToTheSkyMoon extends ConfigurationItemBase {
      */
     firstFullMoon: SimpleCalendar.FirstFullMoonDate = {
         /**
-         * The year reset options for the first full moon
-         * @type {number} 
-         */
-        yearReset: MoonYearResetOptions.None,
-        /**
-         * How often the year should reset
-         * @type {number}
-         */
-        yearX: 0,
-        /**
          * The year of the first full moon
          * @type {number}
          */
@@ -75,9 +65,7 @@ export default class RoadToTheSkyMoon extends ConfigurationItemBase {
     clone(): RoadToTheSkyMoon {
         const c = new RoadToTheSkyMoon(this.rttsMoonId);
         c.id = this.id;
-        c.cycleLengths =  Object.assign([], this.cycleLengths); 
-        c.firstFullMoon.yearReset = this.firstFullMoon.yearReset;
-        c.firstFullMoon.yearX = this.firstFullMoon.yearX;
+        c.cycleLengths =  Object.assign([], this.cycleLengths);
         c.firstFullMoon.year = this.firstFullMoon.year;
         c.firstFullMoon.month = this.firstFullMoon.month;
         c.firstFullMoon.day = this.firstFullMoon.day;
@@ -94,8 +82,6 @@ export default class RoadToTheSkyMoon extends ConfigurationItemBase {
             name: this.name,
             cycleLengths: this.cycleLengths,
             firstFullMoon: {
-                yearReset: this.firstFullMoon.yearReset,
-                yearX: this.firstFullMoon.yearX,
                 year: this.firstFullMoon.year,
                 month: this.firstFullMoon.month,
                 day: this.firstFullMoon.day
@@ -136,8 +122,6 @@ export default class RoadToTheSkyMoon extends ConfigurationItemBase {
             this.rttsMoonId = config.rttsMoonId;
             this.cycleLengths = config.cycleLengths;
             this.firstFullMoon = {
-                yearReset: config.firstFullMoon.yearReset,
-                yearX: config.firstFullMoon.yearX,
                 year: config.firstFullMoon.year,
                 month: config.firstFullMoon.month,
                 day: config.firstFullMoon.day

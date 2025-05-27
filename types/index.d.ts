@@ -2101,15 +2101,11 @@ declare global {
         }
 
         /**
-         * Interface for a RTTS moons first full moon date
+         * Interface for a RTTS moon's first full moon date
          */
         interface FirstFullMoonDate {
-            /** If and when the year of the full moon should be reset. {@link SimpleCalendar.api.MoonYearResetOptions | List of options}*/
-            yearReset: MoonYearResetOptions;
             /** The year of the first full moon. */
             year: number;
-            /** Reset the new moon year every X years. */
-            yearX: number;
             /** The month of the first full moon. */
             month: number;
             /** The day of the first full moon. */

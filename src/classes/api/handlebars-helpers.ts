@@ -19,7 +19,7 @@ export class HandlebarsHelpers {
         Handlebars.registerHelper("sc-multi-select", HandlebarsHelpers.MultiSelect);
         Handlebars.registerHelper("sc-date-time-controls", HandlebarsHelpers.DateTimeControls);
     }
-
+    
     /**
      * Handlebar Helper for rendering a DateSelector
      * @param options
