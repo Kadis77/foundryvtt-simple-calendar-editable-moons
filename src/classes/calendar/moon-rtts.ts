@@ -3,10 +3,7 @@ import ConfigurationItemBase from "../configuration/configuration-item-base";
 import Calendar from "./index";
 import {SimpleCalendar} from "../../../types";
 
-/**
- * Class for representing a moon
- */
-export default class RoadToTheSkyMoon extends ConfigurationItemBase {
+export class RoadToTheSkyMoon extends ConfigurationItemBase {
     /**
      * An ID of one of the four RTTS moons
      * @type {RoadToTheSkyMoonIds}
@@ -47,10 +44,6 @@ export default class RoadToTheSkyMoon extends ConfigurationItemBase {
      * @param rttsMoonId
      */
     constructor(rttsMoonId: RoadToTheSkyMoonIds = RoadToTheSkyMoonIds.harvest) {
-        console.log("RoadToTheSkyMoon ID", rttsMoonId);
-        console.log(RoadToTheSkyMoonConfigs);
-        console.log(RoadToTheSkyMoonConfigs[rttsMoonId]);
-        console.log(RoadToTheSkyMoonConfigs[rttsMoonId].name);
         super(RoadToTheSkyMoonConfigs[rttsMoonId].name);
 
         this.rttsMoonId = rttsMoonId;
@@ -66,7 +59,7 @@ export default class RoadToTheSkyMoon extends ConfigurationItemBase {
     clone(): RoadToTheSkyMoon {
         const c = new RoadToTheSkyMoon(this.rttsMoonId);
         c.id = this.id;
-        c.cycleLengths =  Object.assign([], this.cycleLengths);
+        c.cycleLengths = Object.assign([], this.cycleLengths);
         c.firstFullMoon.year = this.firstFullMoon.year;
         c.firstFullMoon.month = this.firstFullMoon.month;
         c.firstFullMoon.day = this.firstFullMoon.day;
@@ -115,7 +108,7 @@ export default class RoadToTheSkyMoon extends ConfigurationItemBase {
 
     /**
      * Loads the moon data from the config object.
-     * @param {MoonData} config The configuration object for this class
+     * @param {RttsMoonData} config The configuration object for this class
      */
     loadFromSettings(config: SimpleCalendar.RttsMoonData) {
         if (config && Object.keys(config).length) {
@@ -130,8 +123,6 @@ export default class RoadToTheSkyMoon extends ConfigurationItemBase {
             this.color = config.color;
         }
     }
-    
-    
 
     /**
      * Returns the current phase of the moon based on historic data.
@@ -143,25 +134,24 @@ export default class RoadToTheSkyMoon extends ConfigurationItemBase {
      */
     getDateMoonPhase(calendar: Calendar, yearNum: number, monthIndex: number, dayIndex: number): SimpleCalendar.MoonPhase {
         let firstFullMoonDays = calendar.dateToDays(this.firstFullMoon.year, this.firstFullMoon.month, this.firstFullMoon.day, true);
-        const daysSoFar = calendar.dateToDays(yearNum, monthIndex, dayIndex, true);
-        
+        let daysSoFar = calendar.dateToDays(yearNum, monthIndex, dayIndex, true);
+
         // If this is before the first full moon, just make the moon full.
-        if (firstFullMoonDays >= daysSoFar) {
+        if (firstFullMoonDays > daysSoFar) {
             return this.moonPhaseFromConfig(RoadToTheSkyMoonPhaseIds.full, 1);
         }
 
         // This is after the first full moon.         
         const daysSinceReferenceMoon = daysSoFar - firstFullMoonDays;
-        
+
         // Calculate how many moon cycles have passed between the first full moon and this date.
         let totalCycleDaysSoFar = 0;
         let currentCycle = 0;
         for (let i = 0; i < this.cycleLengths.length; i++) {
-            if (totalCycleDaysSoFar + this.cycleLengths[i] >= daysSinceReferenceMoon) {
+            if (totalCycleDaysSoFar + this.cycleLengths[i] > daysSinceReferenceMoon) {
                 currentCycle = i;
                 break;
-            }
-            else {
+            } else {
                 totalCycleDaysSoFar += this.cycleLengths[i];
             }
             if (i == this.cycleLengths.length - 1) {
@@ -169,50 +159,46 @@ export default class RoadToTheSkyMoon extends ConfigurationItemBase {
                 return this.moonPhaseFromConfig(1, 1);
             }
         }
-        
+
         // We have identified which cycle the moon is in. Now we need to find the phase.
         let daysIntoCurrentCycle = daysSoFar - firstFullMoonDays - totalCycleDaysSoFar;
         let currentCycleLength = this.cycleLengths[currentCycle];
         let currentCycleMarkerDays = [4];
-        let daysSpent = 0;
         // Figure out where the 'marker' days are (full, halfs, new)
         currentCycleMarkerDays[0] = 0;
-        currentCycleMarkerDays[1] = Math.ceil(Math.ceil(currentCycleLength/2)/2);
-        currentCycleMarkerDays[2] = Math.ceil(currentCycleLength/2);
-        currentCycleMarkerDays[3] = currentCycleLength - Math.ceil(Math.ceil(currentCycleLength/2)/ 2);
+        currentCycleMarkerDays[1] = Math.ceil(Math.ceil(currentCycleLength / 2) / 2);
+        currentCycleMarkerDays[2] = Math.ceil(currentCycleLength / 2);
+        currentCycleMarkerDays[3] = currentCycleLength - Math.floor(Math.floor(currentCycleLength / 2) / 2);
         
+        if (currentCycleLength > 10) {
+            let i = 1;
+        }
+
         // Find our day
         if (daysIntoCurrentCycle == currentCycleMarkerDays[0]) {
             // full
             return this.moonPhaseFromConfig(RoadToTheSkyMoonPhaseIds.full, 1);
-        }
-        else if (daysIntoCurrentCycle == currentCycleMarkerDays[2]) {
+        } else if (daysIntoCurrentCycle == currentCycleMarkerDays[2]) {
             // new
             return this.moonPhaseFromConfig(RoadToTheSkyMoonPhaseIds.new, 1);
-        }
-        else if (daysIntoCurrentCycle == currentCycleMarkerDays[1]) {
+        } else if (daysIntoCurrentCycle == currentCycleMarkerDays[1]) {
             // waning half
             return this.moonPhaseFromConfig(RoadToTheSkyMoonPhaseIds.waningH, 1);
-        }
-        else if (daysIntoCurrentCycle == currentCycleMarkerDays[3]) {
+        } else if (daysIntoCurrentCycle == currentCycleMarkerDays[3]) {
             // waxing half
             return this.moonPhaseFromConfig(RoadToTheSkyMoonPhaseIds.waxingH, 1);
-        }
-        else if (daysIntoCurrentCycle > currentCycleMarkerDays[1] && daysIntoCurrentCycle < currentCycleMarkerDays[2]) {
+        } else if (daysIntoCurrentCycle > currentCycleMarkerDays[1] && daysIntoCurrentCycle < currentCycleMarkerDays[2]) {
             // waning crescent
             return this.moonPhaseFromConfig(RoadToTheSkyMoonPhaseIds.waningC, currentCycleMarkerDays[2] - currentCycleMarkerDays[1] - 1)
-        }
-        else if (daysIntoCurrentCycle > currentCycleMarkerDays[2] && daysIntoCurrentCycle < currentCycleMarkerDays[3]) {
+        } else if (daysIntoCurrentCycle > currentCycleMarkerDays[2] && daysIntoCurrentCycle < currentCycleMarkerDays[3]) {
             // waxing crescent
             return this.moonPhaseFromConfig(RoadToTheSkyMoonPhaseIds.waxingC, currentCycleMarkerDays[3] - currentCycleMarkerDays[2] - 1)
-        }
-        else if (daysIntoCurrentCycle > currentCycleMarkerDays[0] && daysIntoCurrentCycle < currentCycleMarkerDays[1]) {
+        } else if (daysIntoCurrentCycle > currentCycleMarkerDays[0] && daysIntoCurrentCycle < currentCycleMarkerDays[1]) {
             // waning gibbous
             return this.moonPhaseFromConfig(RoadToTheSkyMoonPhaseIds.waningG, currentCycleMarkerDays[1] - currentCycleMarkerDays[0] - 1)
-        }
-        else if (daysIntoCurrentCycle > currentCycleMarkerDays[3] && daysIntoCurrentCycle < daysIntoCurrentCycle) {
+        } else if (daysIntoCurrentCycle > currentCycleMarkerDays[3]) {
             // waxing gibbous
-            return this.moonPhaseFromConfig(RoadToTheSkyMoonPhaseIds.waxingC, daysIntoCurrentCycle - currentCycleMarkerDays[3] - 1)
+            return this.moonPhaseFromConfig(RoadToTheSkyMoonPhaseIds.waxingG, currentCycleLength - currentCycleMarkerDays[3] - 1)
         }
         return this.moonPhaseFromConfig(RoadToTheSkyMoonPhaseIds.full, 1);
     }
@@ -229,8 +215,8 @@ export default class RoadToTheSkyMoon extends ConfigurationItemBase {
             property === "current"
                 ? calendar.year.numericRepresentation
                 : property === "selected"
-                ? calendar.year.selectedYear
-                : calendar.year.visibleYear;
+                    ? calendar.year.selectedYear
+                    : calendar.year.visibleYear;
         const monthIndex = calendar.getMonthIndex(property);
         if (monthIndex > -1) {
             const dayIndex = property !== "visible" ? calendar.months[monthIndex].getDayIndex(property) : dayToUse;
@@ -238,8 +224,8 @@ export default class RoadToTheSkyMoon extends ConfigurationItemBase {
         }
         return this.moonPhaseFromConfig(RoadToTheSkyMoonPhaseIds.full, 1);
     }
-    
-    
+
+
     moonPhaseFromConfig(phaseId: RoadToTheSkyMoonPhaseIds, phaseLength: number): SimpleCalendar.MoonPhase {
         if (phaseId == RoadToTheSkyMoonPhaseIds.full) {
             return {
@@ -248,61 +234,54 @@ export default class RoadToTheSkyMoon extends ConfigurationItemBase {
                 singleDay: true,
                 icon: Icons.Full
             }
-        }
-        else if (phaseId == RoadToTheSkyMoonPhaseIds.new) {
+        } else if (phaseId == RoadToTheSkyMoonPhaseIds.new) {
             return {
                 name: "New Moon",
                 length: 1,
                 singleDay: true,
                 icon: Icons.NewMoon
             }
-        }
-        else if (phaseId == RoadToTheSkyMoonPhaseIds.waningH) {
+        } else if (phaseId == RoadToTheSkyMoonPhaseIds.waningH) {
             return {
                 name: "Half Moon",
                 length: 1,
                 singleDay: true,
                 icon: Icons.FirstQuarter
             }
-        }
-        else if (phaseId == RoadToTheSkyMoonPhaseIds.waxingH) {
+        } else if (phaseId == RoadToTheSkyMoonPhaseIds.waxingH) {
             return {
                 name: "Half Moon",
                 length: 1,
                 singleDay: true,
                 icon: Icons.LastQuarter
             }
-        }
-        else if (phaseId == RoadToTheSkyMoonPhaseIds.waningG) {
+        } else if (phaseId == RoadToTheSkyMoonPhaseIds.waningG) {
             return {
                 name: "Waning Gibbous Moon",
                 length: phaseLength,
                 singleDay: phaseLength == 1,
                 icon: Icons.WaningGibbous
             }
-        }
-        else if (phaseId == RoadToTheSkyMoonPhaseIds.waningC) {
+        } else if (phaseId == RoadToTheSkyMoonPhaseIds.waningC) {
             return {
                 name: "Waning Crescent Moon",
                 length: phaseLength,
                 singleDay: phaseLength == 1,
                 icon: Icons.WaningCrescent
             }
-        }
-        else if (phaseId == RoadToTheSkyMoonPhaseIds.waxingG) {
+        } else if (phaseId == RoadToTheSkyMoonPhaseIds.waxingG) {
             return {
                 name: "Waxing Gibbous Moon",
                 length: phaseLength,
                 singleDay: phaseLength == 1,
                 icon: Icons.WaxingGibbous
             }
-        }
-        else if (phaseId == RoadToTheSkyMoonPhaseIds.waxingC) {
+        } else if (phaseId == RoadToTheSkyMoonPhaseIds.waxingC) {
             return {
-                name: "Waning Crescent Moon",
+                name: "Waxing Crescent Moon",
                 length: phaseLength,
                 singleDay: phaseLength == 1,
-                icon: Icons.WaningGibbous
+                icon: Icons.WaxingCrescent
             }
         }
         // Something went wrong. Just return a full moon.

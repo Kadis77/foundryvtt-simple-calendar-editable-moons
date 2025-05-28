@@ -1,4 +1,4 @@
-import RoadToTheSkyMoon from "./classes/calendar/moon-rtts";
+import {RoadToTheSkyMoon} from "./classes/calendar/moon-rtts";
 
 /**
  * The name of this module

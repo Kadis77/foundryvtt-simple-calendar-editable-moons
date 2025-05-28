@@ -27,7 +27,7 @@ import Time from "../time";
 import {deepMerge} from "../utilities/object";
 import {Hook} from "../api/hook";
 import PF1E from "../systems/pf1e";
-import RoadToTheSkyMoon from "./moon-rtts";
+import {RoadToTheSkyMoon} from "./moon-rtts";
 
 export default class Calendar extends ConfigurationItemBase {
     /**
@@ -308,7 +308,6 @@ export default class Calendar extends ConfigurationItemBase {
                 }
             }
         }
-        console.log(this.rttsMoons);
         
         const configMoons: SimpleCalendar.MoonData[] | undefined = config.moons || config.moonSettings;
         if (Array.isArray(configMoons)) {
@@ -955,6 +954,14 @@ export default class Calendar extends ConfigurationItemBase {
             daysSoFar += leapYearDayDifference;
         }
         return beforeYearZero ? daysSoFar * -1 : daysSoFar;
+    }
+
+    /**
+     * Convert a number of days to year, month, day, hour, minute, seconds
+     * @param {number} days The days to convert
+     */
+    daysToDate(days: number): SimpleCalendar.DateTime {
+        return this.secondsToDate(days * 86400);
     }
 
     /**
