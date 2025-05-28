@@ -552,7 +552,7 @@ export const RoadToTheSkyMoonConfigs: any[] = [
     {
         id: "foxfire",
         name: "Foxfire Heart",
-        color: "#49FF00s"
+        color: "#49FF00"
     },
     {
         id: "eye",

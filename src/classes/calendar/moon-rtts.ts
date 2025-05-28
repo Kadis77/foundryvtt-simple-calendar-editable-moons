@@ -32,7 +32,7 @@ export class RoadToTheSkyMoon extends ConfigurationItemBase {
          * The day of the first full moon
          * @type {number}
          */
-        day: 1
+        day: 0
     };
     /**
      * A color to associate with the moon when displaying it on the calendar
@@ -95,7 +95,7 @@ export class RoadToTheSkyMoon extends ConfigurationItemBase {
             firstFullMoon: {
                 year: 410,
                 month: 0,
-                day: 1
+                day: 0
             },
             color: this.color,
         };
@@ -113,7 +113,7 @@ export class RoadToTheSkyMoon extends ConfigurationItemBase {
             this.firstFullMoon = {
                 year: 410,
                 month: 0,
-                day: 1
+                day: 0
             };
             this.color = config.color;
         }

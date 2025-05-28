@@ -93,7 +93,7 @@ export class DateSelector {
         this.selectedDate = {
             visible: {
                 year: 0,
-                month: 1,
+                month: 0,
                 day: 1,
                 hour: 0,
                 minute: 0,
@@ -101,7 +101,7 @@ export class DateSelector {
             },
             start: {
                 year: 0,
-                month: 1,
+                month: 0,
                 day: 1,
                 hour: 0,
                 minute: 0,
@@ -109,7 +109,7 @@ export class DateSelector {
             },
             end: {
                 year: 0,
-                month: 1,
+                month: 0,
                 day: 1,
                 hour: 0,
                 minute: 0,

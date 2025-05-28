@@ -240,6 +240,7 @@ export default class Calendar extends ConfigurationItemBase {
             this.months = [];
             for (let i = 0; i < configMonths.length; i++) {
                 const newMonth = new Month();
+                // To Do
                 newMonth.loadFromSettings(configMonths[i]);
                 this.months.push(newMonth);
             }
