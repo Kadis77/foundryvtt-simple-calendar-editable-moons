@@ -309,6 +309,7 @@
                 .fsc-row{
                   .fsc-options{
                     &.fsc-open{
+                      visibility: visible;
                       max-height: fit-content;
                     }
                   }
@@ -324,7 +325,6 @@
                   }
                 }
               }
-              
             }
 
             .fsc-table-actions{

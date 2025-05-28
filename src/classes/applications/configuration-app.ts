@@ -958,8 +958,6 @@ export default class ConfigurationApp extends FormApplication {
             //----------------------------------
             this.appWindow.querySelectorAll(".fsc-moon-settings .fsc-rttsmoons>.fsc-row:not(.fsc-head)").forEach((e) => {
                 const index = parseInt((<HTMLElement>e).getAttribute("data-index") || "");
-                (<Calendar>this.object).rttsMoons[index].firstFullMoon.year = <number>getNumericInputValue(".fsc-rtts-moon-year", 0, false, e);
-                
                 console.log(1);
                 if (!isNaN(index) && index >= 0 && index < (<Calendar>this.object).rttsMoons.length) {
                     console.log(2);
@@ -1503,14 +1501,6 @@ export default class ConfigurationApp extends FormApplication {
             if (moon) {
                 moon.firstNewMoon.month = !selectedDate.startDate.month || selectedDate.startDate.month < 0 ? 0 : selectedDate.startDate.month;
                 moon.firstNewMoon.day = !selectedDate.startDate.day || selectedDate.startDate.day < 0 ? 0 : selectedDate.startDate.day;
-            }
-        } else if (dateSelectorType === ConfigurationDateSelectors.moonFirstFullMoonDate) {
-            const rttsMoon = (<Calendar>this.object).rttsMoons.find((rm) => {
-                return rm.id === itemId;
-            });
-            if (rttsMoon) {
-                rttsMoon.firstFullMoon.month = !selectedDate.startDate.month || selectedDate.startDate.month < 0 ? 0 : selectedDate.startDate.month;
-                rttsMoon.firstFullMoon.day = !selectedDate.startDate.day || selectedDate.startDate.day < 0 ? 0 : selectedDate.startDate.day;
             }
         }
     }

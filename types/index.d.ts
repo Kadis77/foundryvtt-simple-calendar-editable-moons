@@ -1464,8 +1464,6 @@ declare global {
                 cycleLengths: number[];
                 firstFullMoon: FirstFullMoonDate;
                 color: string;
-                firstFullMoonDateSelectorId: string;
-                firstFullMoonSelectedDate: DateTime;
             }
 
             /**

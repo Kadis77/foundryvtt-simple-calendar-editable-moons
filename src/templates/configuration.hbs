@@ -1085,21 +1085,6 @@
                                 <button class="fsc-control fsc-save" data-type="rttsmoon-cycle" data-rttsmoon-index="{{@index}}"><span class="fa fa-plus"></span> Add Cycle</button>
                             </div>
                         </div>
-                        <div class="fsc-options fsc-open">
-                            <h3>First Full Moon</h3>
-                            <div class="form-group fsc-open">
-                                <label for="-fnmyrx{{@index}}">Year</label>
-                                <div class="form-fields">
-                                    <input class="fsc-rtts-moon-year" value="{{firstFullMoon.year}}" type="number" id="-fnmyrx{{@index}}" />
-                                </div>
-                            </div>
-                            <div class="form-group fsc-open" style="overflow: visible;">
-                                <label for="-fnmm{{@index}}">{{localize 'FSC.Configuration.Moon.Month'}}</label>
-                                <div class="form-fields">
-                                    {{sc-date-selector id=firstFullMoonDateSelectorId calendar=../activeCalendarId showDateSelector=true showTimeSelector=false showCalendarYear=false useCloneCalendars=true selectedStartDate=firstFullMoonSelectedDate }}
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 {{/each}}
                 </div>

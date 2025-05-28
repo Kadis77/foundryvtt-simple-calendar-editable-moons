@@ -22,12 +22,12 @@ export class RoadToTheSkyMoon extends ConfigurationItemBase {
          * The year of the first full moon
          * @type {number}
          */
-        year: 0,
+        year: 410,
         /**
          * The month of the first full moon
          * @type {number}
          */
-        month: 1,
+        month: 0,
         /**
          * The day of the first full moon
          * @type {number}
@@ -92,17 +92,12 @@ export class RoadToTheSkyMoon extends ConfigurationItemBase {
             ...super.toTemplate(),
             name: this.name,
             cycleLengths: this.cycleLengths,
-            firstFullMoon: this.firstFullMoon,
+            firstFullMoon: {
+                year: 410,
+                month: 0,
+                day: 1
+            },
             color: this.color,
-            firstFullMoonDateSelectorId: `sc_first_full_moon_date_${this.id}`,
-            firstFullMoonSelectedDate: {
-                year: 0,
-                month: this.firstFullMoon.month,
-                day: this.firstFullMoon.day,
-                hour: 0,
-                minute: 0,
-                seconds: 0
-            }
         };
     }
 
@@ -116,9 +111,9 @@ export class RoadToTheSkyMoon extends ConfigurationItemBase {
             this.rttsMoonId = config.rttsMoonId;
             this.cycleLengths = config.cycleLengths;
             this.firstFullMoon = {
-                year: config.firstFullMoon.year,
-                month: config.firstFullMoon.month,
-                day: config.firstFullMoon.day
+                year: 410,
+                month: 0,
+                day: 1
             };
             this.color = config.color;
         }
