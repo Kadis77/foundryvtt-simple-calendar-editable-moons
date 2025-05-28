@@ -24,6 +24,7 @@ export default class CalendarFull {
         showSeasonName: true,
         showNoteCount: true,
         showMoonPhases: true,
+        showRttsMoonPhases: true,
         showYear: true,
         showDescriptions: true,
         showDayDetails: true,
@@ -264,7 +265,7 @@ export default class CalendarFull {
                             )}</div>`;
                         }
                         if (options.showRttsMoonPhases) {
-                            html += `<div class="fsc-moons">${CalendarFull.MoonPhaseIcons(
+                            html += `<div class="fsc-moons">${CalendarFull.RttsMoonPhaseIcons(
                                 calendar,
                                 vYear,
                                 vMonthIndex,
@@ -794,6 +795,45 @@ export default class CalendarFull {
             if (mp && (mp.singleDay || d.selected || d.current)) {
                 const moon = GetIcon(mp.icon, "#000000", calendar.moons[i].color);
                 moonHtml.push(`<span class="fsc-moon-phase ${mp.icon}" data-tooltip="${calendar.moons[i].name} - ${mp.name}">${moon}</span>`);
+            }
+        }
+        if (moonHtml.length < 3) {
+            html = moonHtml.join("");
+        } else {
+            html = `<div class="fsc-moon-group-wrapper">${
+                moonHtml[0]
+            }<span class="fsc-moon-phase fa fa-caret-down"></span><div class="fsc-moon-group ${lastDayOfWeek ? "fsc-left" : "fsc-right"} ${
+                lastWeekOfMonth ? "fsc-bottom" : "fsc-top"
+            }">${moonHtml.join("")}</div></div>`;
+        }
+        return html;
+    }
+
+    /**
+     * Gets the icons for all RTTS moon phases for the passed in day from the passed in calendar and generates the HTML
+     * @param {Calendar} calendar The calendar to pull data from
+     * @param {number} visibleYear
+     * @param {number} visibleMonthIndex
+     * @param dayIndex The day to check
+     * @param lastDayOfWeek If this day is the last day of the week
+     * @param lastWeekOfMonth if this is the last week of the month
+     */
+    public static RttsMoonPhaseIcons(
+        calendar: Calendar,
+        visibleYear: number,
+        visibleMonthIndex: number,
+        dayIndex: number,
+        lastDayOfWeek: boolean = false,
+        lastWeekOfMonth: boolean = false
+    ): string {
+        let html;
+        const moonHtml: string[] = [];
+        for (let i = 0; i < calendar.rttsMoons.length; i++) {
+            const mp = calendar.rttsMoons[i].getDateMoonPhase(calendar, visibleYear, visibleMonthIndex, dayIndex);
+            const d = calendar.months[visibleMonthIndex].days[dayIndex];
+            if (mp && (mp.singleDay || d.selected || d.current)) {
+                const moon = GetIcon(mp.icon, "#000000", calendar.rttsMoons[i].color);
+                moonHtml.push(`<span class="fsc-moon-phase ${mp.icon}" data-tooltip="${calendar.rttsMoons[i].name} - ${mp.name}">${moon}</span>`);
             }
         }
         if (moonHtml.length < 3) {

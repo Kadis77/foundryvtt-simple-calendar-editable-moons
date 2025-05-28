@@ -10,8 +10,6 @@ import Calendar from "./index";
 import PredefinedCalendar from "../configuration/predefined-calendar";
 import fetchMock from "jest-fetch-mock";
 import NoteManager from "../notes/note-manager";
-import {RoadToTheSkyMoon} from "./moon-rtts";
-import Day from "./day";
 
 fetchMock.enableMocks();
 describe("RTTS Moon Tests", () => {
@@ -58,7 +56,7 @@ describe("RTTS Moon Tests", () => {
     test("To Template", () => {
         for (let i = 0; i < tCal.rttsMoons.length; i++) {
             let c = tCal.rttsMoons[i].toTemplate();
-            expect(Object.keys(c).length).toBe(13); //Make sure no new properties have been added
+            expect(Object.keys(c).length).toBe(11); //Make sure no new properties have been added
             expect(c.name).toBe(tCal.rttsMoons[i].name);
             expect(c.firstFullMoon).toStrictEqual(tCal.rttsMoons[i].firstFullMoon);
             expect(c.cycleLengths.length).toBe(1);
@@ -94,12 +92,12 @@ describe("RTTS Moon Tests", () => {
         // Get the start date in days
         let firstFullMoonDays = tCal.dateToDays(m.firstFullMoon.year, m.firstFullMoon.month, m.firstFullMoon.day, true);
         
-        // Before the first full moon date, the moon is always full
+        // Before the first full moon date, the moon is always the default full
         let dateToGet = tCal.daysToDate(firstFullMoonDays - 5);
         let moonPhaseOnDate = m.getDateMoonPhase(tCal, dateToGet.year, dateToGet.month, dateToGet.day);
         expect(moonPhaseOnDate.name).toBe("Full Moon");
         expect(moonPhaseOnDate.length).toBe(1);
-        expect(moonPhaseOnDate.singleDay).toBe(true);
+        expect(moonPhaseOnDate.singleDay).toBe(false);
         expect(moonPhaseOnDate.icon).toBe(Icons.Full);
         
         // Get the phases based on cycles of each length
@@ -189,7 +187,7 @@ describe("RTTS Moon Tests", () => {
         moonPhaseOnDate = m.getDateMoonPhase(tCal, dateToGet.year, dateToGet.month, dateToGet.day);
         expect(moonPhaseOnDate.name).toBe("Waning Gibbous Moon");
         expect(moonPhaseOnDate.length).toBe(1);
-        expect(moonPhaseOnDate.singleDay).toBe(true);
+        expect(moonPhaseOnDate.singleDay).toBe(false);
         expect(moonPhaseOnDate.icon).toBe(Icons.WaningGibbous);
 
         dateToGet = tCal.daysToDate(tCal.dateToDays(dateToGet.year, dateToGet.month, dateToGet.day) + 1);
@@ -225,7 +223,7 @@ describe("RTTS Moon Tests", () => {
         moonPhaseOnDate = m.getDateMoonPhase(tCal, dateToGet.year, dateToGet.month, dateToGet.day);
         expect(moonPhaseOnDate.name).toBe("Waning Gibbous Moon");
         expect(moonPhaseOnDate.length).toBe(1);
-        expect(moonPhaseOnDate.singleDay).toBe(true);
+        expect(moonPhaseOnDate.singleDay).toBe(false);
         expect(moonPhaseOnDate.icon).toBe(Icons.WaningGibbous);
 
         dateToGet = tCal.daysToDate(tCal.dateToDays(dateToGet.year, dateToGet.month, dateToGet.day) + 1);
@@ -246,7 +244,7 @@ describe("RTTS Moon Tests", () => {
         moonPhaseOnDate = m.getDateMoonPhase(tCal, dateToGet.year, dateToGet.month, dateToGet.day);
         expect(moonPhaseOnDate.name).toBe("Waxing Crescent Moon");
         expect(moonPhaseOnDate.length).toBe(1);
-        expect(moonPhaseOnDate.singleDay).toBe(true);
+        expect(moonPhaseOnDate.singleDay).toBe(false);
         expect(moonPhaseOnDate.icon).toBe(Icons.WaxingCrescent);
         
         dateToGet = tCal.daysToDate(tCal.dateToDays(dateToGet.year, dateToGet.month, dateToGet.day) + 1);
@@ -268,7 +266,7 @@ describe("RTTS Moon Tests", () => {
         moonPhaseOnDate = m.getDateMoonPhase(tCal, dateToGet.year, dateToGet.month, dateToGet.day);
         expect(moonPhaseOnDate.name).toBe("Waning Gibbous Moon");
         expect(moonPhaseOnDate.length).toBe(1);
-        expect(moonPhaseOnDate.singleDay).toBe(true);
+        expect(moonPhaseOnDate.singleDay).toBe(false);
         expect(moonPhaseOnDate.icon).toBe(Icons.WaningGibbous);
 
         dateToGet = tCal.daysToDate(tCal.dateToDays(dateToGet.year, dateToGet.month, dateToGet.day) + 1);
@@ -282,7 +280,7 @@ describe("RTTS Moon Tests", () => {
         moonPhaseOnDate = m.getDateMoonPhase(tCal, dateToGet.year, dateToGet.month, dateToGet.day);
         expect(moonPhaseOnDate.name).toBe("Waning Crescent Moon");
         expect(moonPhaseOnDate.length).toBe(1);
-        expect(moonPhaseOnDate.singleDay).toBe(true);
+        expect(moonPhaseOnDate.singleDay).toBe(false);
         expect(moonPhaseOnDate.icon).toBe(Icons.WaningCrescent);
 
         dateToGet = tCal.daysToDate(tCal.dateToDays(dateToGet.year, dateToGet.month, dateToGet.day) + 1);
@@ -296,7 +294,7 @@ describe("RTTS Moon Tests", () => {
         moonPhaseOnDate = m.getDateMoonPhase(tCal, dateToGet.year, dateToGet.month, dateToGet.day);
         expect(moonPhaseOnDate.name).toBe("Waxing Crescent Moon");
         expect(moonPhaseOnDate.length).toBe(1);
-        expect(moonPhaseOnDate.singleDay).toBe(true);
+        expect(moonPhaseOnDate.singleDay).toBe(false);
         expect(moonPhaseOnDate.icon).toBe(Icons.WaxingCrescent);
 
         dateToGet = tCal.daysToDate(tCal.dateToDays(dateToGet.year, dateToGet.month, dateToGet.day) + 1);
@@ -370,6 +368,14 @@ describe("RTTS Moon Tests", () => {
             expect(moonPhaseOnDate.singleDay).toBe(false);
             expect(moonPhaseOnDate.icon).toBe(Icons.WaxingGibbous);
         }
+        
+        // After the defined dates, the moon is always the default full.
+        dateToGet = tCal.daysToDate(tCal.dateToDays(dateToGet.year, dateToGet.month, dateToGet.day) + 1);
+        moonPhaseOnDate = m.getDateMoonPhase(tCal, dateToGet.year, dateToGet.month, dateToGet.day);
+        expect(moonPhaseOnDate.name).toBe("Full Moon");
+        expect(moonPhaseOnDate.length).toBe(1);
+        expect(moonPhaseOnDate.singleDay).toBe(false);
+        expect(moonPhaseOnDate.icon).toBe(Icons.Full);
     });
     
     test("Get Moon Phase", () => {

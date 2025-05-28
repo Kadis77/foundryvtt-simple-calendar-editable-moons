@@ -138,7 +138,7 @@ export class RoadToTheSkyMoon extends ConfigurationItemBase {
 
         // If this is before the first full moon, just make the moon full.
         if (firstFullMoonDays > daysSoFar) {
-            return this.moonPhaseFromConfig(RoadToTheSkyMoonPhaseIds.full, 1);
+            return this.moonPhaseFromConfig(RoadToTheSkyMoonPhaseIds.default, 1);
         }
 
         // This is after the first full moon.         
@@ -155,8 +155,8 @@ export class RoadToTheSkyMoon extends ConfigurationItemBase {
                 totalCycleDaysSoFar += this.cycleLengths[i];
             }
             if (i == this.cycleLengths.length - 1) {
-                // This is past the last set cycle. Just return the full moon.
-                return this.moonPhaseFromConfig(1, 1);
+                // This is past the last set cycle. Just return the default full moon.
+                return this.moonPhaseFromConfig(RoadToTheSkyMoonPhaseIds.default, 1);
             }
         }
 
@@ -259,36 +259,36 @@ export class RoadToTheSkyMoon extends ConfigurationItemBase {
             return {
                 name: "Waning Gibbous Moon",
                 length: phaseLength,
-                singleDay: phaseLength == 1,
+                singleDay: false,
                 icon: Icons.WaningGibbous
             }
         } else if (phaseId == RoadToTheSkyMoonPhaseIds.waningC) {
             return {
                 name: "Waning Crescent Moon",
                 length: phaseLength,
-                singleDay: phaseLength == 1,
+                singleDay: false,
                 icon: Icons.WaningCrescent
             }
         } else if (phaseId == RoadToTheSkyMoonPhaseIds.waxingG) {
             return {
                 name: "Waxing Gibbous Moon",
                 length: phaseLength,
-                singleDay: phaseLength == 1,
+                singleDay: false,
                 icon: Icons.WaxingGibbous
             }
         } else if (phaseId == RoadToTheSkyMoonPhaseIds.waxingC) {
             return {
                 name: "Waxing Crescent Moon",
                 length: phaseLength,
-                singleDay: phaseLength == 1,
+                singleDay: false,
                 icon: Icons.WaxingCrescent
             }
         }
-        // Something went wrong. Just return a full moon.
+        // Something went wrong. Just return a false full moon.
         return {
             name: "Full Moon",
             length: 1,
-            singleDay: true,
+            singleDay: false,
             icon: Icons.Full
         }
     }

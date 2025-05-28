@@ -552,12 +552,12 @@ export const RoadToTheSkyMoonConfigs: any[] = [
     {
         id: "foxfire",
         name: "Foxfire Heart",
-        color: "#ffffff"
+        color: "#49FF00s"
     },
     {
         id: "eye",
         name: "Vathek's Eye",
-        color: "#ffffff"
+        color: "#FF0000"
     }
 ]
 
@@ -569,5 +569,6 @@ export enum RoadToTheSkyMoonPhaseIds {
     new,
     waxingC,
     waxingH,
-    waxingG
+    waxingG,
+    default
 }

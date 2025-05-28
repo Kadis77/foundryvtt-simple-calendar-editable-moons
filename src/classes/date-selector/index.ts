@@ -230,6 +230,7 @@ export class DateSelector {
                 showDayDetails: false,
                 showDescriptions: false,
                 showMoonPhases: false,
+                showRttsMoonPhases: false,
                 showNoteCount: false,
                 showSeasonName: false,
                 showYear: this.showCalendarYear,
