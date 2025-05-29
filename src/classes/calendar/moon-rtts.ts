@@ -48,7 +48,7 @@ export class RoadToTheSkyMoon extends ConfigurationItemBase {
 
         this.rttsMoonId = rttsMoonId;
 
-        this.color = RoadToTheSkyMoonConfigs[this.rttsMoonId.valueOf()].color;
+        this.color = RoadToTheSkyMoonConfigs[this.rttsMoonId].color;
         this.cycleLengths.push(1);
     }
 
@@ -108,6 +108,7 @@ export class RoadToTheSkyMoon extends ConfigurationItemBase {
     loadFromSettings(config: SimpleCalendar.RttsMoonData) {
         if (config && Object.keys(config).length) {
             super.loadFromSettings(config);
+            
             this.rttsMoonId = config.rttsMoonId;
             this.cycleLengths = config.cycleLengths;
             this.firstFullMoon = {
@@ -115,7 +116,7 @@ export class RoadToTheSkyMoon extends ConfigurationItemBase {
                 month: 0,
                 day: 0
             };
-            this.color = config.color;
+            this.color = RoadToTheSkyMoonConfigs[this.rttsMoonId].color;
         }
     }
 
