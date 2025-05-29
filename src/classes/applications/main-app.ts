@@ -611,6 +611,7 @@ export default class MainApp extends FormApplication {
                 // Activate the full calendar display listeners
                 Renderer.CalendarFull.ActivateListeners(
                     `sc_${this.visibleCalendar.id}_calendar`,
+                    // RTTS TODO: Figure out how to disable when invalid
                     this.changeMonth.bind(this),
                     this.dayClick.bind(this)
                 );
@@ -917,6 +918,7 @@ export default class MainApp extends FormApplication {
      * Processes the callback from the Calendar Renderer's month change click
      * @param {CalendarClickEvents} clickType What was clicked, previous or next
      */
+    // RTTS TODO: Prevent clicking if the next one is not allowed
     public changeMonth(clickType: CalendarClickEvents) {
         this.toggleUnitSelector(true);
         this.visibleCalendar.changeMonth(clickType === CalendarClickEvents.previous ? -1 : 1);
@@ -981,6 +983,8 @@ export default class MainApp extends FormApplication {
      * When the change time unit buttons are clicked
      * @param e
      */
+    
+    // TODO: Block going back before 410
     public timeUnitClick(e: Event) {
         const target = <HTMLElement>e.currentTarget;
         const dataType = target.getAttribute("data-type");

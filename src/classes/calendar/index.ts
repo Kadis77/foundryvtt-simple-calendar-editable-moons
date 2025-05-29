@@ -86,6 +86,10 @@ export default class Calendar extends ConfigurationItemBase {
      * If a combat change has been triggered
      */
     combatChangeTriggered: boolean = false;
+    /**
+     * RTTS: Start Date is always month 1, 410
+     */
+    startDate: SimpleCalendar.Date = {year: 410, month: 0, day: 0};
 
     /**
      * Construct a new Calendar class
@@ -235,21 +239,7 @@ export default class Calendar extends ConfigurationItemBase {
             this.year = new Year(0);
         }
 
-        // RTTS: We have replaced this logic to add our own custom months
-        //const configMonths: SimpleCalendar.MonthData[] | undefined = config.months || config.monthSettings;
-        //if (Array.isArray(configMonths)) {
-        //    this.months = [];
-        //    for (let i = 0; i < configMonths.length; i++) {
-        //        const newMonth = new Month();
-        //        // To Do
-        //        newMonth.loadFromSettings(configMonths[i]);
-        //        this.months.push(newMonth);
-        //    }
-        //    if (this.months.length === 0) {
-        //        this.months.push(new Month("New Month", 1, 0, 30));
-        //    }
-        //}
-        
+        // RTTS: Add hardcoded RTTS months
         this.months = [];
         for (let i = 1; i < RoadToTheSkyMonthConfigs.length; i++) {
             this.months.push(new Month(RoadToTheSkyMonthConfigs[i].name, i, 0, 30, 0, 0));
@@ -795,7 +785,42 @@ export default class Calendar extends ConfigurationItemBase {
         for (let i = 0; i < this.months.length; i++) {
             const month = this.months[i];
             if (month[verifiedSetting]) {
-                if (next && i + amount >= this.months.length) {
+                
+                // RTTS If the harvest moon length is not defined for the new month, we cannot change it.
+                let newYear = this.startDate.year;
+                if (verifiedSetting === "visible") {
+                    newYear = this.year.visibleYear;
+                } else if (verifiedSetting === "selected") {
+                    newYear = this.year.selectedYear;
+                } else {
+                    newYear = this.year.numericRepresentation;
+                }
+                if (next) {
+                    let maxDate = this.getMaxDay();
+                    // Check if this year is greater than the years set so far
+                    newYear += Math.floor((i + amount) / 12);
+                    if (newYear > maxDate.year) {
+                        console.error("cannot add " + amount + " months: year is past defined years");
+                        return;
+                    }
+                    let month = (i + amount) % 12;
+                    if (newYear == maxDate.year && month > maxDate.month)
+                    {
+                        console.error("cannot add " + amount + " months: month is past defined month");
+                        return;
+                    }
+                }
+                if (!next) {
+                    // Check if this year before the start year
+                    newYear -= Math.floor((i + amount) / 12);
+                    if (newYear < this.startDate.year) {
+                        console.error("cannot subtract " + amount + " months: year is before 410");
+                        return;
+                    }
+                }
+                
+                // RTTS: Back to regular logic
+                else if (next && i + amount >= this.months.length) {
                     this.changeYear(1, true, verifiedSetting, setDay);
                     const changeAmount = amount - (this.months.length - i);
                     if (changeAmount > 0) {
@@ -1351,5 +1376,23 @@ export default class Calendar extends ConfigurationItemBase {
         this.updateMonth(parsedDate.month, "current", true);
         this.months[parsedDate.month].updateDay(parsedDate.day, isLeapYear);
         this.time.setTime(parsedDate.hour, parsedDate.minute, parsedDate.seconds);
+    }
+    
+    // RTTS: Get the minimum day to display
+    public getMinDay(): SimpleCalendar.Date {
+        return this.startDate;
+    }
+
+    // RTTS: Get the maximum day to display
+    public getMaxDay(): SimpleCalendar.Date {
+        let monthsSinceStart = this.rttsMoons[RoadToTheSkyMoonIds.harvest].cycleLengths.length;
+        let yearsSinceStart = Math.floor(monthsSinceStart/12);
+        let remainder = monthsSinceStart % 12;
+        
+        return {
+            year: this.startDate.year + yearsSinceStart,
+            month: this.startDate.month + remainder,
+            day: this.rttsMoons[RoadToTheSkyMoonIds.harvest].cycleLengths[monthsSinceStart - 1]
+        }
     }
 }
