@@ -5,13 +5,11 @@ import { SimpleCalendarHooks } from "./constants";
 import {
     CalManager,
     MainApplication,
-    MigrationApplication,
     NManager,
     SC,
     updateCalManager,
     updateConfigurationApplication,
     updateMainApplication,
-    updateMigrationApplication,
     updateNManager,
     updateSC
 } from "./classes";
@@ -20,7 +18,6 @@ import GameSettingsRegistration from "./classes/foundry-interfacing/game-setting
 import CalendarManager from "./classes/calendar/calendar-manager";
 import MainApp from "./classes/applications/main-app";
 import ConfigurationApp from "./classes/applications/configuration-app";
-import MigrationApp from "./classes/applications/migration-app";
 import NoteManager from "./classes/notes/note-manager";
 import { NoteSheet } from "./classes/notes/note-sheet";
 import PF2E from "./classes/systems/pf2e";
@@ -34,7 +31,6 @@ updateCalManager(new CalendarManager());
 updateSC(new SCController());
 updateMainApplication(new MainApp());
 updateConfigurationApplication(new ConfigurationApp());
-updateMigrationApplication(new MigrationApp());
 updateNManager(new NoteManager());
 
 //Add body click events
@@ -66,23 +62,13 @@ Hooks.on("ready", async () => {
         PF2E.updatePF2EVariables(true);
         ChatTimestamp.updateChatMessageTimestamps();
     }
-    MigrationApplication.initialize();
-    //Check to see if we need to run a migration, if we do show the migration dialog otherwise show the main app
-    if (MigrationApplication.showMigration) {
-        await MigrationApplication.run();
-        //Initialize the note manager
-        await NManager.initialize();
-        //Initialize the Simple Calendar Class
-        SC.initialize();
-    } else {
-        //Initialize the note manager
-        await NManager.initialize();
-        //Initialize the Simple Calendar Class
-        SC.initialize();
-        //If we are to open the main app on foundry load, open it
-        if (SC.clientSettings.openOnLoad) {
-            MainApplication.render();
-        }
+    //Initialize the note manager
+    await NManager.initialize();
+    //Initialize the Simple Calendar Class
+    SC.initialize();
+    //If we are to open the main app on foundry load, open it
+    if (SC.clientSettings.openOnLoad) {
+        MainApplication.render();
     }
     Hook.emit(SimpleCalendarHooks.Ready, CalManager.getActiveCalendar());
 });

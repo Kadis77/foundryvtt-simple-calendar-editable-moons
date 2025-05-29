@@ -26,7 +26,7 @@ import { AdvanceTimeToPreset, DateToTimestamp, FormatDateTime, MergeDateTimeObje
 import DateSelectorManager from "../date-selector/date-selector-manager";
 import PredefinedCalendar from "../configuration/predefined-calendar";
 import Renderer from "../renderer";
-import { CalManager, MainApplication, MigrationApplication, NManager, SC } from "../index";
+import { CalManager, MainApplication, NManager, SC } from "../index";
 import { canUser } from "../utilities/permissions";
 import GameSockets from "../foundry-interfacing/game-sockets";
 import { ordinalSuffix } from "../utilities/string";
@@ -1696,39 +1696,6 @@ export async function removeNote(journalEntryId: string): Promise<boolean> {
         Logger.error(`SimpleCalendar.api.removeNote - Unable to find a journal entry with the passed in ID of "${journalEntryId}"`);
     }
     return false;
-}
-
-/**
- * Run the migration from Simple Calendar version 1 to version 2.
- * This will only work if the current player is the primary GM.
- *
- * A dialog will be shown to confirm if the GM wants to run the migration. This will prevent accidental running of the migration.
- *
- * @example
- * ```javascript
- * SimpleCalendar.api.runMigration();
- * ```
- */
-export function runMigration(): void {
-    if (GameSettings.IsGm() && SC.primary) {
-        const d = new Dialog({
-            title: GameSettings.Localize("FSC.Migration.APIDialog.Title"),
-            content: GameSettings.Localize("FSC.Migration.APIDialog.Content"),
-            buttons: {
-                yes: {
-                    icon: '<i class="fas fa-check"></i>',
-                    label: GameSettings.Localize("FSC.Confirm"),
-                    callback: MigrationApplication.run.bind(MigrationApplication, true)
-                },
-                no: {
-                    icon: '<i class="fas fa-times"></i>',
-                    label: GameSettings.Localize("FSC.Cancel")
-                }
-            },
-            default: "no"
-        });
-        d.render(true);
-    }
 }
 
 /**

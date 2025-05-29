@@ -12,7 +12,6 @@ import {
     updateCalManager,
     updateConfigurationApplication,
     updateMainApplication,
-    updateMigrationApplication,
     updateNManager,
     updateSC
 } from "./index";
@@ -21,7 +20,6 @@ import MainApp from "./applications/main-app";
 import ConfigurationApp from "./applications/configuration-app";
 import { GameSettings } from "./foundry-interfacing/game-settings";
 import { CombatPauseRules, NoteReminderNotificationType } from "../constants";
-import MigrationApp from "./applications/migration-app";
 import NoteManager from "./notes/note-manager";
 import Calendar from "./calendar";
 import * as PermUtils from "./utilities/permissions";
@@ -34,7 +32,6 @@ describe("SCController Tests", () => {
         updateSC(new SCController());
         updateMainApplication(new MainApp());
         updateConfigurationApplication(new ConfigurationApp());
-        updateMigrationApplication(new MigrationApp());
         updateNManager(new NoteManager());
     });
 

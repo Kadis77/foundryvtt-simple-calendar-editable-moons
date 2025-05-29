@@ -1,6 +1,6 @@
 import {
     GameWorldTimeIntegrations,
-    LeapYearRules,
+    LeapYearRules, RoadToTheSkyMonthConfigs, RoadToTheSkyMonthIds,
     RoadToTheSkyMoonCount,
     RoadToTheSkyMoonIds,
     SimpleCalendarHooks,
@@ -235,19 +235,26 @@ export default class Calendar extends ConfigurationItemBase {
             this.year = new Year(0);
         }
 
-        const configMonths: SimpleCalendar.MonthData[] | undefined = config.months || config.monthSettings;
-        if (Array.isArray(configMonths)) {
-            this.months = [];
-            for (let i = 0; i < configMonths.length; i++) {
-                const newMonth = new Month();
-                // To Do
-                newMonth.loadFromSettings(configMonths[i]);
-                this.months.push(newMonth);
-            }
-            if (this.months.length === 0) {
-                this.months.push(new Month("New Month", 1, 0, 30));
-            }
+        // RTTS: We have replaced this logic to add our own custom months
+        //const configMonths: SimpleCalendar.MonthData[] | undefined = config.months || config.monthSettings;
+        //if (Array.isArray(configMonths)) {
+        //    this.months = [];
+        //    for (let i = 0; i < configMonths.length; i++) {
+        //        const newMonth = new Month();
+        //        // To Do
+        //        newMonth.loadFromSettings(configMonths[i]);
+        //        this.months.push(newMonth);
+        //    }
+        //    if (this.months.length === 0) {
+        //        this.months.push(new Month("New Month", 1, 0, 30));
+        //    }
+        //}
+        
+        this.months = [];
+        for (let i = 1; i < RoadToTheSkyMonthConfigs.length; i++) {
+            this.months.push(new Month(RoadToTheSkyMonthConfigs[i].name, i, 0, 30, 0, 0));
         }
+        
         const configWeekdays: SimpleCalendar.WeekdayData[] | undefined = config.weekdays || config.weekdaySettings;
         if (Array.isArray(configWeekdays)) {
             this.weekdays = [];

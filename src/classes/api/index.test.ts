@@ -21,12 +21,10 @@ import Calendar from "../calendar";
 import {
     CalManager,
     MainApplication,
-    MigrationApplication,
     NManager,
     SC,
     updateCalManager,
     updateMainApplication,
-    updateMigrationApplication,
     updateNManager,
     updateSC
 } from "../index";
@@ -39,7 +37,6 @@ import fetchMock from "jest-fetch-mock";
 import PredefinedCalendar from "../configuration/predefined-calendar";
 import NoteStub from "../notes/note-stub";
 import Mock = jest.Mock;
-import MigrationApp from "../applications/migration-app";
 import { FoundryVTTGameData } from "../foundry-interfacing/game-data";
 import { ordinalSuffix, PadNumber } from "../utilities/string";
 import { GameSettings } from "../foundry-interfacing/game-settings";
@@ -514,19 +511,6 @@ describe("API Class Tests", () => {
         expect(await API.removeNote("asd")).toBe(false);
         //@ts-ignore
         game.journal = t;
-    });
-
-    test("Run Migration", async () => {
-        jest.spyOn(console, "info").mockImplementation(() => {});
-        jest.spyOn(console, "warn").mockImplementation(() => {});
-        updateMigrationApplication(new MigrationApp());
-        jest.spyOn(MigrationApplication, "run").mockImplementation(async () => {});
-        expect(API.runMigration()).toBeUndefined();
-
-        //@ts-ignore
-        game.user.isGM = true;
-        SC.primary = true;
-        expect(API.runMigration()).toBeUndefined();
     });
 
     test("Search Notes", () => {

@@ -2,13 +2,11 @@ import type CalendarManager from "./calendar/calendar-manager";
 import type MainApp from "./applications/main-app";
 import type SCController from "./s-c-controller";
 import ConfigurationApp from "./applications/configuration-app";
-import MigrationApp from "./applications/migration-app";
 import NoteManager from "./notes/note-manager";
 
 export let CalManager: CalendarManager;
 export let MainApplication: MainApp;
 export let ConfigurationApplication: ConfigurationApp;
-export let MigrationApplication: MigrationApp;
 export let SC: SCController;
 export let NManager: NoteManager;
 
@@ -34,14 +32,6 @@ export function updateMainApplication(app: MainApp) {
  */
 export function updateConfigurationApplication(app: ConfigurationApp) {
     ConfigurationApplication = app;
-}
-
-/**
- * Updates the global migration application to the passed in value, should only be called once
- * @param app
- */
-export function updateMigrationApplication(app: MigrationApp) {
-    MigrationApplication = app;
 }
 
 /**
