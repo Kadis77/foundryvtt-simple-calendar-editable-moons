@@ -1344,19 +1344,6 @@ export default class ConfigurationApp extends FormApplication {
                     const index = parseInt(rowDataIndex);
                     if (!isNaN(index)) {
                         switch (filteredSetting) {
-                            case "month":
-                                if (index < (<Calendar>this.object).months.length) {
-                                    (<Calendar>this.object).months.splice(index, 1);
-                                    if ((<Calendar>this.object).months.length === 0) {
-                                        (<Calendar>this.object).months.push(new Month("New Month", 1, 0, 30));
-                                    }
-                                    //Reindex the remaining months
-                                    for (let i = 0; i < (<Calendar>this.object).months.length; i++) {
-                                        (<Calendar>this.object).months[i].numericRepresentation = i + 1;
-                                    }
-                                    this.rebaseMonthNumbers();
-                                }
-                                break;
                             case "weekday":
                                 if (index < (<Calendar>this.object).weekdays.length) {
                                     (<Calendar>this.object).weekdays.splice(index, 1);
