@@ -572,3 +572,81 @@ export enum RoadToTheSkyMoonPhaseIds {
     waxingG,
     default
 }
+
+export enum RoadToTheSkyMonthIds {
+    dew,
+    seed,
+    rain,
+    song,
+    sun,
+    sky,
+    iron,
+    gold,
+    stone,
+    frost,
+    dusk,
+    lamp
+}
+
+export const RoadToTheSkyMonthConfigs : any[] = [
+    {
+        id: "dew",
+        name: "Dew Month",
+        constellation: "Dragon"
+    },
+    {
+        id: "seed",
+        name: "Seed Month",
+        constellation: "Lovers"
+    },
+    {
+        id: "rain",
+        name: "Rain's Month",
+        constellation: "Charioteer"
+    },
+    {
+        id: "song",
+        name: "Song's Month",
+        constellation: "Winding River"
+    },
+    {
+        id: "sun",
+        name: "Sun's Month",
+        constellation: "Hunter"
+    },
+    {
+        id: "sky",
+        name: "Sky Month",
+        constellation: "Ship"
+    },
+    {
+        id: "iron",
+        name: "Iron Month",
+        constellation: "Wolf"
+    },
+    {
+        id: "gold",
+        name: "Gold Month",
+        constellation: "Scythe"
+    },
+    {
+        id: "stone",
+        name: "Stone Month",
+        constellation: "Two Fishes"
+    },
+    {
+        id: "frost",
+        name: "Frost Month",
+        constellation: "Crab"
+    },
+    {
+        id: "dusk",
+        name: "Dusk Month",
+        constellation: "Tower"
+    },
+    {
+        id: "lamp",
+        name: "Lamp's Month",
+        constellation: "Raptor"
+    }
+]

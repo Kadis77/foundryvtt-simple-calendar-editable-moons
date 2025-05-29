@@ -46,6 +46,10 @@ export default class Month extends ConfigurationItemBase {
      * The day of the week this month starts on (ignores the day of the week calculation
      */
     startingWeekday: number | null = null;
+    /**
+     * The cycle of the harvest moon since 410 that this month corresponds to
+     */
+    harvestMoonCyclesSinceStart: number = 0;
 
     /**
      * Month class constructor
@@ -54,13 +58,15 @@ export default class Month extends ConfigurationItemBase {
      * @param numericRepresentationOffset When numbering days offset them by this amount
      * @param numberOfDays The number of days in this month
      * @param numberOfLeapYearDays The number of days in this month on a leap year
+     * @param harvestMoonCyclesSinceStart The number of harvest moons that have passed since Dew Month 410
      */
     constructor(
         name: string = "",
         numericRepresentation: number = NaN,
         numericRepresentationOffset: number = 0,
         numberOfDays: number = 0,
-        numberOfLeapYearDays: number | null = null
+        numberOfLeapYearDays: number | null = null,
+        harvestMoonCyclesSinceStart: number = 0
     ) {
         super(name, numericRepresentation);
         this.numericRepresentationOffset = numericRepresentationOffset;
@@ -70,6 +76,7 @@ export default class Month extends ConfigurationItemBase {
         this.abbreviation = this.name.substring(0, 3);
         this.numberOfLeapYearDays = numberOfLeapYearDays === null ? numberOfDays : numberOfLeapYearDays;
         this.numberOfDays = numberOfDays;
+        this.harvestMoonCyclesSinceStart = 0;
         this.populateDays(this.numberOfLeapYearDays > this.numberOfDays ? this.numberOfLeapYearDays : this.numberOfDays);
     }
 

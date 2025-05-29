@@ -49,7 +49,16 @@ export class RoadToTheSkyMoon extends ConfigurationItemBase {
         this.rttsMoonId = rttsMoonId;
 
         this.color = RoadToTheSkyMoonConfigs[this.rttsMoonId].color;
-        this.cycleLengths.push(1);
+        
+        if (rttsMoonId == RoadToTheSkyMoonIds.harvest) {
+            // If this is a new harvest moon, push two months of 30 days to start so that the calendar doesn't break
+            this.cycleLengths.push(30);
+            this.cycleLengths.push(30);
+        }
+        else {
+            // Push one cycle of one day
+            this.cycleLengths.push(1);
+        }
     }
 
     /**
