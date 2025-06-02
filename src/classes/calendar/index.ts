@@ -1248,7 +1248,7 @@ export default class Calendar extends ConfigurationItemBase {
         
         return {
             year: this.startDate.year + yearsSinceStart,
-            month: this.startDate.month + remainder,
+            month: this.startDate.month + remainder - 1,
             day: this.rttsMoons[RoadToTheSkyMoonIds.harvest].cycleLengths[monthsSinceStart - 1]
         }
     }
@@ -1262,6 +1262,7 @@ export default class Calendar extends ConfigurationItemBase {
                 return false;
             }
             else if (maxDay.year == date.year && date.month + amount > maxDay.month) {
+                console.log("cannot add month, returning");
                 return false;
             }
         }

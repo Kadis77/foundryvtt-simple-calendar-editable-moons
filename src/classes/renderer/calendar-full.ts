@@ -50,7 +50,7 @@ export default class CalendarFull {
             HTML = `<div class="fsc-year-view-wrapper" id="${options.id}"><div class="fsc-current-year">`;
             
             // RTTS: Check if the forward/backward month controls should be enabled
-            let visibleMonthIndex = calendar.getRttsMonthIndex("visible");
+            let visibleMonthIndex = calendar.getRttsMonthIndexFromDate(vYear, options.date?.month ?? 0);
             let canChangeMonthForward = visibleMonthIndex != calendar.rttsMonths.length - 1;
             console.log("canChangeMonthForward: " + canChangeMonthForward);
             let canChangeMonthBack = visibleMonthIndex > 0;
@@ -177,7 +177,7 @@ export default class CalendarFull {
         console.log("visible date from build: " + JSON.stringify(visibleDate));
         let canChangeMonthForward = calendar.canAddMonths(visibleDate, 1);
         console.log("canChangeMonthForward build: " + canChangeMonthForward);
-        let canChangeMonthBack = calendar.canAddMonths(visibleDate, -1);
+        let canChangeMonthBack = calendar.canAddMonths(visibleDate, - 1);
         console.log("canChangeMonthBack build: " + canChangeMonthBack);
         
         if (options.allowChangeMonth) {
