@@ -16,7 +16,7 @@ import {
     NoteReminderNotificationType,
     NoteRepeat,
     PredefinedCalendars,
-    PresetTimeOfDay, RoadToTheSkyMoonIds,
+    PresetTimeOfDay, RoadToTheSkyMonthIds, RoadToTheSkyMoonIds,
     SimpleCalendarHooks,
     SocketTypes,
     TimeKeeperStatus,
@@ -1457,6 +1457,21 @@ declare global {
             }
 
             /**
+             * Interface for the RTTS month template that is passed to the HTML for rendering
+             */
+            interface RttsMonth extends IDataItemBase {
+                abbreviation: string;
+                name: string;
+                numericRepresentation: number;
+                current: boolean;
+                visible: boolean;
+                selected: boolean;
+                days: Day[];
+                numberOfDays: number;
+                showAdvanced: boolean;
+            }
+
+            /**
              * Interface for a RTTS Moon template
              */
             interface RttsMoon extends IDataItemBase {
@@ -2205,6 +2220,24 @@ declare global {
             intercalaryInclude: boolean;
             /** The day of the week this month should always start on. */
             startingWeekday: number | null;
+        }
+
+        /**
+         * Interface for all information about a RTTS month
+         */
+        interface RttsMonthData extends IDataItemBase {
+            /**  Which RTTS month this represents. */
+            rttsMonthId: RoadToTheSkyMonthIds;
+            /**  How many years since the start this is. */
+            yearsSinceStart: number;
+            /** The abbreviated name of the month. */
+            abbreviation: string;
+            /** The name of the month. */
+            name: string;
+            /** The description of the month. */
+            description: string;
+            /** The number of days this month has. */
+            numberOfDays: number;
         }
 
         /**
