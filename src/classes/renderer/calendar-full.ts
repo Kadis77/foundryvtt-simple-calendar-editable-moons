@@ -98,7 +98,8 @@ export default class CalendarFull {
         }
 
         let vYear,
-            vMonthIndex = 0,
+            vOldMonthIndex,
+            vRttsMonthIndex = 0,
             ssYear,
             ssMonth,
             ssDay,
@@ -114,14 +115,16 @@ export default class CalendarFull {
 
         if (options.date) {
             if (options.date.month >= 0 && options.date.month < calendar.months.length) {
-                vMonthIndex = options.date.month;
+                vOldMonthIndex = options.date.month;
             }
             vYear = options.date.year;
+            vRttsMonthIndex = calendar.getRttsMonthIndexFromDate(options.date.year, options.date.month);
         } else {
             vYear = calendar.year.visibleYear;
-            vMonthIndex = calendar.getRttsMonthIndex("visible") % 12;
+            vRttsMonthIndex = calendar.getRttsMonthIndex("visible");
+            vOldMonthIndex = calendar.getRttsMonthIndex("visible") % 12;
         }
-        weeks = calendar.rttsDaysIntoWeeks(calendar.getRttsMonthIndex("visible"));
+        weeks = calendar.rttsDaysIntoWeeks(vRttsMonthIndex);
 
         //TODO: When Changing the year the same day and month are considered selected
         if (options.selectedDates) {
@@ -144,14 +147,14 @@ export default class CalendarFull {
         }
 
         if (options.showSeasonName || options.colorToMatchSeason) {
-            const season = calendar.getSeason(vMonthIndex, ssDay ? ssDay : 0);
+            const season = calendar.getSeason(vOldMonthIndex || 0, ssDay ? ssDay : 0);
             seasonName = season.name;
             seasonDescription = season.description;
             seasonIcon = GetIcon(season.icon, season.color, season.color);
             calendarStyle = `border-color: ${season.color};`;
         }
 
-        const monthDescription = calendar.months[vMonthIndex].description;
+        const monthDescription = calendar.months[vOldMonthIndex || 0].description;
         const showMonthClickable = monthDescription && options.showDescriptions;
         const showSeasonClickable = seasonDescription && options.showDescriptions;
 
@@ -168,7 +171,7 @@ export default class CalendarFull {
         // RTTS: Check if the forward/backward month controls should be enabled
         let visibleDate = {
             year: calendar.year.visibleYear,
-            month: vMonthIndex,
+            month: vOldMonthIndex || 0,
             day: 0
         }
         console.log("visible date from build: " + JSON.stringify(visibleDate));
@@ -190,8 +193,8 @@ export default class CalendarFull {
         }
         html += `<span class="fsc-month-year ${
             showMonthClickable ? "fsc-description-clickable" : ""
-        }" data-visible="${vMonthIndex}/${vYear}">${FormatDateTime(
-            { year: vYear, month: vMonthIndex, day: 0, hour: 0, minute: 0, seconds: 0 },
+        }" data-visible="${vOldMonthIndex}/${vYear}">${FormatDateTime(
+            { year: vYear, month: vOldMonthIndex || 0, day: 0, hour: 0, minute: 0, seconds: 0 },
             monthYearFormat,
             calendar,
             { year: options.editYear }
@@ -240,7 +243,7 @@ export default class CalendarFull {
                     html += `<div class="fsc-day-wrapper ${isWeekend ? "fsc-weekend" : ""}">`;
                     if (weeks[i][x]) {
                         let dayClass = "fsc-day";
-                        const dayIndex = calendar.rttsMonths[vMonthIndex].days.findIndex((d) => {
+                        const dayIndex = calendar.rttsMonths[vRttsMonthIndex].days.findIndex((d) => {
                             return d.numericRepresentation === (<SimpleCalendar.HandlebarTemplateData.Day>weeks[i][x]).numericRepresentation;
                         });
 
@@ -248,7 +251,7 @@ export default class CalendarFull {
                         if (ssMonth !== undefined && ssDay !== undefined && seMonth !== undefined && seDay !== undefined) {
                             const checkDate: SimpleCalendar.DateTime = {
                                 year: options.showYear ? vYear : 0,
-                                month: vMonthIndex,
+                                month: vOldMonthIndex || 0,
                                 day: dayIndex,
                                 hour: 0,
                                 minute: 0,
@@ -289,24 +292,24 @@ export default class CalendarFull {
 
                         html += `<div class="${dayClass}" data-day="${dayIndex}">`;
                         if (options.showNoteCount) {
-                            html += `<div class="fsc-day-notes">${CalendarFull.NoteIndicator(calendar, vYear, vMonthIndex, dayIndex)}</div>`;
+                            html += `<div class="fsc-day-notes">${CalendarFull.NoteIndicator(calendar, vYear, vOldMonthIndex || 0, dayIndex)}</div>`;
                         }
                         html += (<SimpleCalendar.HandlebarTemplateData.Day>weeks[i][x]).name;
-                        if (options.showMoonPhases) {
-                            html += `<div class="fsc-moons">${CalendarFull.MoonPhaseIcons(
-                                calendar,
-                                vYear,
-                                vMonthIndex,
-                                dayIndex,
-                                x !== 0 && x === weeks[i].length - 1,
-                                i === weeks.length - 1
-                            )}</div>`;
-                        }
+                        //if (options.showMoonPhases) {
+                        //    html += `<div class="fsc-moons">${CalendarFull.MoonPhaseIcons(
+                        //        calendar,
+                        //        vYear,
+                        //        vOldMonthIndex || 0,
+                        //        dayIndex,
+                        //        x !== 0 && x === weeks[i].length - 1,
+                        //        i === weeks.length - 1
+                        //    )}</div>`;
+                        //}
                         if (options.showRttsMoonPhases) {
                             html += `<div class="fsc-moons">${CalendarFull.RttsMoonPhaseIcons(
                                 calendar,
                                 vYear,
-                                vMonthIndex,
+                                vOldMonthIndex || 0,
                                 dayIndex,
                                 x !== 0 && x === weeks[i].length - 1,
                                 i === weeks.length - 1
@@ -867,8 +870,12 @@ export default class CalendarFull {
         let html;
         const moonHtml: string[] = [];
         for (let i = 0; i < calendar.rttsMoons.length; i++) {
+            console.log(visibleYear + " " + visibleMonthIndex + " " + dayIndex);
+            console.log(JSON.stringify(calendar.rttsMonths));
+            console.log(calendar.getRttsMonthIndex("visible"));
             const mp = calendar.rttsMoons[i].getDateMoonPhase(calendar, visibleYear, visibleMonthIndex, dayIndex);
-            const d = calendar.months[visibleMonthIndex].days[dayIndex];
+            console.log(JSON.stringify(mp));
+            const d = calendar.rttsMonths[calendar.getRttsMonthIndex("visible")].days[dayIndex];
             if (mp && (mp.singleDay || d.selected || d.current)) {
                 const moon = GetIcon(mp.icon, "#000000", calendar.rttsMoons[i].color);
                 moonHtml.push(`<span class="fsc-moon-phase ${mp.icon}" data-tooltip="${calendar.rttsMoons[i].name} - ${mp.name}">${moon}</span>`);
