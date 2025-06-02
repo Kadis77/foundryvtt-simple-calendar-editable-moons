@@ -28,6 +28,7 @@ import {deepMerge} from "../utilities/object";
 import {Hook} from "../api/hook";
 import PF1E from "../systems/pf1e";
 import {RoadToTheSkyMoon} from "./moon-rtts";
+import RoadToTheSkyMonth from "./month-rtts";
 
 export default class Calendar extends ConfigurationItemBase {
     /**
@@ -44,6 +45,10 @@ export default class Calendar extends ConfigurationItemBase {
      * A list of all the months for this calendar
      */
     months: Month[] = [];
+    /**
+     * A list of all the RTTS months for this calendar
+     */
+    rttsMonths: RoadToTheSkyMonth[] = [];
     /**
      * The days that make up a week
      */
@@ -118,6 +123,9 @@ export default class Calendar extends ConfigurationItemBase {
         c.name = this.name;
         c.generalSettings = this.generalSettings.clone();
         c.year = this.year.clone();
+        c.rttsMonths = this.rttsMonths.map((m) => {
+            return m.clone();
+        });
         c.months = this.months.map((m) => {
             return m.clone();
         });
@@ -196,6 +204,9 @@ export default class Calendar extends ConfigurationItemBase {
             currentDate: this.getCurrentDate(),
             general: this.generalSettings.toConfig(),
             leapYear: this.year.leapYearRule.toConfig(),
+            rttsMonths: this.rttsMonths.map((m) => {
+                return m.toConfig();
+            }),
             months: this.months.map((m) => {
                 return m.toConfig();
             }),
@@ -279,6 +290,8 @@ export default class Calendar extends ConfigurationItemBase {
             }
         }
 
+        // RTTS: Add hardcoded RTTS months
+        
         const configRttsMoons: SimpleCalendar.RttsMoonData[] | undefined = config.rttsMoons;
         this.rttsMoons = [
             new RoadToTheSkyMoon(RoadToTheSkyMoonIds.harvest),
@@ -306,6 +319,24 @@ export default class Calendar extends ConfigurationItemBase {
                 }
             }
         }
+
+        // RTTS: Populate the RTTS month instances based on the calendar data
+        let rttsMonthIndex = 0;
+        let yearsSinceStart = 0;
+        for (let i = 0; i < this.rttsMoons[RoadToTheSkyMoonIds.harvest].cycleLengths.length; i++){
+            if (rttsMonthIndex >= 12) {
+                rttsMonthIndex = rttsMonthIndex & 12;
+                yearsSinceStart++;
+            }
+            this.rttsMonths.push(
+                new RoadToTheSkyMonth(
+                    rttsMonthIndex,
+                    yearsSinceStart,
+                    this.rttsMoons[RoadToTheSkyMoonIds.harvest].cycleLengths[i]
+                )
+            )
+            console.log("pushed new month of length " + this.rttsMoons[RoadToTheSkyMoonIds.harvest].cycleLengths[i]);
+        }
         
         const configMoons: SimpleCalendar.MoonData[] | undefined = config.moons || config.moonSettings;
         if (Array.isArray(configMoons)) {
@@ -328,9 +359,10 @@ export default class Calendar extends ConfigurationItemBase {
         }
 
         if (config.currentDate) {
-            this.year.numericRepresentation = config.currentDate.year;
-            this.year.selectedYear = config.currentDate.year;
-            this.year.visibleYear = config.currentDate.year;
+            let minDay = this.getMinDay();
+            this.year.numericRepresentation = Math.max(config.currentDate.year, minDay.year);
+            this.year.selectedYear = Math.max(config.currentDate.year, minDay.year);
+            this.year.visibleYear = Math.max(config.currentDate.year, minDay.year);
 
             this.resetMonths("current");
             this.resetMonths("visible");
@@ -338,6 +370,7 @@ export default class Calendar extends ConfigurationItemBase {
             if (config.currentDate.month > -1 && config.currentDate.month < this.months.length) {
                 this.months[config.currentDate.month].current = true;
                 this.months[config.currentDate.month].visible = true;
+                
                 if (config.currentDate.day > -1 && config.currentDate.day < this.months[config.currentDate.month].days.length) {
                     this.months[config.currentDate.month].days[config.currentDate.day].current = true;
                 } else {
@@ -352,10 +385,40 @@ export default class Calendar extends ConfigurationItemBase {
                 this.months[0].visible = true;
                 this.months[0].days[0].current = true;
             }
+            
+            // RTTS month current date setting
+            // Set Current RTTS Month and Day
+
+            let rttsMonthIndex = config.currentDate.month + ((Math.max(this.year.selectedYear - minDay.year, 0)) * 12);
+            console.log("calculated index is " + rttsMonthIndex);
+            if (this.rttsMonths.length >= rttsMonthIndex) {
+                this.rttsMonths[rttsMonthIndex].current = true;
+                this.rttsMonths[rttsMonthIndex].visible = true;
+
+                if (config.currentDate.day > -1 && config.currentDate.day < this.rttsMonths[rttsMonthIndex].days.length) {
+                    this.rttsMonths[rttsMonthIndex].days[config.currentDate.day].current = true;
+                } else {
+                    Logger.warn(
+                        "Saved current day could not be found in this month, perhaps number of days has changed. Setting current day to first day of month"
+                    );
+                    this.rttsMonths[rttsMonthIndex].days[0].current = true;
+                }
+            }
+            else {
+                Logger.warn("Saved current RTTS month could not be found. Setting all to first month.");
+                this.months[0].current = true;
+                this.months[0].visible = true;
+                this.months[0].days[0].current = true;
+                this.rttsMonths[0].current = true;
+                this.rttsMonths[0].visible = true;
+                this.rttsMonths[0].days[0].current = true;
+            }
+            
             this.time.seconds = config.currentDate.seconds;
             if (this.time.seconds === undefined) {
                 this.time.seconds = 0;
             }
+            
         } else if (this.months.length) {
             Logger.warn("No current date setting found, setting default current date.");
             this.months[0].current = true;
@@ -364,6 +427,8 @@ export default class Calendar extends ConfigurationItemBase {
         } else {
             Logger.error("Error setting the current date.");
         }
+        
+        console.log(JSON.stringify(this));
     }
 
     /**
