@@ -37,6 +37,7 @@ export default class CalendarFull {
      * @param calendar
      * @param options
      */
+    // TODO: RTTS prevent changing month if month is not defined
     public static Render(calendar: Calendar, options: SimpleCalendar.Renderer.CalendarOptions = { id: "" }): string {
         options = deepMerge({}, this.defaultOptions, options);
 
@@ -47,12 +48,29 @@ export default class CalendarFull {
             const vYear = options.date ? options.date.year : calendar.year.visibleYear;
 
             HTML = `<div class="fsc-year-view-wrapper" id="${options.id}"><div class="fsc-current-year">`;
+            
+            // RTTS: Check if the forward/backward month controls should be enabled
+            let visibleDate = {
+                year: calendar.year.visibleYear,
+                month: calendar.getMonthAndDayIndex("visible").month ?? 0,
+                day: calendar.getMonthAndDayIndex("visible").day ?? 0
+            }
+            console.log("visible date from renderer: " + JSON.stringify(visibleDate));
+            let canChangeMonthForward = calendar.canAddMonths(visibleDate, 1);
+            console.log("canChangeMonthForward: " + canChangeMonthForward);
+            let canChangeMonthBack = calendar.canAddMonths(visibleDate, -1);
+            console.log("canChangeMonthBack: " + canChangeMonthBack);
+            
             if (options.allowChangeMonth) {
-                HTML += `<a class="fa fa-chevron-left" data-tooltip="${GameSettings.Localize("FSC.ChangePreviousMonth")}"></a>`;
+                if (canChangeMonthBack) {
+                    HTML += `<a class="fa fa-chevron-left" data-tooltip="${GameSettings.Localize("FSC.ChangePreviousMonth")}"></a>`;
+                }
             }
             HTML += `<span>${vYear}</span>`;
             if (options.allowChangeMonth) {
-                HTML += `<a class="fa fa-chevron-right" data-tooltip="${GameSettings.Localize("FSC.ChangeNextMonth")}"></a>`;
+                if (canChangeMonthForward) {
+                    HTML += `<a class="fa fa-chevron-right" data-tooltip="${GameSettings.Localize("FSC.ChangeNextMonth")}"></a>`;
+                }
             }
             HTML += "</div>";
             HTML += `<div  class="fsc-year-view">`;
@@ -151,8 +169,27 @@ export default class CalendarFull {
         html += `<div class="fsc-calendar-header">`;
         //Visible date change and current date
         html += `<div class="fsc-current-date">`;
+
+        // RTTS: Check if the forward/backward month controls should be enabled
+        let visibleDate = {
+            year: calendar.year.visibleYear,
+            month: vMonthIndex,
+            day: 0
+        }
+        console.log("visible date from build: " + JSON.stringify(visibleDate));
+        let canChangeMonthForward = calendar.canAddMonths(visibleDate, 1);
+        console.log("canChangeMonthForward build: " + canChangeMonthForward);
+        let canChangeMonthBack = calendar.canAddMonths(visibleDate, -1);
+        console.log("canChangeMonthBack build: " + canChangeMonthBack);
+        
         if (options.allowChangeMonth) {
-            html += `<a class="fa fa-chevron-left" data-tooltip="${GameSettings.Localize("FSC.ChangePreviousMonth")}"></a>`;
+            if (canChangeMonthBack) {
+                html += `<a class="fa fa-chevron-left" data-tooltip="${GameSettings.Localize("FSC.ChangePreviousMonth")}"></a>`;
+            }
+            else {
+                // TODO: disabled version
+                html += `<span></span>`;
+            }
         } else {
             html += `<span></span>`;
         }
@@ -165,7 +202,13 @@ export default class CalendarFull {
             { year: options.editYear }
         )}</span>`;
         if (options.allowChangeMonth) {
-            html += `<a class="fa fa-chevron-right" data-tooltip="${GameSettings.Localize("FSC.ChangeNextMonth")}"></a>`;
+            if (canChangeMonthForward) {
+                html += `<a class="fa fa-chevron-right" data-tooltip="${GameSettings.Localize("FSC.ChangeNextMonth")}"></a>`;
+            }
+            else {
+                // TODO: disabled version
+                html += `<span></span>`;
+            }
         } else {
             html += `<span></span>`;
         }

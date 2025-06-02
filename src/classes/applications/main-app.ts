@@ -918,10 +918,22 @@ export default class MainApp extends FormApplication {
      * Processes the callback from the Calendar Renderer's month change click
      * @param {CalendarClickEvents} clickType What was clicked, previous or next
      */
-    // RTTS TODO: Prevent clicking if the next one is not allowed
+    // RTTS: Prevent clicking if the next one is not allowed
     public changeMonth(clickType: CalendarClickEvents) {
         this.toggleUnitSelector(true);
-        this.visibleCalendar.changeMonth(clickType === CalendarClickEvents.previous ? -1 : 1);
+        let visibleDate = {
+            year: this.visibleCalendar.year.visibleYear,
+            month: this.visibleCalendar.getMonthAndDayIndex("visible").month ?? 0,
+            day: this.visibleCalendar.getMonthAndDayIndex("visible").day ?? 0
+        }
+        console.log("visible date: " + JSON.stringify(visibleDate));
+        let canChangeMonth = this.visibleCalendar.canAddMonths(
+            visibleDate, 
+            CalendarClickEvents.previous ? -1 : 1);
+        console.log("can change month: " + canChangeMonth);
+        if (canChangeMonth) {
+            this.visibleCalendar.changeMonth(clickType === CalendarClickEvents.previous ? -1 : 1);
+        }
         MainApp.setWidthHeight(this);
     }
 

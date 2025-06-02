@@ -467,6 +467,7 @@ export default class Calendar extends ConfigurationItemBase {
             month: 0,
             day: 0
         };
+        // console.log(JSON.stringify(this.months));
         const mIndex = this.months.findIndex((m) => {
             return m[verifiedSetting];
         });
@@ -806,7 +807,7 @@ export default class Calendar extends ConfigurationItemBase {
                     let month = (i + amount) % 12;
                     if (newYear == maxDate.year && month > maxDate.month)
                     {
-                        console.error("cannot add " + amount + " months: month is past defined month");
+                        console.error("cannot add " + amount + " months: month is past defined max month " + maxDate.month + " of year " + maxDate.year);
                         return;
                     }
                 }
@@ -820,7 +821,8 @@ export default class Calendar extends ConfigurationItemBase {
                 }
                 
                 // RTTS: Back to regular logic
-                else if (next && i + amount >= this.months.length) {
+                if (next && i + amount >= this.months.length) {
+                    console.log("changing...");
                     this.changeYear(1, true, verifiedSetting, setDay);
                     const changeAmount = amount - (this.months.length - i);
                     if (changeAmount > 0) {
@@ -1394,5 +1396,26 @@ export default class Calendar extends ConfigurationItemBase {
             month: this.startDate.month + remainder,
             day: this.rttsMoons[RoadToTheSkyMoonIds.harvest].cycleLengths[monthsSinceStart - 1]
         }
+    }
+    
+    // RTTS: will adding a month make this date invalid?
+    public canAddMonths(date: SimpleCalendar.Date, amount: number) {
+        
+        if (amount > 0) {
+            let maxDay = this.getMaxDay();
+            console.log("max day: " + JSON.stringify(maxDay));
+            if (date.year > maxDay.year) {
+                return false;
+            }
+            else if (maxDay.year == date.year && date.month + amount > maxDay.month) {
+                return false;
+            }
+        }
+        else if (amount < 0) {
+            if (date.year == 410 && date.month + amount < 0) {
+                return false;
+            }
+        }
+        return true;
     }
 }
