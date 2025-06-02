@@ -802,11 +802,12 @@ export class NoteSheet extends JournalSheet {
                         "2": "FSC.Notes.Repeat.Monthly",
                         "3": "FSC.Notes.Repeat.Yearly"
                     };
-                    if (daysBetween >= calendar.totalNumberOfDays(false, true)) {
-                        delete options["1"];
-                        delete options["2"];
-                        delete options["3"];
-                    } else if (daysBetween >= calendar.months[noteData.startDate.month].days.length) {
+                    //if (daysBetween >= calendar.totalNumberOfDays(false, true)) {
+                    //    delete options["1"];
+                    //    delete options["2"];
+                    //    delete options["3"];
+                    //} else 
+                    if (daysBetween >= calendar.months[noteData.startDate.month].days.length) {
                         delete options["1"];
                         delete options["2"];
                     } else if (daysBetween >= calendar.weekdays.length) {

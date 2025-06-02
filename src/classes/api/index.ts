@@ -777,7 +777,7 @@ export function formatTimestamp(timestamp: number, format: string = "", calendar
         if (PF2E.isPF2E && activeCalendar.generalSettings.pf2eSync) {
             timestamp += PF2E.getWorldCreateSeconds(activeCalendar);
         }
-        const date = activeCalendar.secondsToDate(timestamp);
+        const date = activeCalendar.rttsSecondsToDate(timestamp);
         if (format) {
             return FormatDateTime(date, format, activeCalendar);
         } else {
@@ -1730,12 +1730,7 @@ export function searchNotes(
  * ```
  */
 export function secondsToInterval(seconds: number, calendarId: string = "active"): SimpleCalendar.DateTimeParts {
-    const cal = calendarId === "active" ? CalManager.getActiveCalendar() : CalManager.getCalendar(calendarId);
-    if (cal) {
-        return cal.secondsToInterval(seconds);
-    } else {
-        Logger.error(`SimpleCalendar.api.secondsToInterval - Unable to find a calendar with the passed in ID of "${calendarId}"`);
-    }
+    Logger.error(`SimpleCalendar.api.secondsToInterval - Currently disabled for RTTS"`);
     return {};
 }
 
@@ -1968,7 +1963,7 @@ export function timestampPlusInterval(currentSeconds: number, interval: SimpleCa
             currentSeconds += PF2E.getWorldCreateSeconds(activeCalendar);
         }
 
-        const dateTime = clone.secondsToDate(currentSeconds);
+        const dateTime = clone.rttsSecondsToDate(currentSeconds);
         clone.updateTime(dateTime);
         if (interval.year) {
             clone.changeYear(interval.year, false, "current");

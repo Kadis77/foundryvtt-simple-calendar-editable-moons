@@ -43,7 +43,7 @@ export class ChatTimestamp {
                 if (PF2E.isPF2E && cal.generalSettings.pf2eSync) {
                     seconds += PF2E.getWorldCreateSeconds(cal);
                 }
-                const dateTime = cal.secondsToDate(seconds);
+                const dateTime = cal.rttsSecondsToDate(seconds);
                 formattedDateTime = FormatDateTime(dateTime, `${cal.generalSettings.dateFormat.chatTime}`, cal);
             }
         }

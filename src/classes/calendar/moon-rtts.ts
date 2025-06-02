@@ -138,8 +138,8 @@ export class RoadToTheSkyMoon extends ConfigurationItemBase {
      * @param {number} dayIndex The day to use
      */
     getDateMoonPhase(calendar: Calendar, yearNum: number, monthIndex: number, dayIndex: number): SimpleCalendar.MoonPhase {
-        let firstFullMoonDays = calendar.dateToDays(this.firstFullMoon.year, this.firstFullMoon.month, this.firstFullMoon.day, true);
-        let daysSoFar = calendar.dateToDays(yearNum, monthIndex, dayIndex, true);
+        let firstFullMoonDays = calendar.rttsDateToDays(calendar.getRttsMonthIndexFromDate(this.firstFullMoon.year, this.firstFullMoon.month), this.firstFullMoon.day);
+        let daysSoFar = calendar.rttsDateToDays(calendar.getRttsMonthIndexFromDate(yearNum, monthIndex), dayIndex);
 
         // If this is before the first full moon, just make the moon full.
         if (firstFullMoonDays > daysSoFar) {

@@ -257,8 +257,8 @@ export function DateTheSame(startDate: SimpleCalendar.DateTime, endDate: SimpleC
  * @param endDate The ending date
  */
 export function DaysBetweenDates(calendar: Calendar, startDate: SimpleCalendar.DateTime, endDate: SimpleCalendar.DateTime) {
-    const sDays = calendar.dateToDays(startDate.year, startDate.month, startDate.day);
-    const eDays = calendar.dateToDays(endDate.year, endDate.month, endDate.day);
+    const sDays = calendar.rttsDateToDays(calendar.getRttsMonthIndexFromDate(startDate.year, startDate.month), startDate.day);
+    const eDays = calendar.rttsDateToDays(calendar.getRttsMonthIndexFromDate(endDate.year, endDate.month), endDate.day);
     return eDays - sDays;
 }
 
@@ -349,7 +349,7 @@ export function TimestampToDateData(seconds: number, calendar: Calendar): Simple
         seconds += PF2E.getWorldCreateSeconds(calendar);
     }
 
-    const dateTime = calendar.secondsToDate(seconds);
+    const dateTime = calendar.rttsSecondsToDate(seconds);
     result.year = dateTime.year;
     result.month = dateTime.month;
     result.day = dateTime.day;
@@ -431,7 +431,7 @@ export function GetPresetTimeOfDay(preset: PresetTimeOfDay, calendar: Calendar, 
         seconds = calendar.getSunriseSunsetTime(date.year, date.month, date.day, preset === PresetTimeOfDay.Sunrise, false);
     }
 
-    const dt = calendar.secondsToDate(seconds);
+    const dt = calendar.rttsSecondsToDate(seconds);
 
     time.hour = dt.hour;
     time.minute = dt.minute;

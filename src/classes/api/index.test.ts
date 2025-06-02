@@ -524,17 +524,6 @@ describe("API Class Tests", () => {
         expect(NManager.searchNotes).toHaveBeenCalledTimes(1);
     });
 
-    test("Seconds To Interval", () => {
-        expect(API.secondsToInterval(10)).toEqual({});
-        expect(console.error).toHaveBeenCalledTimes(1);
-
-        jest.spyOn(tCal, "secondsToInterval").mockImplementation(() => {
-            return {};
-        });
-        expect(API.secondsToInterval(0, "")).toEqual({});
-        expect(tCal.secondsToInterval).toHaveBeenCalledTimes(1);
-    });
-
     test("Set Date", () => {
         expect(API.setDate({})).toEqual(false);
         expect(console.error).toHaveBeenCalledTimes(1);

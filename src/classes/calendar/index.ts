@@ -702,7 +702,7 @@ export default class Calendar extends ConfigurationItemBase {
 
     /**
      * Calculates the day of the week a passed in day falls on based on its month and year
-     * @param {number} monthIndex The month that the target day is in
+     * @param rttsMonthIndex
      * @param {number} dayIndex  The day of the month that we want to check
      * @return {number}
      */
@@ -718,9 +718,8 @@ export default class Calendar extends ConfigurationItemBase {
 
             const month = this.rttsMonths[rttsMonthIndex];
             // the min day always starts on weekday index 0
-            let daysSoFar = this.dateToDays(
-                this.getMinDay().year + Math.floor(rttsMonthIndex / 12),
-                rttsMonthIndex % 12,
+            let daysSoFar = this.rttsDateToDays(
+                rttsMonthIndex,
                 dayIndex);
             return daysSoFar % 7;
         } else {
@@ -945,121 +944,7 @@ export default class Calendar extends ConfigurationItemBase {
      * @param setting
      */
     changeDayBulk(amount: number, setting: string = "current") {
-        let isLeapYear = this.year.leapYearRule.isLeapYear(this.year.numericRepresentation);
-        let numberOfDays = this.totalNumberOfDays(isLeapYear, true);
-        while (amount > numberOfDays) {
-            this.changeYear(1, false, setting);
-            amount -= numberOfDays;
-            isLeapYear = this.year.leapYearRule.isLeapYear(this.year.numericRepresentation);
-            numberOfDays = this.totalNumberOfDays(isLeapYear, true);
-        }
         this.changeDay(amount, setting);
-    }
-
-    /**
-     * Generates the total number of days in a year
-     * @param leapYear If to count the total number of days in a leap year
-     * @param ignoreIntercalaryRules If to ignore the intercalary rules and include the months days (used to match closer to about-time)
-     * @return {number}
-     */
-    totalNumberOfDays(leapYear: boolean = false, ignoreIntercalaryRules: boolean = false): number {
-        let total = 0;
-        this.months.forEach((m) => {
-            if ((m.intercalary && m.intercalaryInclude) || !m.intercalary || ignoreIntercalaryRules) {
-                total += leapYear ? m.numberOfLeapYearDays : m.numberOfDays;
-            }
-        });
-        return total;
-    }
-
-    /**
-     * Converts the passed in date to the number of days that make up that date
-     * @param year The year to convert
-     * @param monthIndex The index of the month to convert
-     * @param dayIndex The day to convert
-     * @param ignoreIntercalaryRules If to ignore the intercalary rules and include the months days (used to match closer to about-time)
-     */
-    dateToDays(year: number, monthIndex: number, dayIndex: number, ignoreIntercalaryRules: boolean = false) {
-        const beforeYearZero = year < this.year.yearZero;
-        const daysPerYear = this.totalNumberOfDays(false, ignoreIntercalaryRules);
-        const daysPerLeapYear = this.totalNumberOfDays(true, ignoreIntercalaryRules);
-        const leapYearDayDifference = daysPerLeapYear - daysPerYear;
-        const isLeapYear = this.year.leapYearRule.isLeapYear(year);
-        const numberOfLeapYears = this.year.leapYearRule.howManyLeapYears(year);
-        const numberOfYZLeapYears = this.year.leapYearRule.howManyLeapYears(this.year.yearZero);
-        let leapYearDays;
-        let procYear = Math.abs(year - this.year.yearZero);
-
-        if (monthIndex < 0) {
-            monthIndex = 0;
-        } else if (monthIndex >= this.months.length) {
-            monthIndex = this.months.length - 1;
-        }
-
-        if (beforeYearZero) {
-            procYear = procYear - 1;
-        }
-
-        let daysIntoMonth = dayIndex + 1;
-        let daysSoFar = daysPerYear * procYear;
-        if (daysIntoMonth < 1) {
-            daysIntoMonth = 1;
-        }
-        if (beforeYearZero) {
-            if (isLeapYear) {
-                leapYearDays = (numberOfYZLeapYears - (numberOfLeapYears + 1)) * leapYearDayDifference;
-            } else {
-                leapYearDays = (numberOfYZLeapYears - numberOfLeapYears) * leapYearDayDifference;
-            }
-            daysSoFar += leapYearDays;
-            for (let i = this.months.length - 1; i >= 0; i--) {
-                if (
-                    i > monthIndex &&
-                    (ignoreIntercalaryRules || !this.months[i].intercalary || (this.months[i].intercalary && this.months[i].intercalaryInclude))
-                ) {
-                    if (isLeapYear) {
-                        daysSoFar = daysSoFar + this.months[i].numberOfLeapYearDays;
-                    } else {
-                        daysSoFar = daysSoFar + this.months[i].numberOfDays;
-                    }
-                }
-            }
-            daysSoFar += (isLeapYear ? this.months[monthIndex].numberOfLeapYearDays : this.months[monthIndex].numberOfDays) - daysIntoMonth;
-        } else {
-            leapYearDays = Math.abs(numberOfLeapYears - numberOfYZLeapYears) * leapYearDayDifference;
-            daysSoFar += leapYearDays;
-
-            for (let i = 0; i < this.months.length; i++) {
-                //Only look at the month preceding the month we want and is not intercalary or is intercalary if the include setting is set otherwise skip
-                if (
-                    i < monthIndex &&
-                    (ignoreIntercalaryRules || !this.months[i].intercalary || (this.months[i].intercalary && this.months[i].intercalaryInclude))
-                ) {
-                    if (isLeapYear) {
-                        daysSoFar = daysSoFar + this.months[i].numberOfLeapYearDays;
-                    } else {
-                        daysSoFar = daysSoFar + this.months[i].numberOfDays;
-                    }
-                }
-            }
-            daysSoFar += daysIntoMonth;
-        }
-        if (beforeYearZero) {
-            daysSoFar = daysSoFar + 1;
-            if (year <= 0 && this.year.leapYearRule.rule !== LeapYearRules.None) {
-                if (this.year.yearZero === 0 && !isLeapYear) {
-                    daysSoFar -= leapYearDayDifference;
-                } else if (this.year.yearZero !== 0 && isLeapYear) {
-                    daysSoFar += leapYearDayDifference;
-                }
-            }
-        } else {
-            daysSoFar = daysSoFar - 1;
-        }
-        if (year > 0 && this.year.yearZero === 0 && this.year.leapYearRule.rule !== LeapYearRules.None) {
-            daysSoFar += leapYearDayDifference;
-        }
-        return beforeYearZero ? daysSoFar * -1 : daysSoFar;
     }
 
     /**
@@ -1067,147 +952,45 @@ export default class Calendar extends ConfigurationItemBase {
      * @param {number} days The days to convert
      */
     daysToDate(days: number): SimpleCalendar.DateTime {
-        return this.secondsToDate(days * 86400);
+        return this.rttsSecondsToDate(days * 86400);
     }
 
     /**
      * Convert a number of seconds to year, month, day, hour, minute, seconds
      * @param {number} seconds The seconds to convert
      */
-    secondsToDate(seconds: number): SimpleCalendar.DateTime {
-        const beforeYearZero = seconds < 0;
-        seconds = Math.abs(seconds);
-        let day: number, dayCount, month: number, year: number;
-
-        dayCount = Math.floor(seconds / this.time.secondsPerDay);
-        seconds -= dayCount * this.time.secondsPerDay;
-
-        let timeOfDaySeconds = beforeYearZero ? this.time.secondsPerDay - seconds : seconds;
-        const hour = Math.floor(timeOfDaySeconds / (this.time.secondsInMinute * this.time.minutesInHour)) % this.time.hoursInDay;
-        timeOfDaySeconds -= hour * (this.time.secondsInMinute * this.time.minutesInHour);
-        const min = Math.floor(timeOfDaySeconds / this.time.secondsInMinute) % this.time.secondsInMinute;
-        timeOfDaySeconds -= min * this.time.secondsInMinute;
-        const sec = timeOfDaySeconds % 60;
-
-        if (beforeYearZero) {
-            year = this.year.yearZero - 1;
-            let isLeapYear = this.year.leapYearRule.isLeapYear(year);
-            month = this.months.length - 1;
-            day = isLeapYear ? this.months[month].numberOfLeapYearDays - 1 : this.months[month].numberOfDays - 1;
-
-            if (sec === 0 && min === 0 && hour === 0) {
-                dayCount--;
+    rttsSecondsToDate(seconds: number): SimpleCalendar.DateTime {
+        
+        let daysSinceStart = Math.floor(seconds / 86400);
+        let year = this.getMinDay().year;
+        let rttsMonth = 0;
+        let daysSoFar = 0;
+        
+        for (let i = 0; i < this.rttsMonths.length; i++) {
+            if (daysSoFar + this.rttsMonths[i].numberOfDays > daysSinceStart) {
+                break;
             }
-            while (dayCount > 0) {
-                const yearTotalDays = this.totalNumberOfDays(isLeapYear, true);
-                let monthDays = isLeapYear ? this.months[month].numberOfLeapYearDays : this.months[month].numberOfDays;
-                if (dayCount >= yearTotalDays) {
-                    year = year - 1;
-                    isLeapYear = this.year.leapYearRule.isLeapYear(year);
-                    monthDays = isLeapYear ? this.months[month].numberOfLeapYearDays : this.months[month].numberOfDays;
-                    dayCount = dayCount - yearTotalDays;
-                } else if (dayCount >= monthDays) {
-                    month = month - 1;
-                    //Check the new month to see if it has days for this year, if not then skip to the previous months until a month with days this year is found.
-                    let newMonthDays = isLeapYear ? this.months[month].numberOfLeapYearDays : this.months[month].numberOfDays;
-                    let safetyCounter = 0;
-                    while (newMonthDays === 0 && safetyCounter <= this.months.length) {
-                        month--;
-                        newMonthDays = isLeapYear ? this.months[month].numberOfLeapYearDays : this.months[month].numberOfDays;
-                        safetyCounter++;
-                    }
-                    day = isLeapYear ? this.months[month].numberOfLeapYearDays - 1 : this.months[month].numberOfDays - 1;
-                    dayCount = dayCount - monthDays;
-                } else {
-                    day = day - 1;
-                    dayCount = dayCount - 1;
+            else {
+                if (i > 0 && i % 12 == 0){
+                    year++;
                 }
-            }
-        } else {
-            year = this.year.yearZero;
-            let isLeapYear = this.year.leapYearRule.isLeapYear(year);
-            month = 0;
-            day = 0;
-            while (dayCount > 0) {
-                const yearTotalDays = this.totalNumberOfDays(isLeapYear, true);
-                const monthDays = isLeapYear ? this.months[month].numberOfLeapYearDays : this.months[month].numberOfDays;
-                if (dayCount >= yearTotalDays) {
-                    year = year + 1;
-                    isLeapYear = this.year.leapYearRule.isLeapYear(year);
-                    dayCount = dayCount - yearTotalDays;
-                } else if (dayCount >= monthDays) {
-                    month = month + 1;
-                    //Check the new month to see if it has days for this year, if not then skip to the next months until a month with days this year is found.
-                    let newMonthDays = isLeapYear ? this.months[month].numberOfLeapYearDays : this.months[month].numberOfDays;
-                    let safetyCounter = 0;
-                    while (newMonthDays === 0 && safetyCounter <= this.months.length) {
-                        month++;
-                        newMonthDays = isLeapYear ? this.months[month].numberOfLeapYearDays : this.months[month].numberOfDays;
-                        safetyCounter++;
-                    }
-                    dayCount = dayCount - monthDays;
-                } else {
-                    day = day + 1;
-                    dayCount = dayCount - 1;
-                }
-            }
-            if (year < 0) {
-                day++;
+                rttsMonth++;
+                daysSoFar += this.rttsMonths[i].numberOfDays;
             }
         }
+        
+        let remainingSeconds = seconds % 86400;
+        let hour = Math.floor(remainingSeconds / 3600);
+        let minutes = (remainingSeconds - (hour * 3600)) % 60;
+        let sec = remainingSeconds - (hour * 3600) - (minutes * 60);
+        
         return {
             year: year,
-            month: month,
-            day: day,
+            month: rttsMonth % 12,
+            day: daysSinceStart - daysSoFar,
             hour: hour,
-            minute: min,
+            minute: minutes,
             seconds: sec
-        };
-    }
-
-    /**
-     * Convert the passed in seconds into an interval of larger time
-     * @param seconds
-     */
-    secondsToInterval(seconds: number): SimpleCalendar.DateTimeParts {
-        let sec = seconds,
-            min = 0,
-            hour = 0,
-            month: number;
-        if (sec >= this.time.secondsInMinute) {
-            min = Math.floor(sec / this.time.secondsInMinute);
-            sec = sec - min * this.time.secondsInMinute;
-        }
-        if (min >= this.time.minutesInHour) {
-            hour = Math.floor(min / this.time.minutesInHour);
-            min = min - hour * this.time.minutesInHour;
-        }
-        let dayCount = 0;
-        if (hour >= this.time.hoursInDay) {
-            dayCount = Math.floor(hour / this.time.hoursInDay);
-            hour = hour - dayCount * this.time.hoursInDay;
-        }
-
-        const daysInYear = this.totalNumberOfDays(false, false);
-        const averageDaysInMonth =
-            daysInYear /
-            this.months.map((m) => {
-                return !m.intercalary;
-            }).length;
-
-        month = Math.floor(dayCount / averageDaysInMonth);
-        const day = dayCount - Math.round(month * averageDaysInMonth);
-
-        const year = Math.floor(month / this.months.length);
-        month = month - Math.round(year * this.months.length);
-
-        return {
-            seconds: sec,
-            minute: min,
-            hour: hour,
-            day: day,
-            month: month,
-            year: year
         };
     }
 
@@ -1379,7 +1162,7 @@ export default class Calendar extends ConfigurationItemBase {
             ) {
                 //If we didn't request the change (we are running the clock) we need to update the internal time to match the new world time
                 if (!this.timeChangeTriggered) {
-                    const parsedDate = this.secondsToDate(newTime);
+                    const parsedDate = this.rttsSecondsToDate(newTime);
                     this.setDateTime(parsedDate, {
                         updateApp: this.time.updateFrequency * this.time.gameTimeRatio !== changeAmount,
                         sync: false,
@@ -1397,7 +1180,7 @@ export default class Calendar extends ConfigurationItemBase {
             ) {
                 //If we didn't request the change (from a combat change) we need to update the internal time to match the new world time
                 if (!this.timeChangeTriggered) {
-                    const parsedDate = this.secondsToDate(newTime);
+                    const parsedDate = this.rttsSecondsToDate(newTime);
                     // If the current player is the GM then we need to save this new value to the database
                     // Since the current date is updated this will trigger an update on all players as well
                     this.setDateTime(parsedDate, { updateApp: false, sync: false, save: GameSettings.IsGm() && SC.primary });
@@ -1410,7 +1193,7 @@ export default class Calendar extends ConfigurationItemBase {
                     this.generalSettings.gameWorldTimeIntegration === GameWorldTimeIntegrations.Mixed) &&
                 !this.timeChangeTriggered
             ) {
-                const parsedDate = this.secondsToDate(newTime);
+                const parsedDate = this.rttsSecondsToDate(newTime);
                 // If the current player is the GM then we need to save this new value to the database
                 // Since the current date is updated this will trigger an update on all players as well
                 this.setDateTime(parsedDate, { updateApp: false, sync: false, save: GameSettings.IsGm() && SC.primary });
