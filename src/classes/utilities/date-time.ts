@@ -16,6 +16,9 @@ export function FormatDateTime(date: SimpleCalendar.DateTime, mask: string, cale
     inputs = deepMerge({ year: false, month: false }, inputs);
     const token = /DO|d{1,4}|M{1,4}|YN|YA|YZ|YY(?:YY)?|([HhMmsD])\1?|[aA]/g;
     const literal = /\[([^]*?)\]/gm;
+    
+    let rttsMonthIndex = calendar.getRttsMonthIndexFromDate(date.year, date.month);
+    
     const formatFlags: Record<string, (dateObj: SimpleCalendar.DateTime) => string> = {
         D: (dateObj: SimpleCalendar.DateTime) => {
             return String(calendar.months[dateObj.month]?.days[dateObj.day]?.numericRepresentation || 0);
@@ -29,16 +32,16 @@ export function FormatDateTime(date: SimpleCalendar.DateTime, mask: string, cale
             )}`;
         },
         d: (dateObj: SimpleCalendar.DateTime) => {
-            return String(calendar.weekdays[calendar.dayOfTheWeek(dateObj.year, dateObj.month, dateObj.day)]?.numericRepresentation || 0);
+            return String(calendar.weekdays[calendar.rttsDayOfTheWeek(rttsMonthIndex, dateObj.day)]?.numericRepresentation || 0);
         },
         dd: (dateObj: SimpleCalendar.DateTime) => {
-            return PadNumber(calendar.weekdays[calendar.dayOfTheWeek(dateObj.year, dateObj.month, dateObj.day)]?.numericRepresentation || 0);
+            return PadNumber(calendar.weekdays[calendar.rttsDayOfTheWeek(rttsMonthIndex, dateObj.day)]?.numericRepresentation || 0);
         },
         ddd: (dateObj: SimpleCalendar.DateTime) => {
-            return `${calendar.weekdays[calendar.dayOfTheWeek(dateObj.year, dateObj.month, dateObj.day)]?.abbreviation || ""}`;
+            return `${calendar.weekdays[calendar.rttsDayOfTheWeek(rttsMonthIndex, dateObj.day)]?.abbreviation || ""}`;
         },
         dddd: (dateObj: SimpleCalendar.DateTime) => {
-            return `${calendar.weekdays[calendar.dayOfTheWeek(dateObj.year, dateObj.month, dateObj.day)]?.name || ""}`;
+            return `${calendar.weekdays[calendar.rttsDayOfTheWeek(rttsMonthIndex, dateObj.day)]?.name || ""}`;
         },
         M: (dateObj: SimpleCalendar.DateTime) => {
             return String(calendar.months[dateObj.month]?.numericRepresentation || 0);
@@ -142,16 +145,16 @@ export function MergeDateTimeObject(
     target: SimpleCalendar.DateTime | null = null,
     calendar: Calendar | null = null
 ): SimpleCalendar.DateTime {
-    const currentMonthDay = calendar?.getMonthAndDayIndex("current");
+    const rttsCurrentMonthDay = calendar?.getRttsMonthAndDayIndex("current");
     const currentTime = calendar?.time.getCurrentTime();
     if (date.year === undefined) {
         date.year = target?.year || calendar?.year.numericRepresentation || 0;
     }
     if (date.month === undefined) {
-        date.month = target?.month || currentMonthDay?.month || 0;
+        date.month = target?.month || (rttsCurrentMonthDay?.month ?? 0) % 12 || 0;
     }
     if (date.day === undefined) {
-        date.day = target?.day || currentMonthDay?.day || 0;
+        date.day = target?.day || rttsCurrentMonthDay?.day || 0;
     }
     if (date.hour === undefined) {
         date.hour = target?.hour || currentTime?.hour || 0;
@@ -173,16 +176,16 @@ export function MergeDateTimeObject(
  * @param dayIndex The day number
  * @param includeToday If to include today's seconds in the calculation
  */
-export function ToSeconds(calendar: Calendar, year: number, monthIndex: number, dayIndex: number, includeToday: boolean = true) {
+export function RttsToSeconds(calendar: Calendar, rttsMonthIndex: number, dayIndex: number, includeToday: boolean = true) {
     //Get the days so for and add one to include the current day
-    let daysSoFar = calendar.dateToDays(year, monthIndex, dayIndex, true);
+    let daysSoFar = calendar.rttsDateToDays(rttsMonthIndex, dayIndex);
     let totalSeconds = calendar.time.getTotalSeconds(daysSoFar, includeToday);
     // If this is a Pathfinder 2E game, subtract the world creation seconds
     if (PF2E.isPF2E && calendar.generalSettings.pf2eSync) {
         const newYZ = PF2E.newYearZero();
         if (newYZ !== undefined) {
             calendar.year.yearZero = newYZ;
-            daysSoFar = calendar.dateToDays(year, monthIndex, dayIndex, true);
+            daysSoFar = calendar.rttsDateToDays(rttsMonthIndex, dayIndex);
         }
         daysSoFar++;
         totalSeconds = calendar.time.getTotalSeconds(daysSoFar, includeToday) - PF2E.getWorldCreateSeconds(calendar, false);
@@ -273,9 +276,14 @@ export function IsDayBetweenDates(
     endDate: SimpleCalendar.DateTime
 ) {
     let between = DateRangeMatch.None;
-    const checkSeconds = ToSeconds(calendar, checkDate.year, checkDate.month, checkDate.day, false);
-    const startSeconds = ToSeconds(calendar, startDate.year, startDate.month, startDate.day, false);
-    const endSeconds = ToSeconds(calendar, endDate.year, endDate.month, endDate.day, false);
+
+    let checkRttsMonthIndex = calendar.getRttsMonthIndexFromDate(checkDate.year, checkDate.month);
+    let startRttsMonthIndex = calendar.getRttsMonthIndexFromDate(startDate.year, startDate.month);
+    let endRttsMonthIndex = calendar.getRttsMonthIndexFromDate(endDate.year, endDate.month);
+    
+    const checkSeconds = RttsToSeconds(calendar, checkRttsMonthIndex, checkDate.day, false);
+    const startSeconds = RttsToSeconds(calendar, startRttsMonthIndex, startDate.day, false);
+    const endSeconds = RttsToSeconds(calendar, endRttsMonthIndex, endDate.day, false);
     //If the start and end date are the same as the check date
     if (checkSeconds === startSeconds && checkSeconds === endSeconds) {
         between = DateRangeMatch.Exact;
@@ -353,7 +361,9 @@ export function TimestampToDateData(seconds: number, calendar: Calendar): Simple
     const day = month.days[dateTime.day];
     result.dayOffset = month.numericRepresentationOffset;
     result.yearZero = calendar.year.yearZero;
-    result.dayOfTheWeek = calendar.dayOfTheWeek(result.year, result.month, result.day);
+    
+    let rttsMonthIndex = calendar.getRttsMonthIndexFromDate(dateTime.year, dateTime.month);
+    result.dayOfTheWeek = calendar.rttsDayOfTheWeek(rttsMonthIndex, result.day);
     result.currentSeason = calendar.getSeason(result.month, result.day + 1);
     result.weekdays = calendar.weekdays.map((w) => {
         return w.name;
@@ -440,11 +450,11 @@ export async function AdvanceTimeToPreset(preset: PresetTimeOfDay, calendar: Cal
         let changeAmount = 0;
 
         if (preset === PresetTimeOfDay.Sunrise || preset === PresetTimeOfDay.Sunset) {
-            const monthDayIndex = calendar.getMonthAndDayIndex();
+            const rttsMonthDayIndex = calendar.getRttsMonthAndDayIndex();
             targetTimeOfDay = calendar.getSunriseSunsetTime(
                 calendar.year.numericRepresentation,
-                monthDayIndex.month || 0,
-                monthDayIndex.day || 0,
+                (rttsMonthDayIndex.month ?? 0) % 12 || 0,
+                rttsMonthDayIndex.day || 0,
                 preset === PresetTimeOfDay.Sunrise,
                 false
             );
@@ -460,11 +470,11 @@ export async function AdvanceTimeToPreset(preset: PresetTimeOfDay, calendar: Cal
         calendar.changeDateTime({ seconds: changeAmount }, { updateApp: false, showWarning: true });
 
         if (preset === PresetTimeOfDay.Sunrise || preset === PresetTimeOfDay.Sunset) {
-            const monthDayIndex = calendar.getMonthAndDayIndex();
+            const rttsMonthDayIndex = calendar.getRttsMonthAndDayIndex();
             targetTimeOfDay = calendar.getSunriseSunsetTime(
                 calendar.year.numericRepresentation,
-                monthDayIndex.month || 0,
-                monthDayIndex.day || 0,
+                (rttsMonthDayIndex.month ?? 0) % 12 || 0,
+                rttsMonthDayIndex.day || 0,
                 preset === PresetTimeOfDay.Sunrise,
                 false
             );

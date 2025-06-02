@@ -368,43 +368,28 @@ export function chooseRandomDate(
         second = 0;
 
     if (activeCalendar) {
-        /**
-         * Choose a random year
-         *      If the starting and ending year are the same, use that year
-         *      If they are different random choose a year between them (they are included)
-         *      If no years are provided, random choose a year between 0 and 10,000
-         */
+        let minDay = activeCalendar.getMinDay();
+        let maxDay = activeCalendar.getMaxDay();
+        
+        // Translate the min and max days into a RTTS month index. 
+        let minMonthIndex = 0;
+        let maxMonthIndex = activeCalendar.rttsMonths.length;
         if (startingDate.year !== undefined && endingDate.year !== undefined) {
-            if (startingDate.year === endingDate.year) {
-                year = startingDate.year;
-            } else {
-                year = Math.floor(Math.random() * (endingDate.year - startingDate.year + 1)) + startingDate.year;
+            minMonthIndex = (startingDate.year - minDay.year) * 12;
+            maxMonthIndex = ((endingDate.year - minDay.year)) * 12 + 11;
+
+            if (startingDate.month !== undefined && endingDate.month !== undefined) {
+                minMonthIndex += startingDate.month;
+                maxMonthIndex -= endingDate.month;
             }
-        } else {
-            year = Math.floor(Math.random() * 10000);
         }
+        
+        // Choose a random month
+        let randomMonth = Math.floor(Math.random() * (minMonthIndex - minMonthIndex + 1)) + minMonthIndex;
+        year = Math.floor(randomMonth / 12);
+        month = randomMonth % 12;
 
-        /**
-         * Choose a random month
-         *      If the starting and ending month are the same use that month
-         *      If they are different randomly choose a month between them (they are included)
-         *      If no months are provided randomly choose a month between 0 and the number of months in a year
-         */
-        if (startingDate.month !== undefined && endingDate.month !== undefined) {
-            if (startingDate.month === endingDate.month) {
-                month = startingDate.month;
-            } else {
-                month = Math.floor(Math.random() * (endingDate.month - startingDate.month + 1)) + startingDate.month;
-            }
-        } else {
-            month = Math.floor(Math.random() * activeCalendar.months.length);
-        }
-
-        if (month < 0 || month >= activeCalendar.months.length) {
-            month = activeCalendar.months.length - 1;
-        }
-
-        const monthObject = activeCalendar.months[month];
+        const monthObject = activeCalendar.rttsMonths[randomMonth];
         /**
          * Chose a random day
          *      If the starting and ending day are the same use that day
@@ -564,11 +549,11 @@ export async function configureCalendar(
 export function currentDateTime(calendarId: string = "active"): SimpleCalendar.DateTime | null {
     const cal = calendarId === "active" ? CalManager.getActiveCalendar() : CalManager.getCalendar(calendarId);
     if (cal) {
-        const monthDayIndex = cal.getMonthAndDayIndex();
+        const monthDayIndex = cal.getRttsMonthAndDayIndex();
         const time = cal.time.getCurrentTime();
         return {
             year: cal.year.numericRepresentation,
-            month: monthDayIndex.month || 0,
+            month: (monthDayIndex.month ?? 0) % 12 || 0,
             day: monthDayIndex.day || 0,
             hour: time.hour,
             minute: time.minute,
@@ -607,18 +592,18 @@ export function currentDateTime(calendarId: string = "active"): SimpleCalendar.D
 export function currentDateTimeDisplay(calendarId: string = "active"): SimpleCalendar.DateDisplayData | null {
     const cal = calendarId === "active" ? CalManager.getActiveCalendar() : CalManager.getCalendar(calendarId);
     if (cal) {
-        const monthDayIndex = cal.getMonthAndDayIndex();
-        const month = cal.months[monthDayIndex.month || 0];
-        const day = month.days[monthDayIndex.day || 0];
-        const dayOfTheWeek = cal.dayOfTheWeek(cal.year.numericRepresentation, monthDayIndex.month || 0, monthDayIndex.day || 0);
+        const rttsMonthAndDayIndex = cal.getRttsMonthAndDayIndex();
+        const rttsMonth = cal.rttsMonths[rttsMonthAndDayIndex.month || 0];
+        const day = rttsMonth.days[rttsMonthAndDayIndex.day || 0];
+        const dayOfTheWeek = cal.rttsDayOfTheWeek(rttsMonthAndDayIndex.month || 0, rttsMonthAndDayIndex.day || 0);
         const time = cal.time.getCurrentTime();
 
         return {
             date: FormatDateTime(
                 {
                     year: cal.year.numericRepresentation,
-                    month: monthDayIndex.month || 0,
-                    day: monthDayIndex.day || 0,
+                    month: (rttsMonthAndDayIndex.month ?? 0) % 12 || 0,
+                    day: rttsMonthAndDayIndex.day || 0,
                     hour: time.hour,
                     minute: time.minute,
                     seconds: time.seconds
@@ -629,8 +614,8 @@ export function currentDateTimeDisplay(calendarId: string = "active"): SimpleCal
             day: day.numericRepresentation.toString(),
             daySuffix: ordinalSuffix(day.numericRepresentation),
             weekday: cal.weekdays.length > dayOfTheWeek ? cal.weekdays[dayOfTheWeek].name : "",
-            monthName: month.name,
-            month: month.numericRepresentation.toString(),
+            monthName: rttsMonth.name,
+            month: rttsMonth.numericRepresentation.toString(),
             year: cal.year.numericRepresentation.toString(),
             yearName: cal.year.getYearName(cal.year.numericRepresentation),
             yearPrefix: cal.year.prefix,
@@ -638,8 +623,8 @@ export function currentDateTimeDisplay(calendarId: string = "active"): SimpleCal
             time: FormatDateTime(
                 {
                     year: cal.year.numericRepresentation,
-                    month: monthDayIndex.month || 0,
-                    day: monthDayIndex.day || 0,
+                    month: (rttsMonthAndDayIndex.month ?? 0) % 12 || 0,
+                    day: rttsMonthAndDayIndex.day || 0,
                     hour: time.hour,
                     minute: time.minute,
                     seconds: time.seconds
@@ -1329,9 +1314,9 @@ export function getCurrentCalendar(): SimpleCalendar.CalendarData {
 export function getCurrentDay(calendarId: string = "active"): SimpleCalendar.DayData | null {
     const cal = calendarId === "active" ? CalManager.getActiveCalendar() : CalManager.getCalendar(calendarId);
     if (cal) {
-        const month = cal.getMonth();
-        if (month) {
-            const day = month.getDay();
+        const rttsMonth = cal.getRttsMonth();
+        if (rttsMonth) {
+            const day = rttsMonth.getDay();
             if (day) {
                 return day.toConfig();
             }
@@ -1369,15 +1354,7 @@ export function getCurrentDay(calendarId: string = "active"): SimpleCalendar.Day
  * ```
  */
 export function getCurrentMonth(calendarId: string = "active"): SimpleCalendar.MonthData | null {
-    const cal = calendarId === "active" ? CalManager.getActiveCalendar() : CalManager.getCalendar(calendarId);
-    if (cal) {
-        const month = cal.getMonth();
-        if (month) {
-            return month.toConfig();
-        }
-    } else {
-        Logger.error(`SimpleCalendar.api.getCurrentMonth - Unable to find a calendar with the passed in ID of "${calendarId}"`);
-    }
+    Logger.error(`SimpleCalendar.api.getCurrentMonth is disabled for Road to the Sky."`);
     return null;
 }
 
@@ -1408,8 +1385,8 @@ export function getCurrentMonth(calendarId: string = "active"): SimpleCalendar.M
 export function getCurrentSeason(calendarId: string = "active"): SimpleCalendar.SeasonData {
     const cal = calendarId === "active" ? CalManager.getActiveCalendar() : CalManager.getCalendar(calendarId);
     if (cal) {
-        const monthDayIndex = cal.getMonthAndDayIndex();
-        return cal.getSeason(monthDayIndex.month || 0, monthDayIndex.day || 0).toConfig();
+        const rttsMonthDayIndex = cal.getRttsMonthAndDayIndex();
+        return cal.getSeason((rttsMonthDayIndex.month ?? 0) % 12 || 0, rttsMonthDayIndex.day || 0).toConfig();
     } else {
         Logger.error(`SimpleCalendar.api.getCurrentSeason - Unable to find a calendar with the passed in ID of "${calendarId}"`);
     }
@@ -1455,8 +1432,8 @@ export function getCurrentTheme(): string {
 export function getCurrentWeekday(calendarId: string = "active"): SimpleCalendar.WeekdayData | null {
     const activeCalendar = calendarId === "active" ? CalManager.getActiveCalendar() : CalManager.getCalendar(calendarId);
     if (activeCalendar) {
-        const monthDayIndex = activeCalendar.getMonthAndDayIndex();
-        const weekdayIndex = activeCalendar.dayOfTheWeek(activeCalendar.year.numericRepresentation, monthDayIndex.month || 0, monthDayIndex.day || 0);
+        const rttsMonthAndDayIndex = activeCalendar.getRttsMonthAndDayIndex();
+        const weekdayIndex = activeCalendar.rttsDayOfTheWeek(rttsMonthAndDayIndex.month || 0, rttsMonthAndDayIndex.day || 0);
         return activeCalendar.weekdays[weekdayIndex].toConfig();
     } else {
         Logger.error(`SimpleCalendar.api.getCurrentWeekday - Unable to find a calendar with the passed in ID of "${calendarId}"`);
@@ -1852,32 +1829,33 @@ export function showCalendar(date: SimpleCalendar.DateTimeParts | null = null, c
 
     if (activeCalendar) {
         CalManager.setVisibleCalendar(activeCalendar.id);
-        if (date !== null) {
-            const finalDate = MergeDateTimeObject(date, null, activeCalendar);
-
-            if (Number.isInteger(finalDate.year) && Number.isInteger(finalDate.month) && Number.isInteger(finalDate.day)) {
-                const isLeapYear = activeCalendar.year.leapYearRule.isLeapYear(finalDate.year);
-                activeCalendar.year.visibleYear = finalDate.year;
-                if (finalDate.month === -1 || finalDate.month > activeCalendar.months.length) {
-                    finalDate.month = activeCalendar.months.length - 1;
-                }
-                activeCalendar.resetMonths("visible");
-                activeCalendar.months[finalDate.month].visible = true;
-
-                const numberOfDays = isLeapYear
-                    ? activeCalendar.months[finalDate.month].numberOfLeapYearDays
-                    : activeCalendar.months[finalDate.month].numberOfDays;
-                if (finalDate.day === -1 || finalDate.day > numberOfDays) {
-                    finalDate.day = numberOfDays - 1;
-                }
-                activeCalendar.resetMonths("selected");
-                activeCalendar.months[finalDate.month].days[finalDate.day].selected = true;
-                activeCalendar.months[finalDate.month].selected = true;
-                activeCalendar.year.selectedYear = activeCalendar.year.visibleYear;
-            } else {
-                Logger.error("Main.api.showCalendar: Invalid date passed in.");
-            }
-        }
+        Logger.warn(`SimpleCalendar.api.showCalendar - Setting specific date via api is not supported in Road to the Sky"`);
+        //if (date !== null) {
+        //    const finalDate = MergeDateTimeObject(date, null, activeCalendar);
+//
+        //    if (Number.isInteger(finalDate.year) && Number.isInteger(finalDate.month) && Number.isInteger(finalDate.day)) {
+        //        const isLeapYear = activeCalendar.year.leapYearRule.isLeapYear(finalDate.year);
+        //        activeCalendar.year.visibleYear = finalDate.year;
+        //        if (finalDate.month === -1 || finalDate.month > activeCalendar.months.length) {
+        //            finalDate.month = activeCalendar.months.length - 1;
+        //        }
+        //        activeCalendar.resetMonths("visible");
+        //        activeCalendar.months[finalDate.month].visible = true;
+//
+        //        const numberOfDays = isLeapYear
+        //            ? activeCalendar.months[finalDate.month].numberOfLeapYearDays
+        //            : activeCalendar.months[finalDate.month].numberOfDays;
+        //        if (finalDate.day === -1 || finalDate.day > numberOfDays) {
+        //            finalDate.day = numberOfDays - 1;
+        //        }
+        //        activeCalendar.resetMonths("selected");
+        //        activeCalendar.months[finalDate.month].days[finalDate.day].selected = true;
+        //        activeCalendar.months[finalDate.month].selected = true;
+        //        activeCalendar.year.selectedYear = activeCalendar.year.visibleYear;
+        //    } else {
+        //        Logger.error("Main.api.showCalendar: Invalid date passed in.");
+        //    }
+        //}
     } else {
         Logger.error(`SimpleCalendar.api.showCalendar - Unable to find a calendar with the passed in ID of "${calendarId}"`);
     }

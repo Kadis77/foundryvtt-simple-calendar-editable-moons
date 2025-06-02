@@ -156,10 +156,10 @@ export default class MainApp extends FormApplication {
                 this.activeCalendar.generalSettings.showClock &&
                 this.activeCalendar.generalSettings.gameWorldTimeIntegration !== GameWorldTimeIntegrations.ThirdParty;
 
-            const selectedMonthDayIndex = this.visibleCalendar.getMonthAndDayIndex("selected");
+            const selectedMonthDayIndex = this.visibleCalendar.getRttsMonthAndDayIndex("selected");
             if (selectedMonthDayIndex.month !== undefined) {
                 if (selectedMonthDayIndex.day !== undefined) {
-                    if (!this.visibleCalendar.months[selectedMonthDayIndex.month].days[selectedMonthDayIndex.day].current) {
+                    if (!this.visibleCalendar.rttsMonths[selectedMonthDayIndex.month].days[selectedMonthDayIndex.day].current) {
                         data.showSetCurrentDate = canUser((<Game>game).user, SC.globalConfiguration.permissions.changeDateTime);
                     }
                 }
@@ -313,7 +313,7 @@ export default class MainApp extends FormApplication {
         event.preventDefault();
         event.stopPropagation();
         this.uiElementStates.compactView = !this.uiElementStates.compactView;
-        this.visibleCalendar.resetMonths("selected");
+        this.visibleCalendar.resetRttsMonths("selected");
         this.hideDrawers();
         this.render(true);
     }
@@ -921,19 +921,18 @@ export default class MainApp extends FormApplication {
     // RTTS: Prevent clicking if the next one is not allowed
     public changeMonth(clickType: CalendarClickEvents) {
         this.toggleUnitSelector(true);
-        let visibleDate = {
-            year: this.visibleCalendar.year.visibleYear,
-            month: this.visibleCalendar.getMonthAndDayIndex("visible").month ?? 0,
-            day: this.visibleCalendar.getMonthAndDayIndex("visible").day ?? 0
+        let rttsVisibleMonthAndDayIndex = this.visibleCalendar.getRttsMonthAndDayIndex("visible");
+        
+        let canChangeMonth = true;
+        if ((CalendarClickEvents.previous && rttsVisibleMonthAndDayIndex.month == 0)
+        || CalendarClickEvents.next && rttsVisibleMonthAndDayIndex.month == this.visibleCalendar.rttsMonths.length - 1) {
+            canChangeMonth = false;
         }
-        console.log("visible date: " + JSON.stringify(visibleDate));
-        let canChangeMonth = this.visibleCalendar.canAddMonths(
-            visibleDate, 
-            CalendarClickEvents.previous ? -1 : 1);
         console.log("can change month: " + canChangeMonth);
         if (canChangeMonth) {
             this.visibleCalendar.changeMonth(clickType === CalendarClickEvents.previous ? -1 : 1);
         }
+
         MainApp.setWidthHeight(this);
     }
 
@@ -951,19 +950,20 @@ export default class MainApp extends FormApplication {
         ) {
             const selectedDay = options.selectedDates.start.day;
             let allReadySelected = false;
-            const currentlySelectedMonth = this.visibleCalendar.getMonth("selected");
-            if (currentlySelectedMonth) {
-                const currentlySelectedDayIndex = currentlySelectedMonth.getDayIndex("selected");
+            const currentlySelectedRttsMonth = this.visibleCalendar.getRttsMonth("selected");
+            if (currentlySelectedRttsMonth) {
+                const currentlySelectedDayIndex = currentlySelectedRttsMonth.getDayIndex("selected");
                 allReadySelected =
                     currentlySelectedDayIndex === selectedDay && this.visibleCalendar.year.selectedYear === options.selectedDates.start.year;
             }
 
-            this.visibleCalendar.resetMonths("selected");
+            this.visibleCalendar.resetRttsMonths("selected");
             if (!allReadySelected) {
-                const month = this.visibleCalendar.months[options.selectedDates.start.month];
+                let newRttsMonthIndex = this.visibleCalendar.getRttsMonthIndexFromDate(this.visibleCalendar.year.visibleYear, options.selectedDates.start.month);
+                const rttsMonth = this.visibleCalendar.rttsMonths[newRttsMonthIndex];
                 if (selectedDay > -1) {
-                    month.selected = true;
-                    month.days[selectedDay].selected = true;
+                    rttsMonth.selected = true;
+                    rttsMonth.days[selectedDay].selected = true;
                     this.visibleCalendar.year.selectedYear = this.visibleCalendar.year.visibleYear;
                 }
             }
@@ -975,16 +975,16 @@ export default class MainApp extends FormApplication {
      * Click event when a user clicks on the Today button
      */
     public todayClick() {
-        this.visibleCalendar.resetMonths("selected");
-        this.visibleCalendar.resetMonths("visible");
-        const currentMonth = this.visibleCalendar.getMonth();
-        if (currentMonth) {
-            const currentDay = currentMonth.getDay();
+        this.visibleCalendar.resetRttsMonths("selected");
+        this.visibleCalendar.resetRttsMonths("visible");
+        const currentRttsMonth = this.visibleCalendar.getRttsMonth();
+        if (currentRttsMonth) {
+            const currentDay = currentRttsMonth.getDay();
             if (currentDay) {
                 this.visibleCalendar.year.selectedYear = this.visibleCalendar.year.numericRepresentation;
                 this.visibleCalendar.year.visibleYear = this.visibleCalendar.year.numericRepresentation;
-                currentMonth.visible = true;
-                currentMonth.selected = true;
+                currentRttsMonth.visible = true;
+                currentRttsMonth.selected = true;
                 currentDay.selected = true;
                 this.updateApp();
             }
@@ -1064,10 +1064,10 @@ export default class MainApp extends FormApplication {
     public dateControlApply() {
         if (canUser((<Game>game).user, SC.globalConfiguration.permissions.changeDateTime)) {
             const selectedYear = this.activeCalendar.year.selectedYear;
-            const selectedMonthDayIndex = this.activeCalendar.getMonthAndDayIndex("selected");
-            const selectedMonth = this.activeCalendar.getMonth("selected");
-            if (selectedMonth) {
-                if (selectedYear !== this.activeCalendar.year.visibleYear || !selectedMonth.visible) {
+            const rttsSelectedMonthDayIndex = this.activeCalendar.getRttsMonthAndDayIndex("selected");
+            const selectedRttsMonth = this.activeCalendar.getRttsMonth("selected");
+            if (selectedRttsMonth) {
+                if (selectedYear !== this.activeCalendar.year.visibleYear || !selectedRttsMonth.visible) {
                     const utsd = new Dialog({
                         title: GameSettings.Localize("FSC.SetCurrentDateDialog.Title"),
                         content: GameSettings.Localize("FSC.SetCurrentDateDialog.Content").replace(
@@ -1075,8 +1075,8 @@ export default class MainApp extends FormApplication {
                             FormatDateTime(
                                 {
                                     year: selectedYear,
-                                    month: selectedMonthDayIndex.month || 0,
-                                    day: selectedMonthDayIndex.day || 0,
+                                    month: (rttsSelectedMonthDayIndex.month ?? 0) % 12|| 0,
+                                    day: rttsSelectedMonthDayIndex.day || 0,
                                     hour: 0,
                                     minute: 0,
                                     seconds: 0
@@ -1091,8 +1091,8 @@ export default class MainApp extends FormApplication {
                                 callback: this.setCurrentDate.bind(
                                     this,
                                     selectedYear,
-                                    selectedMonthDayIndex.month || 0,
-                                    selectedMonthDayIndex.day || 0
+                                    (rttsSelectedMonthDayIndex.month ?? 0) % 12|| 0,
+                                    rttsSelectedMonthDayIndex.day || 0
                                 )
                             },
                             no: {
@@ -1103,7 +1103,7 @@ export default class MainApp extends FormApplication {
                     });
                     utsd.render(true);
                 } else {
-                    this.setCurrentDate(selectedYear, selectedMonthDayIndex.month || 0, selectedMonthDayIndex.day || 0);
+                    this.setCurrentDate(selectedYear, (rttsSelectedMonthDayIndex.month ?? 0) % 12, rttsSelectedMonthDayIndex.day || 0);
                 }
             }
         } else {

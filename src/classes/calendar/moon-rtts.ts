@@ -222,7 +222,7 @@ export class RoadToTheSkyMoon extends ConfigurationItemBase {
                 : property === "selected"
                     ? calendar.year.selectedYear
                     : calendar.year.visibleYear;
-        const monthIndex = calendar.getMonthIndex(property);
+        const monthIndex = calendar.getRttsMonthIndex(property) % 12;
         if (monthIndex > -1) {
             const dayIndex = property !== "visible" ? calendar.months[monthIndex].getDayIndex(property) : dayToUse;
             return this.getDateMoonPhase(calendar, yearNum, monthIndex, dayIndex);

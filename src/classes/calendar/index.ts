@@ -18,7 +18,7 @@ import ConfigurationItemBase from "../configuration/configuration-item-base";
 import PF2E from "../systems/pf2e";
 import Renderer from "../renderer";
 import {generateUniqueId} from "../utilities/string";
-import {DateToTimestamp, DaysBetweenDates, FormatDateTime, ToSeconds} from "../utilities/date-time";
+import {DateToTimestamp, DaysBetweenDates, FormatDateTime, RttsToSeconds} from "../utilities/date-time";
 import {canUser} from "../utilities/permissions";
 import {CalManager, MainApplication, NManager, SC} from "../index";
 import TimeKeeper from "../time/time-keeper";
@@ -159,17 +159,17 @@ export default class Calendar extends ConfigurationItemBase {
             sMonth,
             sDay;
 
-        const currentMonthDay = this.getMonthAndDayIndex();
-        const selectedMonthDay = this.getMonthAndDayIndex("selected");
-        const visibleMonthDay = this.getMonthAndDayIndex("visible");
+        const currentRttsMonthDay = this.getRttsMonthAndDayIndex();
+        const selectedRttsMonthDay = this.getRttsMonthAndDayIndex("selected");
+        const visibleRttsMonthDay = this.getRttsMonthAndDayIndex("visible");
 
-        if (selectedMonthDay.month !== undefined) {
-            sMonth = selectedMonthDay.month;
-            sDay = selectedMonthDay.day || 0;
+        if (selectedRttsMonthDay.month !== undefined) {
+            sMonth = selectedRttsMonthDay.month % 12;
+            sDay = selectedRttsMonthDay.day || 0;
         } else {
             sYear = this.year.numericRepresentation;
-            sMonth = currentMonthDay.month || 0;
-            sDay = currentMonthDay.day || 0;
+            sMonth = (currentRttsMonthDay.month ?? 0) % 12 || 0;
+            sDay = currentRttsMonthDay.day || 0;
         }
 
         const noteCounts = NManager.getNoteCountsForDay(this.id, sYear, sMonth, sDay);
@@ -190,7 +190,7 @@ export default class Calendar extends ConfigurationItemBase {
                 noteReminderCount: noteCounts.reminderCount,
                 notes: NManager.getNotesForDay(this.id, sYear, sMonth, sDay)
             },
-            visibleDate: { year: this.year.visibleYear, month: visibleMonthDay.month || 0 }
+            visibleDate: { year: this.year.visibleYear, month: visibleRttsMonthDay.month || 0 }
         };
     }
 
@@ -364,8 +364,8 @@ export default class Calendar extends ConfigurationItemBase {
             this.year.selectedYear = Math.max(config.currentDate.year, minDay.year);
             this.year.visibleYear = Math.max(config.currentDate.year, minDay.year);
 
-            this.resetMonths("current");
-            this.resetMonths("visible");
+            this.resetRttsMonths("current");
+            this.resetRttsMonths("visible");
 
             if (config.currentDate.month > -1 && config.currentDate.month < this.months.length) {
                 this.months[config.currentDate.month].current = true;
@@ -436,10 +436,10 @@ export default class Calendar extends ConfigurationItemBase {
      * @private
      */
     getCurrentDate(): SimpleCalendar.CurrentDateData {
-        const monthDayIndex = this.getMonthAndDayIndex();
+        const monthDayIndex = this.getRttsMonthAndDayIndex();
         return {
             year: this.year.numericRepresentation,
-            month: monthDayIndex.month || 0,
+            month: (monthDayIndex.month ?? 0) % 12 || 0,
             day: monthDayIndex.day || 0,
             seconds: this.time.seconds
         };
@@ -457,15 +457,15 @@ export default class Calendar extends ConfigurationItemBase {
             minute: 0,
             seconds: 0
         };
-        const selectedMonthDayIndex = this.getMonthAndDayIndex("selected");
-        const currentMonthDayIndex = this.getMonthAndDayIndex();
+        const selectedMonthDayIndex = this.getRttsMonthAndDayIndex("selected");
+        const currentMonthDayIndex = this.getRttsMonthAndDayIndex();
         if (selectedMonthDayIndex.month !== undefined) {
             dt.year = this.year.selectedYear;
-            dt.month = selectedMonthDayIndex.month;
+            dt.month = selectedMonthDayIndex.month % 12;
             dt.day = selectedMonthDayIndex.day || 0;
         } else {
             dt.year = this.year.numericRepresentation;
-            dt.month = currentMonthDayIndex.month || 0;
+            dt.month = (currentMonthDayIndex.month ?? 0) % 12 || 0;
             dt.day = currentMonthDayIndex.day || 0;
 
             const time = this.time.getCurrentTime();
@@ -480,7 +480,7 @@ export default class Calendar extends ConfigurationItemBase {
      * Gets the current season based on the current date
      */
     getCurrentSeason() {
-        let monthIndex = this.getMonthIndex("visible");
+        let monthIndex = this.getRttsMonthIndex("visible");
         if (monthIndex === -1) {
             monthIndex = 0;
         }
@@ -492,7 +492,7 @@ export default class Calendar extends ConfigurationItemBase {
                 dayIndex = 0;
             }
         }
-        const season = this.getSeason(monthIndex, dayIndex);
+        const season = this.getSeason(monthIndex % 12, dayIndex);
         return {
             name: season.name,
             color: season.color,
@@ -501,12 +501,12 @@ export default class Calendar extends ConfigurationItemBase {
     }
 
     /**
-     * Returns the month, where the passed in setting is true
+     * Returns the RTTS month, where the passed in setting is true
      * @param [setting='current'] The setting to look for. Can be visible, current or selected
      */
-    getMonth(setting: string = "current") {
+    getRttsMonth(setting: string = "current") {
         const verifiedSetting = setting.toLowerCase() as "visible" | "current" | "selected";
-        return this.months.find((m) => {
+        return this.rttsMonths.find((m) => {
             return m[verifiedSetting];
         });
     }
@@ -515,9 +515,9 @@ export default class Calendar extends ConfigurationItemBase {
      * Returns the index of the month, where the passed in setting is true
      * @param [setting='current'] The setting to look for. Can be visible, current or selected
      */
-    getMonthIndex(setting: string = "current") {
+    getRttsMonthIndex(setting: string = "current") {
         const verifiedSetting = setting.toLowerCase() as "visible" | "current" | "selected";
-        return this.months.findIndex((m) => {
+        return this.rttsMonths.findIndex((m) => {
             return m[verifiedSetting];
         });
     }
@@ -526,25 +526,35 @@ export default class Calendar extends ConfigurationItemBase {
      * Returns the index of the month and index of the day in that month, where the passed in setting is true
      * @param [setting='current'] The setting to look for. Can be visible, current or selected
      */
-    getMonthAndDayIndex(setting: string = "current") {
+    getRttsMonthAndDayIndex(setting: string = "current") {
         const verifiedSetting = setting.toLowerCase() as "visible" | "current" | "selected";
         const result: Partial<SimpleCalendar.Date> = {
             month: 0,
             day: 0
         };
-        // console.log(JSON.stringify(this.months));
-        const mIndex = this.months.findIndex((m) => {
+        const mIndex = this.rttsMonths.findIndex((m) => {
             return m[verifiedSetting];
         });
         if (mIndex > -1) {
             result.month = mIndex;
-            const dIndex = this.months[mIndex].getDayIndex(verifiedSetting);
+            const dIndex = this.rttsMonths[mIndex].getDayIndex(verifiedSetting);
             if (dIndex > -1) {
                 result.day = dIndex;
             }
         } else {
             result.month = undefined;
         }
+        return result;
+    }
+
+    /**
+     * Returns the index of the month and index of the day in that month, where the passed in setting is true
+     * @param year
+     * @param month
+     */
+    getRttsMonthIndexFromDate(year: number, month: number) {
+        let yearsSinceStart = year - this.getMinDay().year;
+        let result = (yearsSinceStart * 12) + month;
         return result;
     }
 
@@ -649,20 +659,17 @@ export default class Calendar extends ConfigurationItemBase {
 
     /**
      * Will take the days of the passed in month and break it into an array of weeks
-     * @param monthIndex The month to get the days from
-     * @param year The year the month is in (for leap year calculation)
-     * @param weekLength How many days there are in a week
+     * @param rttsMonthIndex
      */
-    daysIntoWeeks(monthIndex: number, year: number, weekLength: number): (boolean | SimpleCalendar.HandlebarTemplateData.Day)[][] {
+    rttsDaysIntoWeeks(rttsMonthIndex: number): (boolean | SimpleCalendar.HandlebarTemplateData.Day)[][] {
         const weeks = [];
-        const dayOfWeekOffset = this.monthStartingDayOfWeek(monthIndex, year);
-        const isLeapYear = this.year.leapYearRule.isLeapYear(year);
-        const days = this.months[monthIndex].getDaysForTemplate(isLeapYear);
+        const dayOfWeekOffset = this.rttsMonthStartingDayOfWeek(rttsMonthIndex);
+        const days = this.rttsMonths[rttsMonthIndex].getDaysForTemplate();
 
-        if (days.length && weekLength > 0) {
+        if (days.length) {
             const startingWeek = [];
             let dayOffset = 0;
-            for (let i = 0; i < weekLength; i++) {
+            for (let i = 0; i < 7; i++) {
                 if (i < dayOfWeekOffset) {
                     startingWeek.push(false);
                 } else {
@@ -676,11 +683,11 @@ export default class Calendar extends ConfigurationItemBase {
                 }
             }
             weeks.push(startingWeek);
-            const numWeeks = Math.ceil((days.length - dayOffset) / weekLength);
+            const numWeeks = Math.ceil((days.length - dayOffset) / 7);
             for (let i = 0; i < numWeeks; i++) {
                 const w = [];
-                for (let d = 0; d < weekLength; d++) {
-                    const dayIndex = dayOffset + i * weekLength + d;
+                for (let d = 0; d < 7; d++) {
+                    const dayIndex = dayOffset + i * 7 + d;
                     if (dayIndex < days.length) {
                         w.push(days[dayIndex]);
                     } else {
@@ -695,12 +702,11 @@ export default class Calendar extends ConfigurationItemBase {
 
     /**
      * Calculates the day of the week a passed in day falls on based on its month and year
-     * @param {number} year The year of the date to find its day of the week
      * @param {number} monthIndex The month that the target day is in
      * @param {number} dayIndex  The day of the month that we want to check
      * @return {number}
      */
-    dayOfTheWeek(year: number, monthIndex: number, dayIndex: number): number {
+    rttsDayOfTheWeek(rttsMonthIndex: number, dayIndex: number): number {
         if (this.weekdays.length) {
             const activeCalendar = CalManager.getActiveCalendar();
             if (PF2E.isPF2E && activeCalendar.generalSettings.pf2eSync) {
@@ -710,14 +716,13 @@ export default class Calendar extends ConfigurationItemBase {
                 }
             }
 
-            const month = this.months[monthIndex];
-            let daysSoFar;
-            if (month && month.startingWeekday !== null) {
-                daysSoFar = dayIndex + month.startingWeekday - 1;
-            } else {
-                daysSoFar = this.dateToDays(year, monthIndex, dayIndex) + this.year.firstWeekday;
-            }
-            return ((daysSoFar % this.weekdays.length) + this.weekdays.length) % this.weekdays.length;
+            const month = this.rttsMonths[rttsMonthIndex];
+            // the min day always starts on weekday index 0
+            let daysSoFar = this.dateToDays(
+                this.getMinDay().year + Math.floor(rttsMonthIndex / 12),
+                rttsMonthIndex % 12,
+                dayIndex);
+            return daysSoFar % 7;
         } else {
             return 0;
         }
@@ -729,13 +734,13 @@ export default class Calendar extends ConfigurationItemBase {
      * @param {number} year The year the check
      * @return {number}
      */
-    monthStartingDayOfWeek(monthIndex: number, year: number): number {
+    rttsMonthStartingDayOfWeek(monthIndex: number): number {
         if (
             monthIndex > -1 &&
             monthIndex < this.months.length &&
             !(this.months[monthIndex].intercalary && !this.months[monthIndex].intercalaryInclude)
         ) {
-            return this.dayOfTheWeek(year, monthIndex, 0);
+            return this.rttsDayOfTheWeek(monthIndex, 0);
         }
         return 0;
     }
@@ -744,9 +749,9 @@ export default class Calendar extends ConfigurationItemBase {
      * Resents the setting for all months and days to false
      * @param {string} [setting='current']
      */
-    resetMonths(setting: string = "current") {
+    resetRttsMonths(setting: string = "current") {
         const verifiedSetting = setting.toLowerCase() as "visible" | "current" | "selected";
-        this.months.forEach((m) => {
+        this.rttsMonths.forEach((m) => {
             if (setting !== "visible") {
                 m.resetDays(setting);
             }
@@ -759,8 +764,8 @@ export default class Calendar extends ConfigurationItemBase {
      */
     setCurrentToVisible() {
         this.year.visibleYear = this.year.numericRepresentation;
-        this.resetMonths("visible");
-        const curMonth = this.getMonth();
+        this.resetRttsMonths("visible");
+        const curMonth = this.getRttsMonth();
         if (curMonth) {
             curMonth.visible = true;
         }
@@ -791,18 +796,21 @@ export default class Calendar extends ConfigurationItemBase {
         if (setDay !== null) {
             currentDay = setDay;
         } else {
-            const currentMonthDayIndex = this.getMonthAndDayIndex();
-            currentDay = currentMonthDayIndex.day || 0;
+            const currentRttsMonthDayIndex = this.getRttsMonthAndDayIndex();
+            currentDay = currentRttsMonthDayIndex.day || 0;
         }
 
         //Reset all the months settings
-        this.resetMonths(setting);
+        this.resetRttsMonths(setting);
+        this.rttsMonths[month][verifiedSetting] = true;
+
+
         //If the month we are going to show has no days, skip it
         if ((isLeapYear && this.months[month].numberOfLeapYearDays === 0) || (!isLeapYear && this.months[month].numberOfDays === 0)) {
             this.months[month][verifiedSetting] = true;
             return this.changeMonth(next ? 1 : -1, setting, setDay);
         } else {
-            this.months[month][verifiedSetting] = true;
+            
         }
 
         // If we are adjusting the current date we need to propagate that down to the days of the new month as well
@@ -914,24 +922,19 @@ export default class Calendar extends ConfigurationItemBase {
      */
     changeDay(amount: number, setting: string = "current") {
         const verifiedSetting = setting.toLowerCase() as "current" | "selected";
-        const yearToUse = verifiedSetting === "current" ? this.year.numericRepresentation : this.year.selectedYear;
-        const currentMonth = this.getMonth(verifiedSetting);
-        if (currentMonth) {
+        const currentRttsMonth = this.getRttsMonth(verifiedSetting);
+        if (currentRttsMonth) {
             const next = amount > 0;
-            const currentDayIndex = currentMonth.getDayIndex(verifiedSetting);
+            const currentDayIndex = currentRttsMonth.getDayIndex(verifiedSetting);
             
-            // RTTS - figure out the number of days in this month
-            let monthIndexFromStart = ((yearToUse - this.getMinDay().year) * 12) + this.getMonthIndex(verifiedSetting);
-            let lastDayOfCurrentMonth = this.rttsMoons[RoadToTheSkyMoonIds.harvest].cycleLengths[monthIndexFromStart];
-            
-            if (next && currentDayIndex + amount >= lastDayOfCurrentMonth) {
+            if (next && currentDayIndex + amount >= currentRttsMonth.numberOfDays) {
                 this.changeMonth(1, verifiedSetting, 0);
-                this.changeDay(amount - (lastDayOfCurrentMonth - currentDayIndex), verifiedSetting);
+                this.changeDay(amount - (currentRttsMonth.numberOfDays - currentDayIndex), verifiedSetting);
             } else if (!next && currentDayIndex + amount < 0) {
                 this.changeMonth(-1, verifiedSetting, -1);
                 this.changeDay(amount + currentDayIndex + 1, verifiedSetting);
             } else {
-                currentMonth.changeDay(amount, false, verifiedSetting);
+                currentRttsMonth.changeDay(amount, false, verifiedSetting);
             }
         }
     }
@@ -1212,8 +1215,8 @@ export default class Calendar extends ConfigurationItemBase {
      * Converts current date into seconds
      */
     public toSeconds() {
-        const monthDay = this.getMonthAndDayIndex();
-        return ToSeconds(this, this.year.numericRepresentation, monthDay.month || 0, monthDay.day || 0, true);
+        const rttsMonthDay = this.getRttsMonthAndDayIndex();
+        return RttsToSeconds(this, rttsMonthDay.month || 0, rttsMonthDay.day || 0, true);
     }
 
     public changeDateTime(interval: SimpleCalendar.DateTimeParts, options: SimpleCalendar.DateChangeOptions = {}) {
@@ -1286,7 +1289,7 @@ export default class Calendar extends ConfigurationItemBase {
                 minute: date.minute || 0,
                 seconds: date.seconds || 0
             };
-            const monthDayIndex = this.getMonthAndDayIndex();
+            const rttsMonthDayIndex = this.getRttsMonthAndDayIndex();
             const currentTime = this.time.getCurrentTime();
             if (date.seconds === undefined) {
                 processedDate.seconds = currentTime.seconds;
@@ -1301,10 +1304,10 @@ export default class Calendar extends ConfigurationItemBase {
                 processedDate.year = this.year.numericRepresentation;
             }
             if (date.month === undefined) {
-                processedDate.month = monthDayIndex.month || 0;
+                processedDate.month = (rttsMonthDayIndex.month ?? 0) % 12|| 0;
             }
             if (date.day === undefined) {
-                processedDate.day = monthDayIndex.day || 0;
+                processedDate.day = rttsMonthDayIndex.day || 0;
             }
             this.updateTime(processedDate);
 
@@ -1489,170 +1492,23 @@ export default class Calendar extends ConfigurationItemBase {
 
     /**
      * Converts the passed in date to the number of days that make up that date from the Road to the Sky min day
-     * @param year The year to convert
-     * @param monthIndex The index of the month to convert
+     * @param rttsMonthIndex
      * @param dayIndex The day to convert
      */
-    rttsDateToDays(year: number, monthIndex: number, dayIndex: number) {
-        if (monthIndex < 0) {
-            monthIndex = 0;
-        } else if (monthIndex >= this.months.length) {
-            monthIndex = this.months.length - 1;
-        }
-
-        let minDay = this.getMinDay();
-        if (year < minDay.year) {
-            year = minDay.year;
+    rttsDateToDays(rttsMonthIndex: number, dayIndex: number) {
+        if (rttsMonthIndex < 0) {
+            rttsMonthIndex = 0;
+        } else if (rttsMonthIndex >= this.rttsMonths.length) {
+            rttsMonthIndex = this.months.length - 1;
         }
 
         let daysIntoMonth = dayIndex + 1;
-        let monthsSoFar = monthIndex + ((year - minDay.year) * 12);
-        
         let daysSoFar = 0;
-        for (let i = 0; i < monthsSoFar && i < this.rttsMoons[RoadToTheSkyMoonIds.harvest].cycleLengths.length; i++) {
+        for (let i = 0; i < rttsMonthIndex && i < this.rttsMoons[RoadToTheSkyMoonIds.harvest].cycleLengths.length; i++) {
             daysSoFar += this.rttsMoons[RoadToTheSkyMoonIds.harvest].cycleLengths[i];
         }
         
         daysSoFar += daysIntoMonth;
         return daysSoFar;
     }
-    
-    public rttsCanAddIntervalToCurrentTime(interval: SimpleCalendar.DateTimeParts) {
-        // Ignore any year or month component. 
-        let currentDate = this.getCurrentDate();
-        let currentDaysSinceStart = this.rttsDateToDays(currentDate.year, currentDate.month, currentDate.day);
-        let currentTime = this.time.getCurrentTime();
-
-        // is this a positive or negative interval?
-        let next = (interval.day ?? 0 >= 0)
-            && (interval.hour ?? 0 >= 0)
-            && (interval.minute ?? 0 >= 0)
-            && (interval.seconds ?? 0 >= 0);
-
-        if (!next) {
-            // We are going back in time.
-            // Will this take us before day 0?
-            if (interval.day) {
-                if (currentDaysSinceStart + interval.day < 0) {
-                    console.warn("Cannot change date - is before the first day");
-                    return false;
-                }
-            }
-            else if (currentDaysSinceStart + (interval.day ?? 0) == 0) {
-                if (currentTime.hour + (interval.hour ?? 0) < 0) {
-                    console.warn("Cannot change date - is before the first day");
-                    return false;
-                }
-                else if (currentTime.hour + (interval.hour ?? 0) == 0 && currentTime.minute + (interval.minute ?? 0) < 0) {
-                    console.warn("Cannot change date - is before the first day");
-                    return false;
-                }
-                else if  (currentTime.hour + (interval.hour ?? 0) == 0 && currentTime.minute + (interval.minute ?? 0) == 0 && currentTime.seconds + (interval.seconds ?? 0) < 0) {
-                    console.warn("Cannot change date - is before the first day");
-                    return false;
-                }
-            }
-        }
-        else {
-            // We are going forward in time. 
-            // Will this take us after the max day?
-            let maxDayInDays = this.rttsDateToDays(this.getMaxDay().year, this.getMaxDay().month, this.getMaxDay().day);
-            if (currentDaysSinceStart + (interval.day ?? 0 ) > maxDayInDays) {
-                console.warn("Cannot change date - is after the max day.");
-                return false;
-            }
-            else if (currentDaysSinceStart + (interval.day ?? 0) == 0) {
-                // Check if the time will put us over
-                if (currentTime.hour + (interval.hour ?? 0) > 24) {
-                    console.warn("Cannot change date - is after the max day.");
-                    return false;
-                }
-                else if (currentTime.hour + (interval.hour ?? 0) == 23 && currentTime.minute + (interval.minute ?? 0) > 60) {
-                    console.warn("Cannot change date - is after the max day.");
-                    return false;
-                }
-                else if (currentTime.hour + (interval.hour ?? 0) == 23 && currentTime.minute + (interval.minute ?? 0) == 59 && currentTime.seconds + (interval.seconds ?? 0) > 60) {
-                    console.warn("Cannot change date - is after the max day.");
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-    
-
-    // RTTS: A version of changeDateTime that accepts days and never months or years, since these are of variable length.
-    
-    public rttsChangeDateTime(interval: SimpleCalendar.DateTimeParts, options: SimpleCalendar.DateChangeOptions = {}) {
-        options = deepMerge({}, { updateMonth: true, updateApp: true, save: true, sync: true, showWarning: false }, options);
-
-
-        
-
-
-
-        if (canUser((<Game>game).user, SC.globalConfiguration.permissions.changeDateTime)) {
-            if (this.rttsCanAddIntervalToCurrentTime(interval)) {
-
-                // is this a positive or negative interval?
-                let next = (interval.day ?? 0 >= 0)
-                    && (interval.hour ?? 0 >= 0)
-                    && (interval.minute ?? 0 >= 0)
-                    && (interval.seconds ?? 0 >= 0);
-                
-
-
-            }
-            
-            
-            const initialTimestamp = this.toSeconds();
-            let change = false;
-
-            if (interval.year) {
-                this.changeYear(interval.year, options.updateMonth, "current");
-                change = true;
-            }
-            if (interval.month) {
-                this.changeMonth(interval.month, "current");
-                change = true;
-            }
-            if (interval.day) {
-                this.changeDay(interval.day);
-                change = true;
-            }
-            if (interval.hour || interval.minute || interval.seconds) {
-                const dayChange = this.time.changeTime(interval.hour, interval.minute, interval.seconds);
-                if (dayChange !== 0) {
-                    this.changeDay(dayChange);
-                }
-                change = true;
-            }
-
-            if (change) {
-                if (CalManager.isActiveCalendar(this.id)) {
-                    const changeInSeconds = this.toSeconds() - initialTimestamp;
-                    Hook.emit(SimpleCalendarHooks.DateTimeChange, this, changeInSeconds);
-
-                    if (!options.fromCalSync && CalManager.syncWithAllCalendars && !isNaN(initialTimestamp)) {
-                        CalManager.syncWithCalendars({ seconds: changeInSeconds });
-                    }
-                }
-
-                if (options.save) {
-                    CalManager.saveCalendars().catch(Logger.error);
-                }
-                if (options.sync) {
-                    this.syncTime().catch(Logger.error);
-                }
-                if (options.updateApp) {
-                    MainApplication.updateApp();
-                }
-            }
-            return true;
-        } else if (options.showWarning) {
-            GameSettings.UiNotification(GameSettings.Localize("FSC.Warn.Macros.GMUpdate"), "warn");
-        }
-        return false;
-    }
-    
 }

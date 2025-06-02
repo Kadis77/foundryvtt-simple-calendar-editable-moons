@@ -50,15 +50,10 @@ export default class CalendarFull {
             HTML = `<div class="fsc-year-view-wrapper" id="${options.id}"><div class="fsc-current-year">`;
             
             // RTTS: Check if the forward/backward month controls should be enabled
-            let visibleDate = {
-                year: calendar.year.visibleYear,
-                month: calendar.getMonthAndDayIndex("visible").month ?? 0,
-                day: calendar.getMonthAndDayIndex("visible").day ?? 0
-            }
-            console.log("visible date from renderer: " + JSON.stringify(visibleDate));
-            let canChangeMonthForward = calendar.canAddMonths(visibleDate, 1);
+            let visibleMonthIndex = calendar.getRttsMonthIndex("visible");
+            let canChangeMonthForward = visibleMonthIndex != calendar.rttsMonths.length - 1;
             console.log("canChangeMonthForward: " + canChangeMonthForward);
-            let canChangeMonthBack = calendar.canAddMonths(visibleDate, -1);
+            let canChangeMonthBack = visibleMonthIndex > 0;
             console.log("canChangeMonthBack: " + canChangeMonthBack);
             
             if (options.allowChangeMonth) {
@@ -124,9 +119,9 @@ export default class CalendarFull {
             vYear = options.date.year;
         } else {
             vYear = calendar.year.visibleYear;
-            vMonthIndex = calendar.getMonthIndex("visible");
+            vMonthIndex = calendar.getRttsMonthIndex("visible") % 12;
         }
-        weeks = calendar.daysIntoWeeks(vMonthIndex, vYear, calendar.weekdays.length);
+        weeks = calendar.rttsDaysIntoWeeks(calendar.getRttsMonthIndex("visible"));
 
         //TODO: When Changing the year the same day and month are considered selected
         if (options.selectedDates) {
@@ -142,9 +137,9 @@ export default class CalendarFull {
             seDay = options.selectedDates.end.day || 0;
         } else {
             ssYear = seYear = calendar.year.selectedYear;
-            ssMonth = seMonth = calendar.getMonthIndex("selected");
+            ssMonth = seMonth = calendar.getRttsMonthIndex("selected") % 12;
             if (ssMonth > -1) {
-                ssDay = seDay = calendar.months[ssMonth].getDayIndex("selected");
+                ssDay = seDay = calendar.rttsMonths[ssMonth].getDayIndex("selected");
             }
         }
 
@@ -245,7 +240,7 @@ export default class CalendarFull {
                     html += `<div class="fsc-day-wrapper ${isWeekend ? "fsc-weekend" : ""}">`;
                     if (weeks[i][x]) {
                         let dayClass = "fsc-day";
-                        const dayIndex = calendar.months[vMonthIndex].days.findIndex((d) => {
+                        const dayIndex = calendar.rttsMonths[vMonthIndex].days.findIndex((d) => {
                             return d.numericRepresentation === (<SimpleCalendar.HandlebarTemplateData.Day>weeks[i][x]).numericRepresentation;
                         });
 

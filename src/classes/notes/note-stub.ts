@@ -353,6 +353,7 @@ export default class NoteStub {
         return false;
     }
 
+    // TODO: RTTS Note calculations
     /**
      * Calculates the display date of the note. Takes into consideration how often the note repeats.
      * @param full
@@ -364,9 +365,9 @@ export default class NoteStub {
             const calendar = CalManager.getCalendar(noteData.calendarId);
             if (calendar) {
                 const currentVisibleYear = calendar.year.selectedYear || calendar.year.visibleYear;
-                let visibleMonthDay = calendar.getMonthAndDayIndex("selected");
-                if (visibleMonthDay.month === undefined) {
-                    visibleMonthDay = calendar.getMonthAndDayIndex();
+                let rttsVisibleMonthDay = calendar.getRttsMonthAndDayIndex("selected");
+                if (rttsVisibleMonthDay.month === undefined) {
+                    rttsVisibleMonthDay = calendar.getRttsMonthAndDayIndex();
                 }
 
                 let startYear = noteData.startDate.year;
@@ -379,17 +380,17 @@ export default class NoteStub {
                 if (noteData.repeats === NoteRepeat.Weekly) {
                     startYear = currentVisibleYear;
                     endYear = currentVisibleYear;
-                    const noteStartDayOfWeek = calendar.dayOfTheWeek(noteData.startDate.year, startMonth, startDay);
-                    const noteEndDayOfWeek = calendar.dayOfTheWeek(noteData.endDate.year, endMonth, endDay);
-                    const currentDayOfWeek = calendar.dayOfTheWeek(currentVisibleYear, visibleMonthDay.month || 0, visibleMonthDay.day || 0);
+                    const noteStartDayOfWeek = calendar.rttsDayOfTheWeek(calendar.getRttsMonthIndexFromDate(startYear, startMonth), startDay);
+                    const noteEndDayOfWeek = calendar.rttsDayOfTheWeek(calendar.getRttsMonthIndexFromDate(endYear, endMonth), endDay);
+                    const currentDayOfWeek = calendar.rttsDayOfTheWeek(rttsVisibleMonthDay.month || 0, rttsVisibleMonthDay.day || 0);
                     let noteLength = noteEndDayOfWeek - noteStartDayOfWeek;
                     if (noteLength < 0) {
                         noteLength = calendar.weekdays.length + noteLength;
                     }
                     noteLength++;
 
-                    startMonth = visibleMonthDay.month || 0;
-                    endMonth = visibleMonthDay.month || 0;
+                    startMonth = (rttsVisibleMonthDay.month ?? 0) % 12 || 0;
+                    endMonth = rttsVisibleMonthDay.month || 0;
                     let noteStartDiff = currentDayOfWeek - noteStartDayOfWeek;
                     let noteEndDiff = noteEndDayOfWeek - currentDayOfWeek;
                     if (noteStartDiff < 0) {
@@ -399,8 +400,8 @@ export default class NoteStub {
                         noteEndDiff = calendar.weekdays.length + noteEndDiff;
                     }
                     if (noteStartDiff + noteEndDiff < noteLength) {
-                        startDay = (visibleMonthDay.day || 0) - noteStartDiff;
-                        endDay = (visibleMonthDay.day || 0) + noteEndDiff;
+                        startDay = (rttsVisibleMonthDay.day || 0) - noteStartDiff;
+                        endDay = (rttsVisibleMonthDay.day || 0) + noteEndDiff;
                         let safetyCount = 0;
                         while (startDay < 0 && safetyCount < calendar.months.length) {
                             startMonth--;
@@ -432,17 +433,17 @@ export default class NoteStub {
                 } else if (noteData.repeats === NoteRepeat.Monthly) {
                     startYear = currentVisibleYear;
                     endYear = currentVisibleYear;
-                    startMonth = visibleMonthDay.month || 0;
-                    endMonth = visibleMonthDay.month || 0;
+                    startMonth = (rttsVisibleMonthDay.month ?? 0) % 12 || 0;
+                    endMonth = (rttsVisibleMonthDay.month ?? 0) % 12 || 0;
                     if (noteData.startDate.month !== noteData.endDate.month) {
-                        if (noteData.startDate.day <= (visibleMonthDay.day || 0)) {
-                            endMonth = (visibleMonthDay.month || 0) + 1;
+                        if (noteData.startDate.day <= (rttsVisibleMonthDay.day || 0)) {
+                            endMonth = ((rttsVisibleMonthDay.month ?? 0) % 12 || 0) + 1;
                             if (endMonth >= calendar.months.length) {
                                 endMonth = 0;
                                 endYear = currentVisibleYear + 1;
                             }
-                        } else if (noteData.endDate.day >= (visibleMonthDay.day || 0)) {
-                            startMonth = (visibleMonthDay.month || 0) - 1;
+                        } else if (noteData.endDate.day >= (rttsVisibleMonthDay.day || 0)) {
+                            startMonth = ((rttsVisibleMonthDay.month ?? 0) % 12 || 0) - 1;
                             if (startMonth < 0) {
                                 startMonth = calendar.months.length - 1;
                                 startYear = currentVisibleYear - 1;
@@ -464,10 +465,10 @@ export default class NoteStub {
                     if (noteData.startDate.year !== noteData.endDate.year) {
                         const yDiff = noteData.endDate.year - noteData.startDate.year;
                         // The start month is in the current month and  the start day is less than the current day
-                        if (noteData.startDate.month === (visibleMonthDay.month || 0) && noteData.startDate.day <= (visibleMonthDay.day || 0)) {
+                        if (noteData.startDate.month === ((rttsVisibleMonthDay.month ?? 0) % 12 || 0) && noteData.startDate.day <= (rttsVisibleMonthDay.day || 0)) {
                             startYear = currentVisibleYear;
                             endYear = currentVisibleYear + yDiff;
-                        } else if (noteData.endDate.month === (visibleMonthDay.month || 0) && noteData.endDate.day >= (visibleMonthDay.day || 0)) {
+                        } else if (noteData.endDate.month === ((rttsVisibleMonthDay.month ?? 0) % 12 || 0) && noteData.endDate.day >= (rttsVisibleMonthDay.day || 0)) {
                             startYear = currentVisibleYear - yDiff;
                             endYear = currentVisibleYear;
                         }
@@ -509,9 +510,9 @@ export default class NoteStub {
         if (noteData && calendar && this.canUserView()) {
             let inBetween = DateRangeMatch.None;
             if (noteData.repeats === NoteRepeat.Weekly) {
-                const noteStartDayOfWeek = calendar.dayOfTheWeek(noteData.startDate.year, noteData.startDate.month, noteData.startDate.day);
-                const targetDayOfWeek = calendar.dayOfTheWeek(year, monthIndex, dayIndex);
-                const noteEndDayOfWeek = calendar.dayOfTheWeek(noteData.endDate.year, noteData.endDate.month, noteData.endDate.day);
+                const noteStartDayOfWeek = calendar.rttsDayOfTheWeek(calendar.getRttsMonthIndexFromDate(noteData.startDate.year, noteData.startDate.month), noteData.startDate.day);
+                const targetDayOfWeek = calendar.rttsDayOfTheWeek(calendar.getRttsMonthIndexFromDate(year, monthIndex), dayIndex);
+                const noteEndDayOfWeek = calendar.rttsDayOfTheWeek(calendar.getRttsMonthIndexFromDate(noteData.endDate.year, noteData.endDate.month), noteData.endDate.day);
                 if (noteStartDayOfWeek === targetDayOfWeek) {
                     inBetween = DateRangeMatch.Start;
                 } else if (noteEndDayOfWeek === targetDayOfWeek) {

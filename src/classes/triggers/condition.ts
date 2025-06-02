@@ -1,6 +1,6 @@
 import { TriggerConditions } from "../../constants";
 import { CalManager } from "../index";
-import { ToSeconds } from "../utilities/date-time";
+import { RttsToSeconds } from "../utilities/date-time";
 import { generateUniqueId } from "../utilities/string";
 import { TriggerParameter } from "./ parameter";
 
@@ -22,11 +22,13 @@ export class TriggerCondition {
             v2: number = 0;
         const calendar = CalManager.getActiveCalendar();
         const currentDate = calendar.getCurrentDate();
+        const currentRttsMonthIndex = calendar.getRttsMonthIndex();
+        const dateRttsMonthIndex = calendar.getRttsMonthIndexFromDate(date.year, date.month);
 
         switch (this.conditionType) {
             case TriggerConditions.Date:
-                v1 = ToSeconds(calendar, date.year, date.month, date.day);
-                v2 = ToSeconds(calendar, currentDate.year, currentDate.month, currentDate.day, false);
+                v1 = RttsToSeconds(calendar, currentRttsMonthIndex, date.day);
+                v2 = RttsToSeconds(calendar, currentRttsMonthIndex, currentDate.day, false);
                 break;
             case TriggerConditions.Time:
                 v1 =
@@ -37,11 +39,11 @@ export class TriggerCondition {
                 break;
             case TriggerConditions.DateTime:
                 v1 =
-                    ToSeconds(calendar, date.year, date.month, date.day) +
+                    RttsToSeconds(calendar, dateRttsMonthIndex, date.day) +
                     (date.hour * calendar.time.minutesInHour * calendar.time.secondsInMinute +
                         date.minute * calendar.time.secondsInMinute +
                         date.seconds);
-                v2 = ToSeconds(calendar, currentDate.year, currentDate.month, currentDate.day, false) + calendar.time.seconds;
+                v2 = RttsToSeconds(calendar, dateRttsMonthIndex, currentDate.day, false) + calendar.time.seconds;
                 break;
             case TriggerConditions.Year:
                 v1 = date.year;

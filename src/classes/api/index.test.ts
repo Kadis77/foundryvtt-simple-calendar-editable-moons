@@ -255,7 +255,7 @@ describe("API Class Tests", () => {
         expect(API.currentDateTime()).toBeNull();
         expect(API.currentDateTime("")).toEqual({ year: d.getFullYear(), month: d.getMonth(), day: d.getDate() - 1, hour: 0, minute: 0, seconds: 0 });
 
-        jest.spyOn(tCal, "getMonthAndDayIndex").mockReturnValue({});
+        jest.spyOn(tCal, "getRttsMonthAndDayIndex").mockReturnValue({});
         expect(API.currentDateTime("")).toEqual({ year: d.getFullYear(), month: 0, day: 0, hour: 0, minute: 0, seconds: 0 });
     });
 
@@ -277,7 +277,7 @@ describe("API Class Tests", () => {
         });
 
         tCal.weekdays = [];
-        jest.spyOn(tCal, "getMonthAndDayIndex").mockReturnValue({});
+        jest.spyOn(tCal, "getRttsMonthAndDayIndex").mockReturnValue({});
         expect(API.currentDateTimeDisplay("")).toEqual({
             date: `January 01, ${d.getFullYear()}`,
             day: "1",
@@ -383,7 +383,7 @@ describe("API Class Tests", () => {
         expect(API.getCurrentDay()).toBeNull();
         expect(console.error).toHaveBeenCalledTimes(1);
 
-        tCal.resetMonths();
+        tCal.resetRttsMonths();
         expect(API.getCurrentDay()).toBeNull();
 
         tCal.months[0].current = true;
@@ -396,7 +396,7 @@ describe("API Class Tests", () => {
     test("Get Current Month", () => {
         expect(API.getCurrentMonth()).toBeNull();
 
-        tCal.resetMonths();
+        tCal.resetRttsMonths();
         expect(API.getCurrentMonth()).toBeNull();
 
         tCal.months[0].current = true;
@@ -417,7 +417,7 @@ describe("API Class Tests", () => {
         });
         expect(console.error).toHaveBeenCalledTimes(1);
 
-        tCal.resetMonths();
+        tCal.resetRttsMonths();
         tCal.months[0].current = true;
         tCal.months[0].days[0].current = true;
         expect(API.getCurrentSeason("")).not.toBeNull();
@@ -430,7 +430,7 @@ describe("API Class Tests", () => {
     test("Get Current Weekday", () => {
         expect(API.getCurrentWeekday()).toBeNull();
 
-        tCal.resetMonths();
+        tCal.resetRttsMonths();
         expect(API.getCurrentWeekday()).not.toBeNull();
 
         tCal.months[0].current = true;
@@ -566,7 +566,7 @@ describe("API Class Tests", () => {
         expect(console.error).toHaveBeenCalledTimes(1);
         expect(MainApplication.render).toHaveBeenCalledTimes(1);
 
-        tCal.resetMonths();
+        tCal.resetRttsMonths();
         //@ts-ignore
         API.showCalendar({ year: "asd" }, false, "");
         expect(console.error).toHaveBeenCalledTimes(2);
