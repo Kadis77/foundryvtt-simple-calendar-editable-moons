@@ -870,12 +870,12 @@ export default class CalendarFull {
         let html;
         const moonHtml: string[] = [];
         for (let i = 0; i < calendar.rttsMoons.length; i++) {
-            console.log(visibleYear + " " + visibleMonthIndex + " " + dayIndex);
-            console.log(JSON.stringify(calendar.rttsMonths));
-            console.log(calendar.getRttsMonthIndex("visible"));
+            //console.log(visibleYear + " " + visibleMonthIndex + " " + dayIndex);
+            //console.log(JSON.stringify(calendar.rttsMonths));
+            //console.log(calendar.getRttsMonthIndex("visible"));
             const mp = calendar.rttsMoons[i].getDateMoonPhase(calendar, visibleYear, visibleMonthIndex, dayIndex);
-            console.log(JSON.stringify(mp));
-            const d = calendar.rttsMonths[calendar.getRttsMonthIndex("visible")].days[dayIndex];
+            //console.log(JSON.stringify(mp));
+            const d = calendar.rttsMonths[calendar.getRttsMonthIndexFromDate(visibleYear, visibleMonthIndex)].days[dayIndex];
             if (mp && (mp.singleDay || d.selected || d.current)) {
                 const moon = GetIcon(mp.icon, "#000000", calendar.rttsMoons[i].color);
                 moonHtml.push(`<span class="fsc-moon-phase ${mp.icon}" data-tooltip="${calendar.rttsMoons[i].name} - ${mp.name}">${moon}</span>`);

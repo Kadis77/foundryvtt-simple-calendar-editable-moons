@@ -675,7 +675,7 @@ export default class ConfigurationApp extends FormApplication {
         (<Calendar>this.object).year.numericRepresentation = ds.selectedDate.start.year;
         (<Calendar>this.object).year.visibleYear = ds.selectedDate.start.year;
         (<Calendar>this.object).year.selectedYear = ds.selectedDate.start.year;
-        (<Calendar>this.object).updateMonth(ds.selectedDate.start.month, "current", true, ds.selectedDate.start.day);
+        (<Calendar>this.object).rttsUpdateMonth(ds.selectedDate.start.month, "current", true, ds.selectedDate.start.day);
         this._tabs[0].active = "generalSettings";
         this.save(false, false).catch(Logger.error);
     }

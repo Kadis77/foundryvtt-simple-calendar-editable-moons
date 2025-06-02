@@ -409,7 +409,7 @@ export function TimestampToDateData(seconds: number, calendar: Calendar): Simple
 export function DateToTimestamp(date: SimpleCalendar.DateTimeParts, calendar: Calendar): number {
     const clone = calendar.clone(false);
     const mergedDate = MergeDateTimeObject(date, null, clone);
-    clone.updateMonth(mergedDate.month, "current", true, mergedDate.day);
+    clone.rttsUpdateMonth(mergedDate.month, "current", true, mergedDate.day);
     clone.year.numericRepresentation = mergedDate.year;
     clone.time.setTime(mergedDate.hour, mergedDate.minute, mergedDate.seconds);
     return clone.toSeconds();

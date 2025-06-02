@@ -771,13 +771,13 @@ export default class Calendar extends ConfigurationItemBase {
     }
 
     /**
-     * Updates the specified setting for the specified month, also handles instances if the new month has 0 days
+     * Updates the specified setting for the specified month, also handles instances if the new month has 0 day
      * @param month The index of the new month, -1 will be the last month
      * @param setting The setting to update, can be 'visible', 'current' or 'selected'
      * @param next If the change moved the calendar forward(true) or back(false) this is used to determine the direction to go if the new month has 0 days
      * @param setDay If to set the months day to a specific one
      */
-    updateMonth(month: number, setting: string, next: boolean, setDay: null | number = null) {
+    rttsUpdateMonth(month: number, setting: string, next: boolean, setDay: null | number = null) {
         const verifiedSetting = setting.toLowerCase() as "visible" | "current" | "selected";
         const yearToUse =
             verifiedSetting === "current"
@@ -801,8 +801,8 @@ export default class Calendar extends ConfigurationItemBase {
 
         //Reset all the months settings
         this.resetRttsMonths(setting);
-        this.rttsMonths[month][verifiedSetting] = true;
-
+        console.log("setting rtts month " + month + ((yearToUse - this.getMinDay().year) * 12) + " setting "  + verifiedSetting);
+        this.rttsMonths[month + ((yearToUse - this.getMinDay().year) * 12)][verifiedSetting] = true;
 
         //If the month we are going to show has no days, skip it
         if ((isLeapYear && this.months[month].numberOfLeapYearDays === 0) || (!isLeapYear && this.months[month].numberOfDays === 0)) {
@@ -841,7 +841,7 @@ export default class Calendar extends ConfigurationItemBase {
                 if (amount === -1) {
                     mIndex = this.months.length - 1;
                 }
-                this.updateMonth(mIndex, setting, amount > 0, setDay);
+                this.rttsUpdateMonth(mIndex, setting, amount > 0, setDay);
             }
         }
     }
@@ -907,7 +907,7 @@ export default class Calendar extends ConfigurationItemBase {
                         this.changeMonth(changeAmount, verifiedSetting, setDay);
                     }
                 } else {
-                    this.updateMonth(i + amount, setting, next, setDay);
+                    this.rttsUpdateMonth(i + amount, setting, next, setDay);
                 }
                 break;
             }
@@ -1230,7 +1230,7 @@ export default class Calendar extends ConfigurationItemBase {
     updateTime(parsedDate: SimpleCalendar.DateTime) {
         const isLeapYear = this.year.leapYearRule.isLeapYear(parsedDate.year);
         this.year.numericRepresentation = parsedDate.year;
-        this.updateMonth(parsedDate.month, "current", true);
+        this.rttsUpdateMonth(parsedDate.month, "current", true);
         this.months[parsedDate.month].updateDay(parsedDate.day, isLeapYear);
         this.time.setTime(parsedDate.hour, parsedDate.minute, parsedDate.seconds);
     }

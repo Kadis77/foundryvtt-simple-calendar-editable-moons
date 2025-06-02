@@ -377,7 +377,7 @@ describe("Configuration App Class Tests", () => {
         jest.spyOn(DateSelectorManager, "GetSelector").mockReturnValue({ selectedDate: { start: { year: 1, month: 0, day: 0 } } });
         //@ts-ignore
         jest.spyOn(ca, "save").mockImplementation(async () => {});
-        jest.spyOn(tCal, "updateMonth").mockImplementation(() => {});
+        jest.spyOn(tCal, "rttsUpdateMonth").mockImplementation(() => {});
 
         //@ts-ignore
         ca.quickSetupSaveClick(fEvent);
@@ -387,7 +387,7 @@ describe("Configuration App Class Tests", () => {
         expect(ca.uiElementStates.qsNextClicked).toBe(false);
         //@ts-ignore
         expect(ca.uiElementStates.qsAddNotes).toBe(true);
-        expect(tCal.updateMonth).toHaveBeenCalledTimes(1);
+        expect(tCal.rttsUpdateMonth).toHaveBeenCalledTimes(1);
         expect(ca.save).toHaveBeenCalledTimes(1);
     });
 
