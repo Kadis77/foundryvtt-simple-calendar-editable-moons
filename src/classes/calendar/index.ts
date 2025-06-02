@@ -850,12 +850,15 @@ export default class Calendar extends ConfigurationItemBase {
     changeDay(amount: number, setting: string = "current") {
         const verifiedSetting = setting.toLowerCase() as "current" | "selected";
         const yearToUse = verifiedSetting === "current" ? this.year.numericRepresentation : this.year.selectedYear;
-        const isLeapYear = this.year.leapYearRule.isLeapYear(yearToUse);
         const currentMonth = this.getMonth(verifiedSetting);
         if (currentMonth) {
             const next = amount > 0;
             const currentDayIndex = currentMonth.getDayIndex(verifiedSetting);
-            const lastDayOfCurrentMonth = isLeapYear ? currentMonth.numberOfLeapYearDays : currentMonth.numberOfDays;
+            
+            // RTTS - figure out the number of days in this month
+            let monthIndexFromStart = ((yearToUse - this.getMinDay().year) * 12) + this.getMonthIndex(verifiedSetting);
+            let lastDayOfCurrentMonth = this.rttsMoons[RoadToTheSkyMoonIds.harvest].cycleLengths[monthIndexFromStart];
+            
             if (next && currentDayIndex + amount >= lastDayOfCurrentMonth) {
                 this.changeMonth(1, verifiedSetting, 0);
                 this.changeDay(amount - (lastDayOfCurrentMonth - currentDayIndex), verifiedSetting);
@@ -863,7 +866,7 @@ export default class Calendar extends ConfigurationItemBase {
                 this.changeMonth(-1, verifiedSetting, -1);
                 this.changeDay(amount + currentDayIndex + 1, verifiedSetting);
             } else {
-                currentMonth.changeDay(amount, isLeapYear, verifiedSetting);
+                currentMonth.changeDay(amount, false, verifiedSetting);
             }
         }
     }
@@ -1424,9 +1427,8 @@ export default class Calendar extends ConfigurationItemBase {
      * @param year The year to convert
      * @param monthIndex The index of the month to convert
      * @param dayIndex The day to convert
-     * @param ignoreIntercalaryRules If to ignore the intercalary rules and include the months days (used to match closer to about-time)
      */
-    rttsDateToDays(year: number, monthIndex: number, dayIndex: number, ignoreIntercalaryRules: boolean = false) {
+    rttsDateToDays(year: number, monthIndex: number, dayIndex: number) {
         if (monthIndex < 0) {
             monthIndex = 0;
         } else if (monthIndex >= this.months.length) {
@@ -1450,6 +1452,142 @@ export default class Calendar extends ConfigurationItemBase {
         return daysSoFar;
     }
     
+    public rttsCanAddIntervalToCurrentTime(interval: SimpleCalendar.DateTimeParts) {
+        // Ignore any year or month component. 
+        let currentDate = this.getCurrentDate();
+        let currentDaysSinceStart = this.rttsDateToDays(currentDate.year, currentDate.month, currentDate.day);
+        let currentTime = this.time.getCurrentTime();
+
+        // is this a positive or negative interval?
+        let next = (interval.day ?? 0 >= 0)
+            && (interval.hour ?? 0 >= 0)
+            && (interval.minute ?? 0 >= 0)
+            && (interval.seconds ?? 0 >= 0);
+
+        if (!next) {
+            // We are going back in time.
+            // Will this take us before day 0?
+            if (interval.day) {
+                if (currentDaysSinceStart + interval.day < 0) {
+                    console.warn("Cannot change date - is before the first day");
+                    return false;
+                }
+            }
+            else if (currentDaysSinceStart + (interval.day ?? 0) == 0) {
+                if (currentTime.hour + (interval.hour ?? 0) < 0) {
+                    console.warn("Cannot change date - is before the first day");
+                    return false;
+                }
+                else if (currentTime.hour + (interval.hour ?? 0) == 0 && currentTime.minute + (interval.minute ?? 0) < 0) {
+                    console.warn("Cannot change date - is before the first day");
+                    return false;
+                }
+                else if  (currentTime.hour + (interval.hour ?? 0) == 0 && currentTime.minute + (interval.minute ?? 0) == 0 && currentTime.seconds + (interval.seconds ?? 0) < 0) {
+                    console.warn("Cannot change date - is before the first day");
+                    return false;
+                }
+            }
+        }
+        else {
+            // We are going forward in time. 
+            // Will this take us after the max day?
+            let maxDayInDays = this.rttsDateToDays(this.getMaxDay().year, this.getMaxDay().month, this.getMaxDay().day);
+            if (currentDaysSinceStart + (interval.day ?? 0 ) > maxDayInDays) {
+                console.warn("Cannot change date - is after the max day.");
+                return false;
+            }
+            else if (currentDaysSinceStart + (interval.day ?? 0) == 0) {
+                // Check if the time will put us over
+                if (currentTime.hour + (interval.hour ?? 0) > 24) {
+                    console.warn("Cannot change date - is after the max day.");
+                    return false;
+                }
+                else if (currentTime.hour + (interval.hour ?? 0) == 23 && currentTime.minute + (interval.minute ?? 0) > 60) {
+                    console.warn("Cannot change date - is after the max day.");
+                    return false;
+                }
+                else if (currentTime.hour + (interval.hour ?? 0) == 23 && currentTime.minute + (interval.minute ?? 0) == 59 && currentTime.seconds + (interval.seconds ?? 0) > 60) {
+                    console.warn("Cannot change date - is after the max day.");
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
     
+
+    // RTTS: A version of changeDateTime that accepts days and never months or years, since these are of variable length.
+    
+    public rttsChangeDateTime(interval: SimpleCalendar.DateTimeParts, options: SimpleCalendar.DateChangeOptions = {}) {
+        options = deepMerge({}, { updateMonth: true, updateApp: true, save: true, sync: true, showWarning: false }, options);
+
+
+        
+
+
+
+        if (canUser((<Game>game).user, SC.globalConfiguration.permissions.changeDateTime)) {
+            if (this.rttsCanAddIntervalToCurrentTime(interval)) {
+
+                // is this a positive or negative interval?
+                let next = (interval.day ?? 0 >= 0)
+                    && (interval.hour ?? 0 >= 0)
+                    && (interval.minute ?? 0 >= 0)
+                    && (interval.seconds ?? 0 >= 0);
+                
+
+
+            }
+            
+            
+            const initialTimestamp = this.toSeconds();
+            let change = false;
+
+            if (interval.year) {
+                this.changeYear(interval.year, options.updateMonth, "current");
+                change = true;
+            }
+            if (interval.month) {
+                this.changeMonth(interval.month, "current");
+                change = true;
+            }
+            if (interval.day) {
+                this.changeDay(interval.day);
+                change = true;
+            }
+            if (interval.hour || interval.minute || interval.seconds) {
+                const dayChange = this.time.changeTime(interval.hour, interval.minute, interval.seconds);
+                if (dayChange !== 0) {
+                    this.changeDay(dayChange);
+                }
+                change = true;
+            }
+
+            if (change) {
+                if (CalManager.isActiveCalendar(this.id)) {
+                    const changeInSeconds = this.toSeconds() - initialTimestamp;
+                    Hook.emit(SimpleCalendarHooks.DateTimeChange, this, changeInSeconds);
+
+                    if (!options.fromCalSync && CalManager.syncWithAllCalendars && !isNaN(initialTimestamp)) {
+                        CalManager.syncWithCalendars({ seconds: changeInSeconds });
+                    }
+                }
+
+                if (options.save) {
+                    CalManager.saveCalendars().catch(Logger.error);
+                }
+                if (options.sync) {
+                    this.syncTime().catch(Logger.error);
+                }
+                if (options.updateApp) {
+                    MainApplication.updateApp();
+                }
+            }
+            return true;
+        } else if (options.showWarning) {
+            GameSettings.UiNotification(GameSettings.Localize("FSC.Warn.Macros.GMUpdate"), "warn");
+        }
+        return false;
+    }
     
 }
