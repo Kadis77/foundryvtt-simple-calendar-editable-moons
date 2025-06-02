@@ -1419,34 +1419,6 @@ export default class Calendar extends ConfigurationItemBase {
         return true;
     }
 
-    // RTTS: will adding a given interval make this date invalid?
-    //public getAddInterval(date: SimpleCalendar.Date, interval: SimpleCalendar.DateTimeParts) {
-    //    let yearsToAdd = interval.year ?? 0;
-    //    let monthsToAdd = interval.month ?? 0;
-    //    
-    //    // Check if this is too many years or months
-    //    if (!this.canAddMonths(date, monthsToAdd + (yearsToAdd * 12))) {
-    //        return false
-    //    }
-    //    
-    //    // The years and months are okay. Set what the new values will be.
-    //    let newYear = date.year + yearsToAdd + (Math.floor((date.month + monthsToAdd) / 12));
-    //    let newMonthIndex = (date.month + monthsToAdd) % 12;
-//
-    //    // Check if the days will go to an invalid month
-    //    let daysToAdd = interval.day ?? 0;
-    //    if (daysToAdd > 0) {
-    //        if (newYear == this.getMaxDay().year
-    //        && newMonthIndex == this.getMaxDay().month
-    //        && date)
-    //    }
-    //    
-    //    // Finally, check the time. 
-    //    
-    //    
-    //    return true;
-    //}
-
     /**
      * Converts the passed in date to the number of days that make up that date from the Road to the Sky min day
      * @param year The year to convert
