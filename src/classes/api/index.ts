@@ -373,7 +373,7 @@ export function chooseRandomDate(
         
         // Translate the min and max days into a RTTS month index. 
         let minMonthIndex = 0;
-        let maxMonthIndex = activeCalendar.rttsMonths.length;
+        let maxMonthIndex = activeCalendar.rttsMonths.length - 1;
         if (startingDate.year !== undefined && endingDate.year !== undefined) {
             minMonthIndex = (startingDate.year - minDay.year) * 12;
             maxMonthIndex = ((endingDate.year - minDay.year)) * 12 + 11;
@@ -385,7 +385,7 @@ export function chooseRandomDate(
         }
         
         // Choose a random month
-        let randomMonth = Math.floor(Math.random() * (minMonthIndex - minMonthIndex + 1)) + minMonthIndex;
+        let randomMonth = Math.floor(Math.random() * (maxMonthIndex - minMonthIndex)) + minMonthIndex;
         year = Math.floor(randomMonth / 12);
         month = randomMonth % 12;
 

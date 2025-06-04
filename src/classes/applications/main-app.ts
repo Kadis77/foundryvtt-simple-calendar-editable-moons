@@ -910,7 +910,7 @@ export default class MainApp extends FormApplication {
         this.toggleUnitSelector(true);
         const rttsVisibleMonthAndDayIndex = this.visibleCalendar.getRttsMonthAndDayIndex("visible");
         const canChangeMonth = this.visibleCalendar.canAddMonths({
-            year: this.visibleCalendar.year.visibleYear, month: rttsVisibleMonthAndDayIndex.month ?? 0,
+            year: this.visibleCalendar.year.visibleYear, month: (rttsVisibleMonthAndDayIndex.month ?? 0) % 12,
             day: 0
         }, clickType == CalendarClickEvents.previous ? -1 : 1);
         console.log("main-app: changeMonth: rttsVisibleMonthAndDayIndex=" + JSON.stringify(rttsVisibleMonthAndDayIndex) + ", canChangeMonth=" + canChangeMonth + ",clickType=" + JSON.stringify(clickType));

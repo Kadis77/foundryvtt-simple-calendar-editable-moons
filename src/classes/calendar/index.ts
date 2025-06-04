@@ -1,7 +1,6 @@
 import {
     GameWorldTimeIntegrations,
     RoadToTheSkyMonthConfigs,
-    RoadToTheSkyMonthIds,
     RoadToTheSkyMoonIds,
     RoadToTheSkySeasonConfigs,
     SimpleCalendarHooks,
@@ -253,7 +252,7 @@ export default class Calendar extends ConfigurationItemBase {
 
         // RTTS: Add hardcoded RTTS months
         this.months = [];
-        for (let i = 1; i < RoadToTheSkyMonthConfigs.length; i++) {
+        for (let i = 0; i < RoadToTheSkyMonthConfigs.length; i++) {
             this.months.push(new Month(RoadToTheSkyMonthConfigs[i].name, i, 0, 30, 0, 0));
         }
         
@@ -553,8 +552,7 @@ export default class Calendar extends ConfigurationItemBase {
      */
     getRttsMonthIndexFromDate(year: number, month: number) {
         let yearsSinceStart = year - this.getMinDay().year;
-        let result = (yearsSinceStart * 12) + month;
-        return result;
+        return (yearsSinceStart * 12) + month;
     }
 
     /**
@@ -809,6 +807,7 @@ export default class Calendar extends ConfigurationItemBase {
      */
     changeYear(amount: number, setting: string = "visible") {
         const verifiedSetting = setting.toLowerCase() as "visible" | "current" | "selected";
+        console.log("index change year: about to change " + setting + " year by " + amount);
         if (verifiedSetting === "visible") {
             this.year.visibleYear = this.year.visibleYear + amount;
         } else if (verifiedSetting === "selected") {
@@ -829,7 +828,7 @@ export default class Calendar extends ConfigurationItemBase {
         const next = amount > 0;
         
         // Get the current date for this setting
-        let currentYearIndex = this.getMinDay().year;
+        let currentYearIndex: number;
         let currentMonthIndex = this.getRttsMonthIndex(verifiedSetting);
         if (verifiedSetting === "visible") {
             currentYearIndex = this.year.visibleYear;
@@ -842,17 +841,18 @@ export default class Calendar extends ConfigurationItemBase {
         console.log("Change month calculation: The current " + verifiedSetting + " month is " + currentYearIndex + "/" + currentMonthIndex % 12 + " and rttsMonthIndex="  + currentMonthIndex); 
         
         // Find out if this date is valid
-        let canAddMonths = this.canAddMonths({year: currentYearIndex, month : currentMonthIndex, day: 0}, amount);
+        let canAddMonths = this.canAddMonths({year: currentYearIndex, month : currentMonthIndex % 12, day: 0}, amount);
         console.log("Change month calculation: canAddMonths="  + canAddMonths);
         
         if (canAddMonths) {
             // Do we need to change the year as well?
+            console.log("changeMonth: checking if we need to change the year");
             let yearChangeAmount = 0;
-            if (next && (currentMonthIndex % 12) + amount > 12) {
-                
+            if (next && (currentMonthIndex % 12) + amount >= 12) {
+                yearChangeAmount = (this.getMinDay().year + Math.floor((currentMonthIndex + amount) / 12)) - currentYearIndex;
             }
             else if (!next && (currentMonthIndex % 12) + amount < 0) {
-                
+                yearChangeAmount = Math.floor(((currentMonthIndex % 12) + amount) / 12);
             }
             if (yearChangeAmount != 0) {
                 this.changeYear(yearChangeAmount, verifiedSetting);

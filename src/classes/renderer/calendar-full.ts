@@ -37,22 +37,25 @@ export default class CalendarFull {
      * @param calendar
      * @param options
      */
-    // TODO: RTTS prevent changing month if month is not defined
     public static Render(calendar: Calendar, options: SimpleCalendar.Renderer.CalendarOptions = { id: "" }): string {
         options = deepMerge({}, this.defaultOptions, options);
 
         let HTML = "";
         if (options.view === CalendarViews.Month) {
+            console.log("calendar-full render: about to build from month view");
             HTML = this.Build(calendar, options);
         } else if (options.view === CalendarViews.Year) {
             const vYear = options.date ? options.date.year : calendar.year.visibleYear;
+            
+            console.log("calendar-full Render: date=" + JSON.stringify(options.date));
 
             HTML = `<div class="fsc-year-view-wrapper" id="${options.id}"><div class="fsc-current-year">`;
             
             // RTTS: Check if the forward/backward month controls should be enabled
-            let visibleMonthIndex = calendar.getRttsMonthIndexFromDate(vYear, options.date?.month ?? 0);
-            let canChangeMonthForward = visibleMonthIndex != calendar.rttsMonths.length - 1;
+            let visibleMonthIndex = calendar.getRttsMonthIndex("visible");
+            let canChangeMonthForward = visibleMonthIndex <= calendar.rttsMonths.length - 1;
             let canChangeMonthBack = visibleMonthIndex > 0;
+            console.log("render: visibleMonthIndex =" + visibleMonthIndex + ",rttsMonths,length=" + calendar.rttsMonths.length);
             
             if (options.allowChangeMonth) {
                 if (canChangeMonthBack) {
@@ -77,6 +80,7 @@ export default class CalendarFull {
                     day: 0
                 };
                 options.id = `${origId}-${i}`;
+                console.log("calendar-full render: about to build from year view");
                 HTML += this.Build(calendar, options);
             }
             HTML += "</div>";
@@ -117,6 +121,7 @@ export default class CalendarFull {
             }
             vYear = options.date.year;
             vRttsMonthIndex = calendar.getRttsMonthIndexFromDate(options.date.year, options.date.month);
+            console.log("calendar-full build: date was provided as " + JSON.stringify(options.date) + ", building calendar for vYean=" + vYear + " rttsMonth=" + vRttsMonthIndex);
         } else {
             vYear = calendar.year.visibleYear;
             let rttsVisibleMonthAndDayIndex = calendar.getRttsMonthAndDayIndex("visible");
@@ -166,24 +171,12 @@ export default class CalendarFull {
         html += `<div class="fsc-calendar-header">`;
         //Visible date change and current date
         html += `<div class="fsc-current-date">`;
-
-        // RTTS: Check if the forward/backward month controls should be enabled
-        let visibleDate = {
-            year: calendar.year.visibleYear,
-            month: vOldMonthIndex || 0,
-            day: 0
-        }
-        let canChangeMonthForward = calendar.canAddMonths(visibleDate, 1);
-        let canChangeMonthBack = calendar.canAddMonths(visibleDate, - 1);
         
-        if (options.allowChangeMonth) {
-            if (canChangeMonthBack) {
-                html += `<a class="fa fa-chevron-left" data-tooltip="${GameSettings.Localize("FSC.ChangePreviousMonth")}"></a>`;
-            }
-            else {
-                // TODO: disabled version
-                html += `<span></span>`;
-            }
+        let canChangeMonthForward = vRttsMonthIndex < calendar.rttsMonths.length - 1;
+        let canChangeMonthBack = vRttsMonthIndex > 0;
+        
+        if (options.allowChangeMonth && canChangeMonthBack) {
+            html += `<a class="fa fa-chevron-left" data-tooltip="${GameSettings.Localize("FSC.ChangePreviousMonth")}"></a>`;
         } else {
             html += `<span></span>`;
         }
@@ -195,14 +188,8 @@ export default class CalendarFull {
             calendar,
             { year: options.editYear }
         )}</span>`;
-        if (options.allowChangeMonth) {
-            if (canChangeMonthForward) {
-                html += `<a class="fa fa-chevron-right" data-tooltip="${GameSettings.Localize("FSC.ChangeNextMonth")}"></a>`;
-            }
-            else {
-                // TODO: disabled version
-                html += `<span></span>`;
-            }
+        if (options.allowChangeMonth && canChangeMonthForward) {
+            html += `<a class="fa fa-chevron-right" data-tooltip="${GameSettings.Localize("FSC.ChangeNextMonth")}"></a>`;
         } else {
             html += `<span></span>`;
         }
@@ -504,6 +491,7 @@ export default class CalendarFull {
                     const dataVis = currentMonthYear.getAttribute("data-visible");
                     if (dataVis) {
                         const my = dataVis.split("/");
+                        console.log("eventListener: my=" + dataVis);
                         if (my.length === 2) {
                             let monthIndex = parseInt(my[0]);
                             let yearNumber = parseInt(my[1]);
@@ -612,19 +600,21 @@ export default class CalendarFull {
                         }
                     }
                 }
+                if (funcs.onMonthChange !== null && (clickType === CalendarClickEvents.previous || clickType === CalendarClickEvents.next)) {
+                    console.log("calendar-full EventListener: about to call month change functions");
+                    funcs.onMonthChange(clickType, options);
+                } else if (funcs.onDayClick !== null && clickType === CalendarClickEvents.day) {
+                    funcs.onDayClick(options);
+                } else if (funcs.onYearChange !== null && clickType === CalendarClickEvents.year) {
+                    funcs.onYearChange(options);
+                }
+                console.log("calendar-full EventListener: about to render with options=" + JSON.stringify(options))
                 const newHTML = CalendarFull.Render(calendar, options);
                 const temp = document.createElement("div");
                 temp.innerHTML = newHTML;
                 if (temp.firstChild) {
                     calendarElement.replaceWith(temp.firstChild);
                     CalendarFull.ActivateListeners(options.id, funcs.onMonthChange, funcs.onDayClick);
-                }
-                if (funcs.onMonthChange !== null && (clickType === CalendarClickEvents.previous || clickType === CalendarClickEvents.next)) {
-                    funcs.onMonthChange(clickType, options);
-                } else if (funcs.onDayClick !== null && clickType === CalendarClickEvents.day) {
-                    funcs.onDayClick(options);
-                } else if (funcs.onYearChange !== null && clickType === CalendarClickEvents.year) {
-                    funcs.onYearChange(options);
                 }
             }
         }
