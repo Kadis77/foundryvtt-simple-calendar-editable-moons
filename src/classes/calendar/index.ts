@@ -484,9 +484,9 @@ export default class Calendar extends ConfigurationItemBase {
             monthIndex = 0;
         }
 
-        let dayIndex = this.months[monthIndex].getDayIndex("selected");
+        let dayIndex = this.rttsMonths[monthIndex].getDayIndex("selected");
         if (dayIndex === -1) {
-            dayIndex = this.months[monthIndex].getDayIndex();
+            dayIndex = this.rttsMonths[monthIndex].getDayIndex();
             if (dayIndex === -1) {
                 dayIndex = 0;
             }
