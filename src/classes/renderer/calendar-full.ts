@@ -43,8 +43,6 @@ export default class CalendarFull {
 
         let HTML = "";
         if (options.view === CalendarViews.Month) {
-            console.log("entry 1");
-            console.log(JSON.stringify(options));
             HTML = this.Build(calendar, options);
         } else if (options.view === CalendarViews.Year) {
             const vYear = options.date ? options.date.year : calendar.year.visibleYear;
@@ -54,9 +52,7 @@ export default class CalendarFull {
             // RTTS: Check if the forward/backward month controls should be enabled
             let visibleMonthIndex = calendar.getRttsMonthIndexFromDate(vYear, options.date?.month ?? 0);
             let canChangeMonthForward = visibleMonthIndex != calendar.rttsMonths.length - 1;
-            console.log("canChangeMonthForward: " + canChangeMonthForward);
             let canChangeMonthBack = visibleMonthIndex > 0;
-            console.log("canChangeMonthBack: " + canChangeMonthBack);
             
             if (options.allowChangeMonth) {
                 if (canChangeMonthBack) {
@@ -177,11 +173,8 @@ export default class CalendarFull {
             month: vOldMonthIndex || 0,
             day: 0
         }
-        console.log("visible date from build: " + JSON.stringify(visibleDate));
         let canChangeMonthForward = calendar.canAddMonths(visibleDate, 1);
-        console.log("canChangeMonthForward build: " + canChangeMonthForward);
         let canChangeMonthBack = calendar.canAddMonths(visibleDate, - 1);
-        console.log("canChangeMonthBack build: " + canChangeMonthBack);
         
         if (options.allowChangeMonth) {
             if (canChangeMonthBack) {

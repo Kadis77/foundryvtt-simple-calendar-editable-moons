@@ -85,7 +85,6 @@ export class DateSelector {
      * @param options The options associated with setting up the new Date Selector
      */
     constructor(id: string, options: SimpleCalendar.DateTimeSelector.Options) {
-        console.log("id: " + id + " options: " + JSON.stringify(options.selectedStartDate));
         this.id = id;
         this.calendarId = `${this.id}_calendar`;
         this.timeSelectorId = `${this.id}_time_selector`;
