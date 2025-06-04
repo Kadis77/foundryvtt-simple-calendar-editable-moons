@@ -921,18 +921,20 @@ export default class MainApp extends FormApplication {
     // RTTS: Prevent clicking if the next one is not allowed
     public changeMonth(clickType: CalendarClickEvents) {
         this.toggleUnitSelector(true);
-        let rttsVisibleMonthAndDayIndex = this.visibleCalendar.getRttsMonthAndDayIndex("visible");
+        const rttsVisibleMonthAndDayIndex = this.visibleCalendar.getRttsMonthAndDayIndex("visible");
+        const canChangeMonth = this.visibleCalendar.canAddMonths({
+            year: this.visibleCalendar.year.visibleYear, month: rttsVisibleMonthAndDayIndex.month ?? 0,
+            day: 0
+        }, clickType == CalendarClickEvents.previous ? -1 : 1);
+        console.log("main-app: changeMonth: rttsVisibleMonthAndDayIndex=" + JSON.stringify(rttsVisibleMonthAndDayIndex) + ", canChangeMonth=" + canChangeMonth + ",clickType=" + JSON.stringify(clickType));
         
-        let canChangeMonth = true;
-        if ((CalendarClickEvents.previous && rttsVisibleMonthAndDayIndex.month == 0)
-        || CalendarClickEvents.next && rttsVisibleMonthAndDayIndex.month == this.visibleCalendar.rttsMonths.length - 1) {
-            canChangeMonth = false;
-        }
-        console.log("can change month: " + canChangeMonth);
         if (canChangeMonth) {
-            this.visibleCalendar.changeMonth(clickType === CalendarClickEvents.previous ? -1 : 1);
+            this.visibleCalendar.changeMonth(clickType == CalendarClickEvents.previous ? -1 : 1, "visible");
         }
 
+        const newRttsVisibleMonthAndDayIndex = this.visibleCalendar.getRttsMonthAndDayIndex("visible");
+        console.log("main-app: changeMonth: after change, newRttsVisibleMonthAndDayIndex=" + JSON.stringify(newRttsVisibleMonthAndDayIndex));
+        
         MainApp.setWidthHeight(this);
     }
 
@@ -1031,7 +1033,7 @@ export default class MainApp extends FormApplication {
                         GameSockets.emit({ type: SocketTypes.dateTimeChange, data: socketData }).catch(Logger.error);
                     }
                 } else {
-                    this.activeCalendar.changeDateTime(interval, { updateMonth: false, showWarning: true });
+                    this.activeCalendar.changeDateTime(interval, { showWarning: true });
                 }
             }
         } else if (dataType && (dataType === "sunrise" || dataType === "midday" || dataType === "sunset" || dataType === "midnight")) {

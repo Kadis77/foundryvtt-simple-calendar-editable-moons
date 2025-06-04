@@ -190,7 +190,7 @@ export default class RoadToTheSkyMonth extends ConfigurationItemBase {
                 this.resetDays(setting);
                 changeAmount = amount > 0 ? 1 : -1;
             } else {
-                this.updateDay(newIndex, isLeapYear, setting);
+                this.updateDay(newIndex, setting);
             }
         }
         return changeAmount;
@@ -210,10 +210,9 @@ export default class RoadToTheSkyMonth extends ConfigurationItemBase {
     /**
      * Updates the setting for the day to true
      * @param {number} dayIndex The Index of the day to update, -1 is for the last day of the month
-     * @param {boolean} [isLeapYear=false] If the year is a leap year
      * @param {string} [setting='current'] The setting on the day to update. Can be either current or selected
      */
-    updateDay(dayIndex: number, isLeapYear: boolean = false, setting: string = "current") {
+    updateDay(dayIndex: number, setting: string = "current") {
         const verifiedSetting = setting.toLowerCase() as "current" | "selected";
         this.resetDays(setting);
         if (dayIndex < 0 || dayIndex >= this.numberOfDays) {

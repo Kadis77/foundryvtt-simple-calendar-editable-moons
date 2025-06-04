@@ -429,8 +429,6 @@ export default class Calendar extends ConfigurationItemBase {
         } else {
             Logger.error("Error setting the current date.");
         }
-        
-        console.log(JSON.stringify(this));
     }
 
     /**
@@ -666,7 +664,6 @@ export default class Calendar extends ConfigurationItemBase {
     rttsDaysIntoWeeks(rttsMonthIndex: number): (boolean | SimpleCalendar.HandlebarTemplateData.Day)[][] {
         const weeks = [];
         const dayOfWeekOffset = this.rttsMonthStartingDayOfWeek(rttsMonthIndex);
-        console.log("about to call getDaysForTemplate " + rttsMonthIndex);
         const days = this.rttsMonths[rttsMonthIndex].getDaysForTemplate();
 
         if (days.length) {
@@ -764,6 +761,7 @@ export default class Calendar extends ConfigurationItemBase {
     /**
      * Set the current date to also be the visible date
      */
+    // TODO: Rtts call this if the day that we were set to no longer exists
     setCurrentToVisible() {
         this.year.visibleYear = this.year.numericRepresentation;
         this.resetRttsMonths("visible");
@@ -773,63 +771,60 @@ export default class Calendar extends ConfigurationItemBase {
         }
     }
 
+    rttsDoesDayExist(rttsMonthIndex: number, dayIndex: number): boolean {
+        return this.rttsMonths.length > rttsMonthIndex && this.rttsMonths[rttsMonthIndex].numberOfDays > dayIndex;
+    }
+
+    doesDayExist(year: number, monthIndex: number, dayIndex: number): boolean {
+        let rttsMonthIndex = (year * 12) + monthIndex;
+        return this.rttsDoesDayExist(rttsMonthIndex, dayIndex);
+    }
+
     /**
      * Updates the specified setting for the specified month, also handles instances if the new month has 0 day
-     * @param month The index of the new month, -1 will be the last month
+     * @param rttsMonthIndex
      * @param setting The setting to update, can be 'visible', 'current' or 'selected'
      * @param next If the change moved the calendar forward(true) or back(false) this is used to determine the direction to go if the new month has 0 days
      * @param setDay If to set the months day to a specific one
      */
-    rttsUpdateMonth(month: number, setting: string, next: boolean, setDay: null | number = null) {
+    rttsUpdateMonth(rttsMonthIndex: number, setting: string, next: boolean, setDay: null | number = null) {
         const verifiedSetting = setting.toLowerCase() as "visible" | "current" | "selected";
-        const yearToUse =
-            verifiedSetting === "current"
-                ? this.year.numericRepresentation
-                : verifiedSetting === "visible"
-                ? this.year.visibleYear
-                : this.year.selectedYear;
-        const isLeapYear = this.year.leapYearRule.isLeapYear(yearToUse);
-        if (month === -1 || month >= this.months.length) {
-            month = this.months.length - 1;
-        }
-        //Get the current months current day
-        let currentDay: number;
-
-        if (setDay !== null) {
-            currentDay = setDay;
-        } else {
-            const currentRttsMonthDayIndex = this.getRttsMonthAndDayIndex();
-            currentDay = currentRttsMonthDayIndex.day || 0;
-        }
 
         //Reset all the months settings
-        this.resetRttsMonths(setting);
-        console.log("setting rtts month " + month + ((yearToUse - this.getMinDay().year) * 12) + " setting "  + verifiedSetting);
-        this.rttsMonths[month + ((yearToUse - this.getMinDay().year) * 12)][verifiedSetting] = true;
 
-        //If the month we are going to show has no days, skip it
-        if ((isLeapYear && this.months[month].numberOfLeapYearDays === 0) || (!isLeapYear && this.months[month].numberOfDays === 0)) {
-            this.months[month][verifiedSetting] = true;
-            return this.changeMonth(next ? 1 : -1, setting, setDay);
-        } else {
-            
+        console.log("rttsUpdateMonth: setting rtts month " + rttsMonthIndex + " setting "  + verifiedSetting);
+        
+        if (this.rttsMonths.length - 1  < rttsMonthIndex) {
+            console.warn("rttsUpdateMonth: Tried to set " + verifiedSetting + " month to rttsIndex " + rttsMonthIndex + ". Month does not exist");
+            return;
         }
+
+        this.resetRttsMonths(setting);
+        this.rttsMonths[rttsMonthIndex][verifiedSetting] = true;
 
         // If we are adjusting the current date we need to propagate that down to the days of the new month as well
         // We also need to set the visibility of the new month to true
         if (verifiedSetting === "current") {
-            this.months[month].updateDay(currentDay, isLeapYear);
+            //Get the current RTTS months current day
+            let currentDay: number;
+
+            if (setDay !== null) {
+                currentDay = setDay;
+            } else {
+                const currentRttsMonthDayIndex = this.getRttsMonthAndDayIndex();
+                currentDay = currentRttsMonthDayIndex.day || 0;
+            }
+
+            this.rttsMonths[rttsMonthIndex].updateDay(currentDay);
         }
     }
 
     /**
      * Changes the number of the currently active year
      * @param amount The amount to change the year by
-     * @param updateMonth If to also update month
      * @param setting The month property we are changing. Can be 'visible', 'current' or 'selected'
-     * @param setDay If to set the months day to a specific one
      */
-    changeYear(amount: number, updateMonth: boolean = true, setting: string = "visible", setDay: null | number = null) {
+    changeYear(amount: number, setting: string = "visible") {
         const verifiedSetting = setting.toLowerCase() as "visible" | "current" | "selected";
         if (verifiedSetting === "visible") {
             this.year.visibleYear = this.year.visibleYear + amount;
@@ -837,15 +832,6 @@ export default class Calendar extends ConfigurationItemBase {
             this.year.selectedYear = this.year.selectedYear + amount;
         } else {
             this.year.numericRepresentation = this.year.numericRepresentation + amount;
-        }
-        if (this.months.length) {
-            if (updateMonth) {
-                let mIndex = 0;
-                if (amount === -1) {
-                    mIndex = this.months.length - 1;
-                }
-                this.rttsUpdateMonth(mIndex, setting, amount > 0, setDay);
-            }
         }
     }
 
@@ -858,62 +844,39 @@ export default class Calendar extends ConfigurationItemBase {
     changeMonth(amount: number, setting: string = "visible", setDay: null | number = null): void {
         const verifiedSetting = setting.toLowerCase() as "visible" | "current" | "selected";
         const next = amount > 0;
-        for (let i = 0; i < this.months.length; i++) {
-            const month = this.months[i];
-            if (month[verifiedSetting]) {
+        
+        // Get the current date for this setting
+        let currentYearIndex = this.getMinDay().year;
+        let currentMonthIndex = this.getRttsMonthIndex(verifiedSetting);
+        if (verifiedSetting === "visible") {
+            currentYearIndex = this.year.visibleYear;
+        } else if (verifiedSetting === "selected") {
+            currentYearIndex = this.year.selectedYear;
+        } else {
+            currentYearIndex = this.year.numericRepresentation;
+        }
+        
+        console.log("Change month calculation: The current " + verifiedSetting + " month is " + currentYearIndex + "/" + currentMonthIndex % 12 + " and rttsMonthIndex="  + currentMonthIndex); 
+        
+        // Find out if this date is valid
+        let canAddMonths = this.canAddMonths({year: currentYearIndex, month : currentMonthIndex, day: 0}, amount);
+        console.log("Change month calculation: canAddMonths="  + canAddMonths);
+        
+        if (canAddMonths) {
+            // Do we need to change the year as well?
+            let yearChangeAmount = 0;
+            if (next && (currentMonthIndex % 12) + amount > 12) {
                 
-                // RTTS If the harvest moon length is not defined for the new month, we cannot change it.
-                let newYear = this.startDate.year;
-                if (verifiedSetting === "visible") {
-                    newYear = this.year.visibleYear;
-                } else if (verifiedSetting === "selected") {
-                    newYear = this.year.selectedYear;
-                } else {
-                    newYear = this.year.numericRepresentation;
-                }
-                if (next) {
-                    let maxDate = this.getMaxDay();
-                    // Check if this year is greater than the years set so far
-                    newYear += Math.floor((i + amount) / 12);
-                    if (newYear > maxDate.year) {
-                        console.error("cannot add " + amount + " months: year is past defined years");
-                        return;
-                    }
-                    let month = (i + amount) % 12;
-                    if (newYear == maxDate.year && month > maxDate.month)
-                    {
-                        console.error("cannot add " + amount + " months: month is past defined max month " + maxDate.month + " of year " + maxDate.year);
-                        return;
-                    }
-                }
-                if (!next) {
-                    // Check if this year before the start year
-                    newYear -= Math.floor((i + amount) / 12);
-                    if (newYear < this.startDate.year) {
-                        console.error("cannot subtract " + amount + " months: year is before 410");
-                        return;
-                    }
-                }
-                
-                // RTTS: Back to regular logic
-                if (next && i + amount >= this.months.length) {
-                    console.log("changing...");
-                    this.changeYear(1, true, verifiedSetting, setDay);
-                    const changeAmount = amount - (this.months.length - i);
-                    if (changeAmount > 0) {
-                        this.changeMonth(changeAmount, verifiedSetting, setDay);
-                    }
-                } else if (!next && i + amount < 0) {
-                    this.changeYear(-1, true, verifiedSetting, setDay);
-                    const changeAmount = amount + i + 1;
-                    if (changeAmount < 0) {
-                        this.changeMonth(changeAmount, verifiedSetting, setDay);
-                    }
-                } else {
-                    this.rttsUpdateMonth(i + amount, setting, next, setDay);
-                }
-                break;
             }
+            else if (!next && (currentMonthIndex % 12) + amount < 0) {
+                
+            }
+            if (yearChangeAmount != 0) {
+                this.changeYear(yearChangeAmount, verifiedSetting);
+            }
+            
+            // Change the month
+            this.rttsUpdateMonth(currentMonthIndex + amount, setting, next, setDay);
         }
     }
 
@@ -1012,7 +975,7 @@ export default class Calendar extends ConfigurationItemBase {
             let change = false;
             
             if (interval.year) {
-                this.changeYear(interval.year, options.updateMonth, "current");
+                this.changeYear(interval.year, "current");
                 change = true;
             }
             if (interval.month) {
@@ -1231,10 +1194,10 @@ export default class Calendar extends ConfigurationItemBase {
      * @param {DateTimeParts} parsedDate Interface that contains all of the individual parts of a date and time
      */
     updateTime(parsedDate: SimpleCalendar.DateTime) {
-        const isLeapYear = this.year.leapYearRule.isLeapYear(parsedDate.year);
+        const rttsMonthIndex = this.getRttsMonthIndexFromDate(parsedDate.year, parsedDate.month);
         this.year.numericRepresentation = parsedDate.year;
-        this.rttsUpdateMonth(parsedDate.month, "current", true);
-        this.months[parsedDate.month].updateDay(parsedDate.day, isLeapYear);
+        this.rttsUpdateMonth(rttsMonthIndex, "current", true);
+        this.rttsMonths[rttsMonthIndex].updateDay(parsedDate.day);
         this.time.setTime(parsedDate.hour, parsedDate.minute, parsedDate.seconds);
     }
     
@@ -1258,14 +1221,13 @@ export default class Calendar extends ConfigurationItemBase {
     
     // RTTS: will adding a month make this date invalid?
     public canAddMonths(date: SimpleCalendar.Date, amount: number) {
+        console.log("index canAddMonths: date=" + JSON.stringify(date) + ",amount=" + amount)
         if (amount > 0) {
             let maxDay = this.getMaxDay();
-            console.log("max day: " + JSON.stringify(maxDay));
             if (date.year > maxDay.year) {
                 return false;
             }
             else if (maxDay.year == date.year && date.month + amount > maxDay.month) {
-                console.log("cannot add month, returning");
                 return false;
             }
         }

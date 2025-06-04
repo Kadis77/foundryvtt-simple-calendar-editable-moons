@@ -44,7 +44,7 @@ export function ParseChatCommand(message: string) {
                                 }
                                 switch (unit.toLowerCase()) {
                                     case "y":
-                                        calendar.changeYear(value, false, "current");
+                                        calendar.changeYear(value, "current");
                                         break;
                                     case "m":
                                         calendar.changeMonth(value, "current");

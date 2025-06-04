@@ -81,7 +81,6 @@ export default class CalendarFull {
                     day: 0
                 };
                 options.id = `${origId}-${i}`;
-                console.log("entry 2");
                 HTML += this.Build(calendar, options);
             }
             HTML += "</div>";
@@ -122,13 +121,11 @@ export default class CalendarFull {
             }
             vYear = options.date.year;
             vRttsMonthIndex = calendar.getRttsMonthIndexFromDate(options.date.year, options.date.month);
-            console.log("A: " + vYear + " " + vOldMonthIndex + " " + vRttsMonthIndex);
         } else {
             vYear = calendar.year.visibleYear;
             let rttsVisibleMonthAndDayIndex = calendar.getRttsMonthAndDayIndex("visible");
             vRttsMonthIndex = rttsVisibleMonthAndDayIndex.month ?? 0;
             vOldMonthIndex = vRttsMonthIndex % 12;
-            console.log("B: " + vYear + " " + vOldMonthIndex + " " + vRttsMonthIndex);
         }
         weeks = calendar.rttsDaysIntoWeeks(vRttsMonthIndex);
 

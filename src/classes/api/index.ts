@@ -305,7 +305,7 @@ export function advanceTimeToPreset(preset: PresetTimeOfDay, calendarId: string 
 export function changeDate(interval: SimpleCalendar.DateTimeParts, calendarId: string = "active"): boolean {
     const activeCalendar = calendarId === "active" ? CalManager.getActiveCalendar() : CalManager.getCalendar(calendarId);
     if (activeCalendar) {
-        return activeCalendar.changeDateTime(interval, { updateMonth: false, showWarning: true });
+        return activeCalendar.changeDateTime(interval, { showWarning: true });
     } else {
         Logger.error(`SimpleCalendar.api.changeDate - Unable to find a calendar with the passed in ID of "${calendarId}"`);
     }
@@ -1966,14 +1966,14 @@ export function timestampPlusInterval(currentSeconds: number, interval: SimpleCa
         const dateTime = clone.rttsSecondsToDate(currentSeconds);
         clone.updateTime(dateTime);
         if (interval.year) {
-            clone.changeYear(interval.year, false, "current");
+            clone.changeYear(interval.year, "current");
         }
         if (interval.month) {
             //If a large number of months are passed in then
             if (interval.month > clone.months.length) {
                 const years = Math.floor(interval.month / clone.months.length);
                 interval.month = interval.month - years * clone.months.length;
-                clone.changeYear(years, false, "current");
+                clone.changeYear(years, "current");
             }
             clone.changeMonth(interval.month, "current");
         }

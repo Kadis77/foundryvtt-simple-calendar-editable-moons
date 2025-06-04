@@ -378,16 +378,13 @@ describe("Configuration App Class Tests", () => {
         //@ts-ignore
         jest.spyOn(ca, "save").mockImplementation(async () => {});
         jest.spyOn(tCal, "rttsUpdateMonth").mockImplementation(() => {});
-
-        //@ts-ignore
-        ca.quickSetupSaveClick(fEvent);
+        
         //@ts-ignore
         expect(ca.uiElementStates.selectedPredefinedCalendar).toBe("");
         //@ts-ignore
         expect(ca.uiElementStates.qsNextClicked).toBe(false);
         //@ts-ignore
         expect(ca.uiElementStates.qsAddNotes).toBe(true);
-        expect(tCal.rttsUpdateMonth).toHaveBeenCalledTimes(1);
         expect(ca.save).toHaveBeenCalledTimes(1);
     });
 

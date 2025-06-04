@@ -423,10 +423,6 @@ export default class ConfigurationApp extends FormApplication {
             this.appWindow
                 .querySelector(".fsc-quick-setup .fsc-control-section .fsc-qs-back")
                 ?.addEventListener("click", this.quickSetupBackClick.bind(this));
-            //Save button clicked
-            this.appWindow
-                .querySelector(".fsc-quick-setup .fsc-control-section .fsc-qs-save")
-                ?.addEventListener("click", this.quickSetupSaveClick.bind(this));
 
             //---------------------
             // Show/Hide Advanced
@@ -637,25 +633,6 @@ export default class ConfigurationApp extends FormApplication {
                 animateElement(step2, 500);
             }
         }
-    }
-
-    /**
-     * Process when the save button is clicked in the quick setup tab
-     * @param e The Click Event
-     * @private
-     */
-    private quickSetupSaveClick(e: Event) {
-        e.preventDefault();
-        this.uiElementStates.selectedPredefinedCalendar = "";
-        this.uiElementStates.qsNextClicked = false;
-        this.uiElementStates.qsAddNotes = true;
-        const ds = DateSelectorManager.GetSelector("quick-setup-predefined-calendar", {});
-        (<Calendar>this.object).year.numericRepresentation = ds.selectedDate.start.year;
-        (<Calendar>this.object).year.visibleYear = ds.selectedDate.start.year;
-        (<Calendar>this.object).year.selectedYear = ds.selectedDate.start.year;
-        (<Calendar>this.object).rttsUpdateMonth(ds.selectedDate.start.month, "current", true, ds.selectedDate.start.day);
-        this._tabs[0].active = "generalSettings";
-        this.save(false, false).catch(Logger.error);
     }
 
     /**
@@ -936,15 +913,10 @@ export default class ConfigurationApp extends FormApplication {
             //----------------------------------
             this.appWindow.querySelectorAll(".fsc-moon-settings .fsc-rttsmoons>.fsc-row:not(.fsc-head)").forEach((e) => {
                 const index = parseInt((<HTMLElement>e).getAttribute("data-index") || "");
-                console.log(1);
                 if (!isNaN(index) && index >= 0 && index < (<Calendar>this.object).rttsMoons.length) {
-                    console.log(2);
                     e.querySelectorAll(".fsc-rtts-moon-cycles>.fsc-row:not(.fsc-head)").forEach((p) => {
-                        console.log(3);
                         const cycleIndex = parseInt((<HTMLElement>p).getAttribute("data-index") || "");
-                        console.log(4);
                         if (!isNaN(cycleIndex) && cycleIndex >= 0 && cycleIndex < (<Calendar>this.object).rttsMoons[index].cycleLengths.length) {
-                            console.log(5);
                             (<Calendar>this.object).rttsMoons[index].cycleLengths[cycleIndex] = <number>getNumericInputValue(".fsc-rtts-cycle-length", 1, false, p);
                         }
                      });
@@ -1338,8 +1310,6 @@ export default class ConfigurationApp extends FormApplication {
                                 if (dataRttsMoonIndex) {
                                     const rttsMoonIndex = parseInt(dataRttsMoonIndex);
                                     if (rttsMoonIndex < (<Calendar>this.object).rttsMoons.length) {
-                                        console.log("1 " + (rttsMoonIndex < (<Calendar>this.object).rttsMoons.length) + " " +  (<Calendar>this.object).rttsMoons.length + " " + rttsMoonIndex);
-                                        console.log("2 " + (index < (<Calendar>this.object).rttsMoons[rttsMoonIndex].cycleLengths.length) + " " +  (<Calendar>this.object).rttsMoons[rttsMoonIndex].cycleLengths.length + " " + index);
                                         if (index < (<Calendar>this.object).rttsMoons[rttsMoonIndex].cycleLengths.length) {
                                             (<Calendar>this.object).rttsMoons[rttsMoonIndex].cycleLengths.splice(index, 1);
                                         }
