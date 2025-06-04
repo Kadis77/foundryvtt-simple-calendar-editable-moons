@@ -12,7 +12,7 @@ import {
     ModuleName,
     MoonYearResetOptions,
     NoteReminderNotificationType,
-    PredefinedCalendars,
+    PredefinedCalendars, RoadToTheSkyMoonIds,
     Themes,
     YearNamingRules
 } from "../../constants";
@@ -1252,6 +1252,9 @@ export default class ConfigurationApp extends FormApplication {
                         const rttsMoonIndex = parseInt(dataRttsMoonIndex);
                         if (!isNaN(rttsMoonIndex) && rttsMoonIndex < (<Calendar>this.object).rttsMoons.length) {
                             (<Calendar>this.object).rttsMoons[rttsMoonIndex].cycleLengths.push(1);
+                            if (rttsMoonIndex == RoadToTheSkyMoonIds.harvest) {
+                                (<Calendar>this.object).onRttsMonthDeleted();
+                            }
                         }
                     }
                     break;
@@ -1312,6 +1315,8 @@ export default class ConfigurationApp extends FormApplication {
                                     if (rttsMoonIndex < (<Calendar>this.object).rttsMoons.length) {
                                         if (index < (<Calendar>this.object).rttsMoons[rttsMoonIndex].cycleLengths.length) {
                                             (<Calendar>this.object).rttsMoons[rttsMoonIndex].cycleLengths.splice(index, 1);
+                                            // Do any required reset of names of momths
+                                            (<Calendar>this.object).onRttsMonthDeleted();
                                         }
                                     }
                                 }

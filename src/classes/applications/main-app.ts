@@ -174,18 +174,6 @@ export default class MainApp extends FormApplication {
             if (data.compactViewDisplay.currentSeasonIcon === "") {
                 data.compactViewDisplay.currentSeasonIcon = `<span style="color:${season.color};">${season.name.slice(0, 2)}</span>`;
             }
-
-            if (this.visibleCalendar.moons.length) {
-                for (let i = 0; i < this.visibleCalendar.moons.length; i++) {
-                    const phase = this.visibleCalendar.moons[i].getMoonPhase(this.visibleCalendar, "current");
-                    data.compactViewDisplay.selectedDayMoons.push({
-                        name: this.visibleCalendar.moons[i].name,
-                        color: this.visibleCalendar.moons[i].color,
-                        phase: phase,
-                        iconSVG: GetIcon(phase.icon, "#000000", this.visibleCalendar.moons[i].color)
-                    });
-                }
-            }
         } else {
             for (let i = 0; i < this.addonButtons.length; i++) {
                 data.mainViewDisplay.addonButtons += `<button class="fsc-control fsc-grey fsc-addon-button ${this.addonButtons[i].customClass}" data-sc-abi="${i}" data-tooltip="${this.addonButtons[i].title}"><span class="fa ${this.addonButtons[i].iconClass}"></span></button>`;
@@ -235,7 +223,7 @@ export default class MainApp extends FormApplication {
         }
         if (canUser((<Game>game).user, SC.globalConfiguration.permissions.viewCalendar)) {
             if (this.visibleCalendar.timeKeeper.getStatus() !== TimeKeeperStatus.Started) {
-                //this.visibleCalendar.setCurrentToVisible();
+                this.visibleCalendar.setCurrentToVisible();
             }
             const mergedOptions: Application.RenderOptions = deepMerge({}, options);
             if (this.opening) {
@@ -611,7 +599,6 @@ export default class MainApp extends FormApplication {
                 // Activate the full calendar display listeners
                 Renderer.CalendarFull.ActivateListeners(
                     `sc_${this.visibleCalendar.id}_calendar`,
-                    // RTTS TODO: Figure out how to disable when invalid
                     this.changeMonth.bind(this),
                     this.dayClick.bind(this)
                 );

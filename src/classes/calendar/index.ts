@@ -1,8 +1,9 @@
 import {
     GameWorldTimeIntegrations,
-    LeapYearRules, RoadToTheSkyMonthConfigs, RoadToTheSkyMonthIds,
-    RoadToTheSkyMoonCount,
-    RoadToTheSkyMoonIds, RoadToTheSkySeasonConfigs,
+    RoadToTheSkyMonthConfigs,
+    RoadToTheSkyMonthIds,
+    RoadToTheSkyMoonIds,
+    RoadToTheSkySeasonConfigs,
     SimpleCalendarHooks,
     TimeKeeperStatus
 } from "../../constants";
@@ -29,7 +30,6 @@ import {Hook} from "../api/hook";
 import PF1E from "../systems/pf1e";
 import {RoadToTheSkyMoon} from "./moon-rtts";
 import RoadToTheSkyMonth from "./month-rtts";
-import * as sea from "node:sea";
 
 export default class Calendar extends ConfigurationItemBase {
     /**
@@ -292,8 +292,7 @@ export default class Calendar extends ConfigurationItemBase {
             season.sunsetTime = seasonConfig.sunsetTime;
         }
 
-        // RTTS: Add hardcoded RTTS months
-        
+        // RTTS: Add hardcoded RTTS moons
         const configRttsMoons: SimpleCalendar.RttsMoonData[] | undefined = config.rttsMoons;
         this.rttsMoons = [
             new RoadToTheSkyMoon(RoadToTheSkyMoonIds.harvest),
@@ -708,15 +707,6 @@ export default class Calendar extends ConfigurationItemBase {
      */
     rttsDayOfTheWeek(rttsMonthIndex: number, dayIndex: number): number {
         if (this.weekdays.length) {
-            const activeCalendar = CalManager.getActiveCalendar();
-            if (PF2E.isPF2E && activeCalendar.generalSettings.pf2eSync) {
-                const pf2eAdjust = PF2E.weekdayAdjust();
-                if (pf2eAdjust !== undefined) {
-                    this.year.firstWeekday = pf2eAdjust;
-                }
-            }
-
-            const month = this.rttsMonths[rttsMonthIndex];
             // the min day always starts on weekday index 0
             let daysSoFar = this.rttsDateToDays(
                 rttsMonthIndex,
@@ -734,14 +724,7 @@ export default class Calendar extends ConfigurationItemBase {
      * @return {number}
      */
     rttsMonthStartingDayOfWeek(monthIndex: number): number {
-        if (
-            monthIndex > -1 &&
-            monthIndex < this.months.length &&
-            !(this.months[monthIndex].intercalary && !this.months[monthIndex].intercalaryInclude)
-        ) {
-            return this.rttsDayOfTheWeek(monthIndex, 0);
-        }
-        return 0;
+        return this.rttsDayOfTheWeek(monthIndex, 0);
     }
 
     /**
@@ -1259,5 +1242,22 @@ export default class Calendar extends ConfigurationItemBase {
         
         daysSoFar += daysIntoMonth;
         return daysSoFar;
+    }
+
+    /**
+     * Reassigns the names of RTTS months
+     */
+    onRttsMonthDeleted() {
+        let m = 0;
+        for (let i = 0; i < this.rttsMonths.length; i++) {
+            if (m >= 12) {
+                m = m % 12;
+            }
+            let rm = this.rttsMonths[i];
+            rm.rttsMonthId = m;
+            rm.name = RoadToTheSkyMonthConfigs[m].name;
+            rm.description = RoadToTheSkyMonthConfigs[m].description;
+            rm.numericRepresentation = RoadToTheSkyMonthConfigs[m].numericRepresentation;
+        }
     }
 }

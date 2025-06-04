@@ -10,16 +10,6 @@
         </div>
         {{#if isGM}}
         <div class="fsc-tab-section fsc-stripe fsc-calendar-settings">
-            <div class="fsc-calendar-selector">
-                <div class="fsc-heading">{{localize 'FSC.Calendar'}}:<br/>{{object.name}}</div>
-                <ul class="fsc-closed">
-                    {{#each calendars}}
-                        <li class="{{#if (eq ../object.id id)}} fsc-active{{/if}}" data-calendar="{{id}}">
-                            {{name}} {{#unless (eq id 'default_temp')}}<button class="fsc-control fsc-delete" data-tooltip="{{localize 'FSC.RemoveCalendar'}}" data-calendar="{{id}}"><span class="fa fa-trash"></span></button>{{/unless}}
-                        </li>
-                    {{/each}}
-                </ul>
-            </div>
             <div class="fsc-sub-heading">{{localize 'FSC.Settings'}}</div>
             <a class="fsc-item" data-tab="generalSettings">{{localize 'FSC.Configuration.General.Title'}}</a>
             <a class="fsc-item" data-tab="displayOptions">{{localize 'FSC.Configuration.General.DisplayOptions'}}</a>
