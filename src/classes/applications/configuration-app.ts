@@ -389,16 +389,6 @@ export default class ConfigurationApp extends FormApplication {
      */
     public activateListeners(html: JQuery<HTMLElement>) {
         super.activateListeners(html);
-        (<Calendar>this.object).moons.forEach((m) => {
-            DateSelectorManager.GetSelector(`sc_first_new_moon_date_${m.id}`, {
-                onDateSelect: this.dateSelectorChange.bind(this, m.id, ConfigurationDateSelectors.moonFirstNewMoonDate)
-            }).activateListeners();
-        });
-        (<Calendar>this.object).rttsMoons.forEach((rm) => {
-            DateSelectorManager.GetSelector(`sc_first_full_moon_date_${rm.id}`, {
-                onDateSelect: this.dateSelectorChange.bind(this, rm.id, ConfigurationDateSelectors.moonFirstFullMoonDate)
-            }).activateListeners();
-        });
         this.appWindow = document.getElementById(ConfigurationApp.appWindowId);
         if (this.appWindow) {
             DateSelectorManager.ActivateSelector("quick-setup-predefined-calendar");
