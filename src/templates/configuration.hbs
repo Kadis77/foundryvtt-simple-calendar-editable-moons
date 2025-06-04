@@ -21,7 +21,6 @@
                     <li class="fsc-item fsc-new-calendar" data-tab="newCalendar">{{localize 'FSC.AddNewCalendar'}}<span class="fa fa-plus-circle"></span></li>
                 </ul>
             </div>
-            <a class="fsc-item" data-tab="quickSetup">{{localize 'FSC.Configuration.General.QuickSetup'}}</a>
             <div class="fsc-sub-heading">{{localize 'FSC.Settings'}}</div>
             <a class="fsc-item" data-tab="generalSettings">{{localize 'FSC.Configuration.General.Title'}}</a>
             <a class="fsc-item" data-tab="displayOptions">{{localize 'FSC.Configuration.General.DisplayOptions'}}</a>
@@ -284,68 +283,6 @@
                 <button class="fsc-control fsc-save" id="scAddCalendar">{{localize 'FSC.Configuration.AddCalendar.Button'}}</button>
             </div>
         </div>
-        <div class="tab fsc-quick-setup" data-tab="quickSetup">
-            <h2>{{localize 'FSC.Configuration.General.QuickSetup'}} <a href="https://simplecalendar.info/docs/calendar-configuration/quick-setup" data-tooltip="{{localize 'FSC.Help'}}" target="_blank" class="fa fa-question-circle"></a></h2>
-            <p>{{localize 'FSC.Configuration.QuickSetup.Description'}}</p>
-            <div class="fsc-section-wrapper">
-                <div class="fsc-section fsc-predefined {{#if uiElementStates.qsNextClicked}} fsc-closed{{else}} fsc-open{{/if}}">
-                    <div class="form-group fsc-open">
-                        <label>{{localize 'FSC.Configuration.QuickSetup.ChoosePredefinedTitle'}}</label>
-                        <p class="notes">{{localize 'FSC.Configuration.QuickSetup.ChoosePredefinedDescription'}}</p>
-                        <div class="fsc-predefined-list">
-                            {{#each predefined}}
-                                <div class="fsc-predefined-calendar {{#if (eq ../uiElementStates.selectedPredefinedCalendar key)}} fsc-selected{{/if}}" data-calendar="{{key}}">
-                                    <div class="fsc-predefined-calendar-details">
-                                        {{localize label}}
-                                        <div class="fsc-predefined-calendar-includes">
-                                            {{localize "FSC.Includes"}}:
-                                            {{#if config}}
-                                                <span class="fa fa-calendar" data-tooltip="{{localize "FSC.CalendarConfiguration"}}"></span>
-                                            {{/if}}
-                                            {{#if notes}}
-                                                <span class="fa fa-sticky-note" data-tooltip="{{localize "FSC.CalendarNotes"}}"></span>
-                                            {{/if}}
-                                        </div>
-                                    </div>
-
-                                </div>
-                            {{/each}}
-                        </div>
-                    </div>
-                    <div class="form-group fsc-open">
-                        <label for="scQSAddNotes">{{localize 'FSC.Configuration.QuickSetup.ImportNotes'}}</label>
-                        <div class="form-fields">
-                            <input value="{{uiElementStates.qsAddNotes}}" type="checkbox" id="scQSAddNotes" {{checked uiElementStates.qsAddNotes}} />
-                        </div>
-                        <p class="notes">{{localize 'FSC.Configuration.QuickSetup.ImportNotesDescription'}}</p>
-                    </div>
-                    <div class="fsc-control-section">
-                        <button class="fsc-control fsc-primary fsc-qs-next" {{#unless uiElementStates.selectedPredefinedCalendar}}style="display: none;" {{/unless}}>{{localize 'FSC.Next'}}&nbsp;<span class="fa fa-arrow-right"></span></button>
-                    </div>
-                </div>
-                <div class="fsc-section fsc-settings {{#if uiElementStates.qsNextClicked}} fsc-open{{else}} fsc-closed{{/if}}">
-                    <div class="form-group fsc-open">
-                        <label>{{localize 'FSC.Configuration.QuickSetup.ChooseCurrentDateTitle'}}</label>
-                        <div class="form-fields">
-                            {{sc-date-selector id='quick-setup-predefined-calendar' calendar=activeCalendarId selectedStartDate=qsCalDate selectedEndDate=qsCalDate position='left-down' allowDateRangeSelection=false showTimeSelector=false editYear=true }}
-                        </div>
-                        <p class="notes">{{localize 'FSC.Configuration.QuickSetup.ChooseCurrentDateDescription'}}</p>
-                    </div>
-                    <div class="form-group fsc-open">
-                        <label for="scQSShowClock">{{localize 'FSC.Configuration.General.ShowClock'}}</label>
-                        <div class="form-fields">
-                            <input class="fsc-toggle" value="{{generalSettings.showClock}}" type="checkbox" id="scQSShowClock" {{checked generalSettings.showClock}} />
-                        </div>
-                        <p class="notes">{{localize 'FSC.Configuration.General.ShowClockHelp'}}</p>
-                    </div>
-                    <div class="fsc-control-section">
-                        <button class="fsc-control fsc-primary fsc-qs-back"><span class="fa fa-arrow-left"></span>&nbsp;{{localize 'FSC.Back'}}</button>
-                        <button class="fsc-control fsc-save fsc-qs-save"><span class="fa fa-save"></span>&nbsp;{{localize 'FSC.Save'}}</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
         <div class="tab fsc-general-settings" data-tab="generalSettings">
             <h2>{{localize 'FSC.Configuration.General.Title'}} <a href="https://simplecalendar.info/docs/calendar-configuration/general-settings" data-tooltip="{{localize 'FSC.Help'}}" target="_blank" class="fa fa-question-circle"></a></h2>
             <p>{{localize 'FSC.Configuration.General.Description'}}</p>
