@@ -62,7 +62,7 @@ describe("Note Manager Class Tests", () => {
             return null;
         });
         jest.spyOn(tCal, "getDateTime").mockImplementation(() => {
-            return { year: 0, month: 0, day: 0, hour: 0, minute: 0, seconds: 0 };
+            return { year: 410, month: 0, day: 0, hour: 0, minute: 0, seconds: 0 };
         });
         await NManager.addNewNote(tCal, "");
         expect(NManager.createNote).toHaveBeenCalledTimes(1);
@@ -72,8 +72,8 @@ describe("Note Manager Class Tests", () => {
     test("Create Note", async () => {
         const noteData = {
             calendarId: tCal.id,
-            startDate: { year: 0, month: 0, day: 0, hour: 0, minute: 0, seconds: 0 },
-            endDate: { year: 0, month: 0, day: 0, hour: 0, minute: 0, seconds: 0 },
+            startDate: { year: 410, month: 0, day: 0, hour: 0, minute: 0, seconds: 0 },
+            endDate: { year: 410, month: 0, day: 0, hour: 0, minute: 0, seconds: 0 },
             allDay: false,
             repeats: 0,
             order: 0,
@@ -279,7 +279,7 @@ describe("Note Manager Class Tests", () => {
             return true;
         });
 
-        await NManager.orderNotesOnDay("asd", [], { year: 0, month: 0, day: 0, hour: 0, minute: 0, seconds: 0 });
+        await NManager.orderNotesOnDay("asd", [], { year: 410, month: 0, day: 0, hour: 0, minute: 0, seconds: 0 });
         expect(NManager.getNotesForDay).toHaveBeenCalledTimes(1);
         expect(GameSockets.emit).toHaveBeenCalledTimes(1);
 
@@ -290,7 +290,7 @@ describe("Note Manager Class Tests", () => {
             //@ts-ignore
             { entryId: "ns2", setOrder: async () => {} }
         ]);
-        await NManager.orderNotesOnDay("asd", ["ns2", "ns1"], { year: 0, month: 0, day: 0, hour: 0, minute: 0, seconds: 0 });
+        await NManager.orderNotesOnDay("asd", ["ns2", "ns1"], { year: 410, month: 0, day: 0, hour: 0, minute: 0, seconds: 0 });
         expect(NManager.getNotesForDay).toHaveBeenCalledTimes(2);
         expect(GameSockets.emit).toHaveBeenCalledTimes(2);
     });

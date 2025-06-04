@@ -43,6 +43,8 @@ export default class CalendarFull {
 
         let HTML = "";
         if (options.view === CalendarViews.Month) {
+            console.log("entry 1");
+            console.log(JSON.stringify(options));
             HTML = this.Build(calendar, options);
         } else if (options.view === CalendarViews.Year) {
             const vYear = options.date ? options.date.year : calendar.year.visibleYear;
@@ -79,6 +81,7 @@ export default class CalendarFull {
                     day: 0
                 };
                 options.id = `${origId}-${i}`;
+                console.log("entry 2");
                 HTML += this.Build(calendar, options);
             }
             HTML += "</div>";
@@ -119,10 +122,13 @@ export default class CalendarFull {
             }
             vYear = options.date.year;
             vRttsMonthIndex = calendar.getRttsMonthIndexFromDate(options.date.year, options.date.month);
+            console.log("A: " + vYear + " " + vOldMonthIndex + " " + vRttsMonthIndex);
         } else {
             vYear = calendar.year.visibleYear;
-            vRttsMonthIndex = calendar.getRttsMonthIndex("visible");
-            vOldMonthIndex = calendar.getRttsMonthIndex("visible") % 12;
+            let rttsVisibleMonthAndDayIndex = calendar.getRttsMonthAndDayIndex("visible");
+            vRttsMonthIndex = rttsVisibleMonthAndDayIndex.month ?? 0;
+            vOldMonthIndex = vRttsMonthIndex % 12;
+            console.log("B: " + vYear + " " + vOldMonthIndex + " " + vRttsMonthIndex);
         }
         weeks = calendar.rttsDaysIntoWeeks(vRttsMonthIndex);
 
@@ -551,8 +557,8 @@ export default class CalendarFull {
                                     if (dataDate) {
                                         const dayIndex = parseInt(dataDate);
                                         if (!isNaN(dayIndex)) {
-                                            const start = { year: 0, month: 0, day: 0 };
-                                            const end = { year: 0, month: 0, day: 0 };
+                                            const start = { year: 410, month: 0, day: 0 };
+                                            const end = { year: 410, month: 0, day: 0 };
 
                                             if (options.allowSelectDateRange) {
                                                 if (!options.selectedDates || options.selectedDates.end.year !== null) {
@@ -731,7 +737,7 @@ export default class CalendarFull {
                                 if (sunrise && sunset) {
                                     sunrise.textContent = FormatDateTime(
                                         {
-                                            year: 0,
+                                            year: 410,
                                             month: 0,
                                             day: 0,
                                             ...GetPresetTimeOfDay(PresetTimeOfDay.Sunrise, calendar, {
@@ -745,7 +751,7 @@ export default class CalendarFull {
                                     );
                                     sunset.textContent = FormatDateTime(
                                         {
-                                            year: 0,
+                                            year: 410,
                                             month: 0,
                                             day: 0,
                                             ...GetPresetTimeOfDay(PresetTimeOfDay.Sunset, calendar, {

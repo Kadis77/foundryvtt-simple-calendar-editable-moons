@@ -101,7 +101,7 @@ describe("Utilities Date/Time Tests", () => {
 
     test("MergeDateTimeObject", () => {
         const d = new Date();
-        expect(MergeDateTimeObject({})).toEqual({ year: 0, month: 0, day: 0, hour: 0, minute: 0, seconds: 0 });
+        expect(MergeDateTimeObject({})).toEqual({ year: 410, month: 0, day: 0, hour: 0, minute: 0, seconds: 0 });
         expect(
             MergeDateTimeObject({ hour: 0, minute: 0, seconds: 0 }, { year: 1999, month: 11, day: 24, hour: 23, minute: 59, seconds: 59 })
         ).toEqual({ year: 1999, month: 11, day: 24, hour: 0, minute: 0, seconds: 0 });

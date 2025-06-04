@@ -34,8 +34,8 @@ describe("Date Selector Manager Class Tests", () => {
             showCalendarYear: false,
             timeSelected: false,
             allowTimeRangeSelection: true,
-            selectedStartDate: { year: 0, month: 1, day: 1, hour: 0, minute: 0, seconds: 0 },
-            selectedEndDate: { year: 0, month: 1, day: 1, hour: 0, minute: 0, seconds: 0 }
+            selectedStartDate: { year: 410, month: 1, day: 1, hour: 0, minute: 0, seconds: 0 },
+            selectedEndDate: { year: 410, month: 1, day: 1, hour: 0, minute: 0, seconds: 0 }
         });
         expect(newDs.id).toBe("test2");
         expect(newDs.allowDateRangeSelection).toBe(true);

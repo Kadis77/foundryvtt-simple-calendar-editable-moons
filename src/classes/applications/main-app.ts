@@ -212,7 +212,7 @@ export default class MainApp extends FormApplication {
                     ),
                     time: c.generalSettings.showClock
                         ? FormatDateTime(
-                              { year: 0, month: 0, day: 0, hour: ct.hour, minute: ct.minute, seconds: ct.seconds },
+                              { year: 410, month: 0, day: 0, hour: ct.hour, minute: ct.minute, seconds: ct.seconds },
                               c.generalSettings.dateFormat.time,
                               c
                           )

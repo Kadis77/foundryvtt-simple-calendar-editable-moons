@@ -191,10 +191,6 @@ export default class ConfigurationApp extends FormApplication {
      */
     close(options?: FormApplication.CloseOptions): Promise<void> {
         CalManager.clearClones();
-        (<Calendar>this.object).seasons.forEach((s) => {
-            DateSelectorManager.RemoveSelector(`sc_season_start_date_${s.id}`);
-            DateSelectorManager.RemoveSelector(`sc_season_sunrise_time_${s.id}`);
-        });
         DateSelectorManager.DeactivateSelector("quick-setup-predefined-calendar");
         this.appWindow = null;
         return super.close(options);
@@ -299,7 +295,7 @@ export default class ConfigurationApp extends FormApplication {
             },
             noteCategories: <SimpleCalendar.NoteCategory[]>[],
             predefined: this.predefindCalendars,
-            qsCalDate: { year: 1, month: 0, day: 0, hour: 0, minute: 0, allDay: true },
+            qsCalDate: { year: 410, month: 0, day: 0, hour: 0, minute: 0, allDay: true },
             seasonColors: [
                 {
                     value: "#ffffff",
@@ -393,14 +389,6 @@ export default class ConfigurationApp extends FormApplication {
      */
     public activateListeners(html: JQuery<HTMLElement>) {
         super.activateListeners(html);
-        (<Calendar>this.object).seasons.forEach((s) => {
-            DateSelectorManager.GetSelector(`sc_season_start_date_${s.id}`, {
-                onDateSelect: this.dateSelectorChange.bind(this, s.id, ConfigurationDateSelectors.seasonStartingDate)
-            }).activateListeners();
-            DateSelectorManager.GetSelector(`sc_season_sunrise_time_${s.id}`, {
-                onDateSelect: this.dateSelectorChange.bind(this, s.id, ConfigurationDateSelectors.seasonSunriseSunsetTime)
-            }).activateListeners();
-        });
         (<Calendar>this.object).moons.forEach((m) => {
             DateSelectorManager.GetSelector(`sc_first_new_moon_date_${m.id}`, {
                 onDateSelect: this.dateSelectorChange.bind(this, m.id, ConfigurationDateSelectors.moonFirstNewMoonDate)
@@ -1237,15 +1225,12 @@ export default class ConfigurationApp extends FormApplication {
                 case "weekday":
                     (<Calendar>this.object).weekdays.push(new Weekday((<Calendar>this.object).weekdays.length + 1, "New Weekday"));
                     break;
-                case "season":
-                    (<Calendar>this.object).seasons.push(new Season("New Season", 1, 1));
-                    break;
                 case "moon": {
                     const newMoon = new Moon("Moon", 29.53059);
                     newMoon.firstNewMoon = {
                         yearReset: MoonYearResetOptions.None,
                         yearX: 0,
-                        year: 0,
+                        year: 410,
                         month: 1,
                         day: 1
                     };

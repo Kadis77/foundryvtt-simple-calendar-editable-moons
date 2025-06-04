@@ -650,3 +650,46 @@ export const RoadToTheSkyMonthConfigs : any[] = [
         constellation: "Raptor"
     }
 ]
+
+export const RoadToTheSkySeasonConfigs : any[] = [
+    {
+        id: "spring",
+        name: "Spring",
+        startingMonth: 0,
+        startingDay: 0,
+        color: "#46b946",
+        icon: "spring",
+        sunriseTime:21600, 
+        sunsetTime:64800
+    },
+    {
+        id: "summer",
+        name: "Summer",
+        startingMonth: 3,
+        startingDay: 0,
+        color: "#e0c40b",
+        icon: "summer",
+        sunriseTime:21600,
+        sunsetTime:64800
+    },
+    {
+        id: "autumn",
+        name: "Autumn",
+        startingMonth: 6,
+        startingDay: 0,
+        color: "#ff8e47",
+        icon: "fall",
+        sunriseTime:21600,
+        sunsetTime:64800
+    },
+    {
+        id: "winter",
+        name: "Winter",
+        startingMonth: 9,
+        startingDay: 0,
+        color: "#479dff",
+        icon: "winter",
+        sunriseTime:21600,
+        sunsetTime:64800
+    }
+]

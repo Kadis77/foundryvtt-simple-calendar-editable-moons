@@ -102,7 +102,7 @@ export default class RoadToTheSkyMonth extends ConfigurationItemBase {
             current: this.current,
             visible: this.visible,
             selected: this.selected,
-            days: this.days,
+            days: this.getDaysForTemplate(),
             numberOfDays: this.numberOfDays,
         };
     }

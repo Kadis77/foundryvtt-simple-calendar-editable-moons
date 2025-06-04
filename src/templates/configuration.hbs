@@ -29,7 +29,6 @@
             <a class="fsc-item" data-tab="monthSettings">{{localize 'FSC.Configuration.Month.Title'}}</a>
             <a class="fsc-item" data-tab="weekdaySettings">{{localize 'FSC.Configuration.Weekday.Title'}}</a>
             <a class="fsc-item" data-tab="leapYearSettings">{{localize 'FSC.Configuration.LeapYear.Title'}}</a>
-            <a class="fsc-item" data-tab="seasonSettings">{{localize 'FSC.Configuration.Season.Title'}}</a>
             <a class="fsc-item" data-tab="moonSettings">{{localize 'FSC.Configuration.Moon.Title'}}</a>
             <a class="fsc-item" data-tab="rttsMoonSettings">{{localize 'FSC.Configuration.RTTSMoon.Title'}}</a>
             <a class="fsc-item" data-tab="timeSettings">{{localize 'FSC.Configuration.Time.Title'}}</a>
@@ -972,82 +971,6 @@
                             <div class="fsc-col">{{#if numericRepresentation}}{{numericRepresentation}}{{else}}IC{{/if}}</div>
                         </div>
                     {{/each}}
-                </div>
-            </div>
-        </div>
-        <div class="tab fsc-season-settings" data-tab="seasonSettings">
-            <div class="settings-group fsc-open">
-                <h2>{{localize 'FSC.Configuration.Season.Title'}} <a href="https://simplecalendar.info/docs/calendar-configuration/season-settings" data-tooltip="{{localize 'FSC.Help'}}" target="_blank" class="fa fa-question-circle"></a></h2>
-                <datalist id="scSeasonColors">
-                    {{#each seasonColors}}
-                        <option value="{{value}}">{{display}}</option>
-                    {{/each}}
-                </datalist>
-                <div class="fsc-hidden-label">
-                    <label id="fsc-season-name">{{localize 'FSC.Configuration.Season.NameHelp'}}</label>
-                    <label id="fsc-season-start-date">{{localize 'FSC.Configuration.Season.StartingDateHelp'}}</label>
-                    <label id="fsc-season-end-date">{{localize 'FSC.Configuration.Season.SunriseSunsetHelp'}}</label>
-                    <label id="fsc-season-icon">{{localize 'FSC.Configuration.Season.IconHelp'}}</label>
-                    <label id="fsc-season-color">{{localize 'FSC.Configuration.Season.ColorHelp'}}</label>
-                </div>
-                <div class="fsc-f-table fsc-seasons">
-                    <div class="fsc-row fsc-head">
-                        <div data-tooltip="{{localize 'FSC.Configuration.Season.NameHelp'}}" class="fsc-col">{{localize 'FSC.Configuration.Season.Name'}}</div>
-                        <div data-tooltip="{{localize 'FSC.Configuration.Season.StartingDateHelp'}}" class="fsc-col">{{localize 'FSC.Configuration.Season.StartingDate'}}</div>
-                        <div data-tooltip="{{localize 'FSC.Configuration.Season.SunriseSunsetHelp'}}" class="fsc-col">{{localize 'FSC.Configuration.Season.SunriseSunset'}}</div>
-                        <div data-tooltip="{{localize 'FSC.Configuration.Season.IconHelp'}}" class="fsc-col">{{localize 'FSC.Configuration.Season.Icon'}}</div>
-                        <div data-tooltip="{{localize 'FSC.Configuration.Season.ColorHelp'}}" class="fsc-col">{{localize 'FSC.Configuration.Season.Color'}}</div>
-                        <div class="fsc-col"></div>
-                        <div class="fsc-col"></div>
-                    </div>
-                    {{#each seasons}}
-                        <div class="fsc-row" data-index="{{@index}}" data-type="season">
-                            <div class="fsc-col">
-                                <label for="-seasonName{{@index}}" class="fsc-hidden-label">{{localize 'FSC.Configuration.Season.Name'}}</label>
-                                <input id="-seasonName{{@index}}" class="fsc-season-name" value="{{name}}" type="text" aria-describedby="fsc-season-name" />
-                            </div>
-                            <div class="fsc-col">
-                                {{sc-date-selector id=startDateSelectorId calendar=../activeCalendarId showDateSelector=true showTimeSelector=false showCalendarYear=false useCloneCalendars=true selectedStartDate=startDateSelectedDate }}
-                            </div>
-                            <div class="fsc-col">
-                                {{sc-date-selector id=sunriseSelectorId calendar=../activeCalendarId showDateSelector=false showTimeSelector=true allowDateRangeSelection=false allowTimeRangeSelection=true timeDelimiter='/' useCloneCalendars=true selectedStartDate=sunriseSelectorSelectedDates.start selectedEndDate=sunriseSelectorSelectedDates.end}}
-                            </div>
-                            <div class="fsc-col">
-                                <label for="-seasonIcon{{@index}}" class="fsc-hidden-label">{{localize 'FSC.Configuration.Season.Icon'}}</label>
-                                <select id="-seasonIcon{{@index}}" class="fsc-season-icon" aria-describedby="fsc-season-icon">
-                                    {{selectOptions ../seasonIcons selected=icon }}
-                                </select>
-                            </div>
-                            <div class="fsc-col">
-                                <label for="-seasonColor{{@index}}" class="fsc-hidden-label">{{localize 'FSC.Configuration.Season.Color'}}</label>
-                                <input id="-seasonColor{{@index}}" type="color" value="{{color}}" class="fsc-season-color" aria-describedby="fsc-season-color" list="scSeasonColors" />
-                            </div>
-                            <div class="fsc-col">
-                                {{#if showAdvanced}}
-                                    <a class="fsc-show-advanced" aria-expanded="true" aria-controls="-seasonAdvanced{{@index}}"><i class="fa fa-chevron-up"></i><span>{{localize 'FSC.HideAdvanced'}}</span></a>
-                                {{else}}
-                                    <a class="fsc-show-advanced" aria-expanded="false" aria-controls="-seasonAdvanced{{@index}}"><i class="fa fa-chevron-down"></i><span>{{localize 'FSC.ShowAdvanced'}}</span></a>
-                                {{/if}}
-                            </div>
-                            <div class="fsc-col">
-                                <button class="fsc-control fsc-delete" data-type="season"><span class="fa fa-trash"></span> {{localize 'FSC.Configuration.Month.Remove'}}</button>
-                            </div>
-                            <div id="-seasonAdvanced{{@index}}" class="fsc-options {{#if showAdvanced }} fsc-open{{else}} fsc-closed{{/if}}">
-                                <div class="form-group fsc-open">
-                                    <label for="-sd{{@index}}">{{localize 'FSC.Configuration.Season.DescriptionField'}}</label>
-                                    <div class="form-fields">
-                                        <textarea id="-sd{{@index}}" class="fsc-season-description">{{description}}</textarea>
-                                    </div>
-                                    <p class="notes">{{localize 'FSC.Configuration.Season.DescriptionHelp'}}</p>
-                                </div>
-                            </div>
-                        </div>
-                    {{/each}}
-                </div>
-                <div class="fsc-table-actions">
-                    <button class="fsc-control fsc-save" data-type="season"><span class="fa fa-plus"></span> {{localize 'FSC.Configuration.Season.Add'}}</button>
-                    <span class="fsc-spacer"></span>
-                    <button class="fsc-control fsc-delete" data-type="season" data-index="all"><span class="fa fa-trash"></span> {{localize 'FSC.Configuration.Season.RemoveAll'}}</button>
                 </div>
             </div>
         </div>

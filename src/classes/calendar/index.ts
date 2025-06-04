@@ -2,7 +2,7 @@ import {
     GameWorldTimeIntegrations,
     LeapYearRules, RoadToTheSkyMonthConfigs, RoadToTheSkyMonthIds,
     RoadToTheSkyMoonCount,
-    RoadToTheSkyMoonIds,
+    RoadToTheSkyMoonIds, RoadToTheSkySeasonConfigs,
     SimpleCalendarHooks,
     TimeKeeperStatus
 } from "../../constants";
@@ -29,6 +29,7 @@ import {Hook} from "../api/hook";
 import PF1E from "../systems/pf1e";
 import {RoadToTheSkyMoon} from "./moon-rtts";
 import RoadToTheSkyMonth from "./month-rtts";
+import * as sea from "node:sea";
 
 export default class Calendar extends ConfigurationItemBase {
     /**
@@ -280,14 +281,15 @@ export default class Calendar extends ConfigurationItemBase {
             this.timeKeeper.updateFrequency = this.time.updateFrequency;
         }
 
-        const configSeasons: SimpleCalendar.SeasonData[] | undefined = config.seasons || config.seasonSettings;
-        if (Array.isArray(configSeasons)) {
-            this.seasons = [];
-            for (let i = 0; i < configSeasons.length; i++) {
-                const newW = new Season();
-                newW.loadFromSettings(configSeasons[i]);
-                this.seasons.push(newW);
-            }
+        // RTTS: Add hardcoded RTTS seasons
+        this.seasons = [];
+        for (let i = 1; i < RoadToTheSkySeasonConfigs.length; i++) {
+            let seasonConfig = RoadToTheSkySeasonConfigs[i];
+            let season = new Season(seasonConfig.name, seasonConfig.startingMonth, seasonConfig.startingDay);
+            season.color = seasonConfig.color;
+            season.icon = seasonConfig.icon;
+            season.sunriseTime = seasonConfig.sunriseTime;
+            season.sunsetTime = seasonConfig.sunsetTime;
         }
 
         // RTTS: Add hardcoded RTTS months
@@ -450,7 +452,7 @@ export default class Calendar extends ConfigurationItemBase {
      */
     getDateTime(): SimpleCalendar.DateTime {
         const dt: SimpleCalendar.DateTime = {
-            year: 0,
+            year: 410,
             month: 0,
             day: 0,
             hour: 0,
@@ -664,6 +666,7 @@ export default class Calendar extends ConfigurationItemBase {
     rttsDaysIntoWeeks(rttsMonthIndex: number): (boolean | SimpleCalendar.HandlebarTemplateData.Day)[][] {
         const weeks = [];
         const dayOfWeekOffset = this.rttsMonthStartingDayOfWeek(rttsMonthIndex);
+        console.log("about to call getDaysForTemplate " + rttsMonthIndex);
         const days = this.rttsMonths[rttsMonthIndex].getDaysForTemplate();
 
         if (days.length) {

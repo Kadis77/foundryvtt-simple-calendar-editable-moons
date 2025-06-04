@@ -929,11 +929,11 @@ Returns an [Interval Time Object](#interval-time-object).
 
 ```javascript
 //Assuming a Gregorian Calendar
-SimpleCalendar.api.secondsToInterval(3600); //Returns {year: 0, month: 0, day: 0, hour: 1, minute: 0, second 0}
-SimpleCalendar.api.secondsToInterval(3660); //Returns {year: 0, month: 0, day: 0, hour: 1, minute: 1, second: 0}
-SimpleCalendar.api.secondsToInterval(86400); //Returns {year: 0, month: 0, day: 1, hour: 0, minute: 0, second: 0}
-SimpleCalendar.api.secondsToInterval(604800); //Returns {year: 0, month: 0, day: 7, hour: 0, minute: 0, second: 0}
-SimpleCalendar.api.secondsToInterval(2629743); //Returns {year: 0, month: 1, day: 0, hour: 10, minute: 29, second: 3}
+SimpleCalendar.api.secondsToInterval(3600); //Returns {year: 410, month: 0, day: 0, hour: 1, minute: 0, second 0}
+SimpleCalendar.api.secondsToInterval(3660); //Returns {year: 410, month: 0, day: 0, hour: 1, minute: 1, second: 0}
+SimpleCalendar.api.secondsToInterval(86400); //Returns {year: 410, month: 0, day: 1, hour: 0, minute: 0, second: 0}
+SimpleCalendar.api.secondsToInterval(604800); //Returns {year: 410, month: 0, day: 7, hour: 0, minute: 0, second: 0}
+SimpleCalendar.api.secondsToInterval(2629743); //Returns {year: 410, month: 1, day: 0, hour: 10, minute: 29, second: 3}
 SimpleCalendar.api.secondsToInterval(31556926); //Returns {year: 1, month: 0, day: 0, hour: 5, minute: 48, second: 46}
 ```
 

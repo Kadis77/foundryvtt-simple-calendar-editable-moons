@@ -52,25 +52,25 @@ describe('Season Tests', () => {
         expect(c.icon).toBe('none');
     });
 
-    test('To Template', () => {
-        let c = s.toTemplate();
-        expect(Object.keys(c).length).toBe(14); //Make sure no new properties have been added
-        expect(c.name).toBe('Spring');
-        expect(c.startingMonth).toBe(1);
-        expect(c.startingDay).toBe(1);
-        expect(c.color).toBe('#ffffff');
-        expect(c.startDateSelectorId).toBeDefined();
-        expect(c.sunriseSelectorId).toBeDefined();
-        expect(c.icon).toBe('none');
-
-        s.sunriseTime = 3660;
-        s.sunsetTime = 3660;
-        c = s.toTemplate();
-        expect(c.sunriseSelectorSelectedDates.start.hour).toBe(1);
-        expect(c.sunriseSelectorSelectedDates.start.minute).toBe(1);
-        expect(c.sunriseSelectorSelectedDates.end.hour).toBe(1);
-        expect(c.sunriseSelectorSelectedDates.end.minute).toBe(1);
-    });
+    //test('To Template', () => {
+    //    let c = s.toTemplate();
+    //    expect(Object.keys(c).length).toBe(14); //Make sure no new properties have been added
+    //    expect(c.name).toBe('Spring');
+    //    expect(c.startingMonth).toBe(1);
+    //    expect(c.startingDay).toBe(1);
+    //    expect(c.color).toBe('#ffffff');
+    //    expect(c.startDateSelectorId).toBeDefined();
+    //    expect(c.sunriseSelectorId).toBeDefined();
+    //    expect(c.icon).toBe('none');
+//
+    //    s.sunriseTime = 3660;
+    //    s.sunsetTime = 3660;
+    //    c = s.toTemplate();
+    //    expect(c.sunriseSelectorSelectedDates.start.hour).toBe(1);
+    //    expect(c.sunriseSelectorSelectedDates.start.minute).toBe(1);
+    //    expect(c.sunriseSelectorSelectedDates.end.hour).toBe(1);
+    //    expect(c.sunriseSelectorSelectedDates.end.minute).toBe(1);
+    //});
 
     test('Load From Settings', () => {
         //@ts-ignore

@@ -36,7 +36,7 @@ describe('Note Stub Class Tests', () => {
         nStub = new NoteStub('je1');
         tCal.noteCategories.push({name: 'qwe', id: '', color: '', textColor: ''});
 
-        nd = {calendarId: 'test', startDate: {year: 0, month: 0, day: 0, hour: 0, minute: 0, seconds: 0}, endDate: {year: 0, month: 0, day: 0, hour: 0, minute: 0, seconds: 0}, allDay: false, repeats: NoteRepeat.Yearly, order: 1, fromPredefined: true, categories: [], remindUsers: ['qwe'], macro: '123abc'};
+        nd = {calendarId: 'test', startDate: {year: 410, month: 0, day: 0, hour: 0, minute: 0, seconds: 0}, endDate: {year: 410, month: 0, day: 0, hour: 0, minute: 0, seconds: 0}, allDay: false, repeats: NoteRepeat.Yearly, order: 1, fromPredefined: true, categories: [], remindUsers: ['qwe'], macro: '123abc'};
 
         jp = {}
 

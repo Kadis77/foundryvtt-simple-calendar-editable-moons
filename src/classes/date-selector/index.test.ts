@@ -44,7 +44,7 @@ describe("Date Selector Class Tests", () => {
             editYear: true,
             timeDelimiter: "~",
             selectedStartDate: {
-                year: 0,
+                year: 410,
                 month: 0,
                 day: 0,
                 hour: 0,
@@ -52,7 +52,7 @@ describe("Date Selector Class Tests", () => {
                 seconds: 0
             },
             selectedEndDate: {
-                year: 0,
+                year: 410,
                 month: 0,
                 day: 1,
                 hour: 0,
@@ -268,8 +268,8 @@ describe("Date Selector Class Tests", () => {
         ds.dayClick({
             id: "",
             selectedDates: {
-                start: { year: 0, month: 0, day: 0 },
-                end: { year: 0, month: 0, day: 0 }
+                start: { year: 410, month: 0, day: 0 },
+                end: { year: 410, month: 0, day: 0 }
             }
         });
         expect(ds.update).not.toHaveBeenCalled();
@@ -281,8 +281,8 @@ describe("Date Selector Class Tests", () => {
         ds.dayClick({
             id: "",
             selectedDates: {
-                start: { year: 0, month: 0, day: 0 },
-                end: { year: 0, month: 0, day: 0 }
+                start: { year: 410, month: 0, day: 0 },
+                end: { year: 410, month: 0, day: 0 }
             }
         });
         expect(ds.update).not.toHaveBeenCalled();
@@ -292,8 +292,8 @@ describe("Date Selector Class Tests", () => {
         ds.dayClick({
             id: "",
             selectedDates: {
-                start: { year: 0, month: 0, day: 0 },
-                end: { year: 0, month: 0, day: 0 }
+                start: { year: 410, month: 0, day: 0 },
+                end: { year: 410, month: 0, day: 0 }
             }
         });
         expect(ds.update).toHaveBeenCalledTimes(1);
@@ -304,8 +304,8 @@ describe("Date Selector Class Tests", () => {
         ds.dayClick({
             id: "",
             selectedDates: {
-                start: { year: 0, month: 0, day: 0 },
-                end: { year: 0, month: 0, day: 0 }
+                start: { year: 410, month: 0, day: 0 },
+                end: { year: 410, month: 0, day: 0 }
             }
         });
         expect(ds.update).toHaveBeenCalledTimes(2);
@@ -317,8 +317,8 @@ describe("Date Selector Class Tests", () => {
         ds.dayClick({
             id: "",
             selectedDates: {
-                start: { year: 0, month: 0, day: 0 },
-                end: { year: 0, month: 0, day: 0 }
+                start: { year: 410, month: 0, day: 0 },
+                end: { year: 410, month: 0, day: 0 }
             }
         });
         expect(ds.update).toHaveBeenCalledTimes(3);
@@ -330,12 +330,12 @@ describe("Date Selector Class Tests", () => {
         jest.spyOn(ds, "update").mockImplementation(() => {});
         jest.spyOn(Renderer.TimeSelector, "HideTimeDropdown").mockImplementation(() => {});
 
-        ds.changeMonthClick(CalendarClickEvents.next, { id: "", date: { year: 0, month: 0, day: 0 } });
+        ds.changeMonthClick(CalendarClickEvents.next, { id: "", date: { year: 410, month: 0, day: 0 } });
         expect(ds.update).toHaveBeenCalledTimes(1);
         expect(Renderer.TimeSelector.HideTimeDropdown).not.toHaveBeenCalled();
 
         ds.showTimeSelector = true;
-        ds.changeMonthClick(CalendarClickEvents.next, { id: "", date: { year: 0, month: 0, day: 0 } });
+        ds.changeMonthClick(CalendarClickEvents.next, { id: "", date: { year: 410, month: 0, day: 0 } });
         expect(ds.update).toHaveBeenCalledTimes(2);
         expect(Renderer.TimeSelector.HideTimeDropdown).toHaveBeenCalledTimes(1);
     });
@@ -344,12 +344,12 @@ describe("Date Selector Class Tests", () => {
         jest.spyOn(ds, "update").mockImplementation(() => {});
         jest.spyOn(Renderer.TimeSelector, "HideTimeDropdown").mockImplementation(() => {});
 
-        ds.changeYear({ id: "", date: { year: 0, month: 0, day: 0 } });
+        ds.changeYear({ id: "", date: { year: 410, month: 0, day: 0 } });
         expect(ds.update).toHaveBeenCalledTimes(1);
         expect(Renderer.TimeSelector.HideTimeDropdown).not.toHaveBeenCalled();
 
         ds.showTimeSelector = true;
-        ds.changeYear({ id: "", date: { year: 0, month: 0, day: 0 } });
+        ds.changeYear({ id: "", date: { year: 410, month: 0, day: 0 } });
         expect(ds.update).toHaveBeenCalledTimes(2);
         expect(Renderer.TimeSelector.HideTimeDropdown).toHaveBeenCalledTimes(1);
     });

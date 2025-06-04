@@ -793,16 +793,16 @@ describe("Calendar Class Tests", () => {
     //});
 //
     //test("Seconds To Interval", () => {
-    //    expect(tCal.secondsToInterval(6)).toStrictEqual({ year: 0, month: 0, day: 0, hour: 0, minute: 0, seconds: 6 });
-    //    expect(tCal.secondsToInterval(66)).toStrictEqual({ year: 0, month: 0, day: 0, hour: 0, minute: 1, seconds: 6 });
-    //    expect(tCal.secondsToInterval(3666)).toStrictEqual({ year: 0, month: 0, day: 0, hour: 1, minute: 1, seconds: 6 });
-    //    expect(tCal.secondsToInterval(86400)).toStrictEqual({ year: 0, month: 0, day: 1, hour: 0, minute: 0, seconds: 0 });
-    //    expect(tCal.secondsToInterval(2678400)).toStrictEqual({ year: 0, month: 1, day: 1, hour: 0, minute: 0, seconds: 0 }); // Interval uses the average number of days per month so it will never be exact. In this case 31 days worth of seconds works out to 1 month and 1 day
+    //    expect(tCal.secondsToInterval(6)).toStrictEqual({ year: 410, month: 0, day: 0, hour: 0, minute: 0, seconds: 6 });
+    //    expect(tCal.secondsToInterval(66)).toStrictEqual({ year: 410, month: 0, day: 0, hour: 0, minute: 1, seconds: 6 });
+    //    expect(tCal.secondsToInterval(3666)).toStrictEqual({ year: 410, month: 0, day: 0, hour: 1, minute: 1, seconds: 6 });
+    //    expect(tCal.secondsToInterval(86400)).toStrictEqual({ year: 410, month: 0, day: 1, hour: 0, minute: 0, seconds: 0 });
+    //    expect(tCal.secondsToInterval(2678400)).toStrictEqual({ year: 410, month: 1, day: 1, hour: 0, minute: 0, seconds: 0 }); // Interval uses the average number of days per month so it will never be exact. In this case 31 days worth of seconds works out to 1 month and 1 day
     //    expect(tCal.secondsToInterval(31536000)).toStrictEqual({ year: 1, month: 0, day: 0, hour: 0, minute: 0, seconds: 0 });
 //
-    //    expect(tCal.secondsToInterval(2505600)).toStrictEqual({ year: 0, month: 0, day: 29, hour: 0, minute: 0, seconds: 0 });
-    //    expect(tCal.secondsToInterval(2591999)).toStrictEqual({ year: 0, month: 0, day: 29, hour: 23, minute: 59, seconds: 59 });
-    //    expect(tCal.secondsToInterval(5356800)).toStrictEqual({ year: 0, month: 2, day: 1, hour: 0, minute: 0, seconds: 0 });
+    //    expect(tCal.secondsToInterval(2505600)).toStrictEqual({ year: 410, month: 0, day: 29, hour: 0, minute: 0, seconds: 0 });
+    //    expect(tCal.secondsToInterval(2591999)).toStrictEqual({ year: 410, month: 0, day: 29, hour: 23, minute: 59, seconds: 59 });
+    //    expect(tCal.secondsToInterval(5356800)).toStrictEqual({ year: 410, month: 2, day: 1, hour: 0, minute: 0, seconds: 0 });
     //});
 //
     //test("To Seconds", () => {
@@ -933,7 +933,7 @@ describe("Calendar Class Tests", () => {
     //        return true;
     //    });
     //    jest.spyOn(tCal, "secondsToDate").mockImplementation(() => {
-    //        return { year: 0, month: 0, day: 0, hour: 0, minute: 0, seconds: 0 };
+    //        return { year: 410, month: 0, day: 0, hour: 0, minute: 0, seconds: 0 };
     //    });
 //
     //    tCal.setFromTime(1, 0);

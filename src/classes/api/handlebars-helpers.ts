@@ -25,6 +25,7 @@ export class HandlebarsHelpers {
      * @param options
      */
     static DateSelector(options: any) {
+        console.log ("from date selector: " + JSON.stringify(options));
         if (Object.prototype.hasOwnProperty.call(options.hash, "id")) {
             const dsOptions: SimpleCalendar.DateTimeSelector.Options = {};
             if (Object.prototype.hasOwnProperty.call(options.hash, "allowDateRangeSelection")) {

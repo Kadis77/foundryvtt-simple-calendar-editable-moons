@@ -85,6 +85,7 @@ export class DateSelector {
      * @param options The options associated with setting up the new Date Selector
      */
     constructor(id: string, options: SimpleCalendar.DateTimeSelector.Options) {
+        console.log("id: " + id + " options: " + JSON.stringify(options.selectedStartDate));
         this.id = id;
         this.calendarId = `${this.id}_calendar`;
         this.timeSelectorId = `${this.id}_time_selector`;
@@ -92,7 +93,7 @@ export class DateSelector {
         this.showTimeSelector = false;
         this.selectedDate = {
             visible: {
-                year: 0,
+                year: 410,
                 month: 0,
                 day: 1,
                 hour: 0,
@@ -100,7 +101,7 @@ export class DateSelector {
                 seconds: 0
             },
             start: {
-                year: 0,
+                year: 410,
                 month: 0,
                 day: 1,
                 hour: 0,
@@ -108,7 +109,7 @@ export class DateSelector {
                 seconds: 0
             },
             end: {
-                year: 0,
+                year: 410,
                 month: 0,
                 day: 1,
                 hour: 0,
@@ -219,6 +220,8 @@ export class DateSelector {
         let timeSelectors = "";
 
         if (this.showDateSelector) {
+            console.log("build showDateSelector", JSON.stringify(this.selectedDate));
+            
             calendar = Renderer.CalendarFull.Render(this.calendar, {
                 id: this.calendarId,
                 allowChangeMonth: true,

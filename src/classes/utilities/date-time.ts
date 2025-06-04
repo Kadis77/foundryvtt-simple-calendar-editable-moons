@@ -304,7 +304,7 @@ export function IsDayBetweenDates(
  */
 export function TimestampToDateData(seconds: number, calendar: Calendar): SimpleCalendar.DateData {
     const result: SimpleCalendar.DateData = {
-        year: 0,
+        year: 410,
         month: 0,
         dayOffset: 0,
         day: 0,

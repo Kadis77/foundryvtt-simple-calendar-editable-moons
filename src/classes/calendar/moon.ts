@@ -35,7 +35,7 @@ export default class Moon extends ConfigurationItemBase {
          * The year of the first new moon
          * @type {number}
          */
-        year: 0,
+        year: 410,
         /**
          * The month of the first new moon
          * @type {number}
@@ -130,7 +130,7 @@ export default class Moon extends ConfigurationItemBase {
             color: this.color,
             cycleDayAdjust: this.cycleDayAdjust,
             firstNewMoonDateSelectorId: `sc_first_new_moon_date_${this.id}`,
-            firstNewMoonSelectedDate: { year: 0, month: this.firstNewMoon.month, day: this.firstNewMoon.day, hour: 0, minute: 0, seconds: 0 }
+            firstNewMoonSelectedDate: { year: 410, month: this.firstNewMoon.month, day: this.firstNewMoon.day, hour: 0, minute: 0, seconds: 0 }
         };
         return data;
     }

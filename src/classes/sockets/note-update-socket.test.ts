@@ -57,7 +57,7 @@ describe("Note Update Socket Tests", () => {
 
         r = await s.process({
             type: SocketTypes.noteUpdate,
-            data: { calendarId: "test", newOrder: ["1"], date: { year: 0, month: 0, day: 0, hour: 0, minute: 0, seconds: 0 } }
+            data: { calendarId: "test", newOrder: ["1"], date: { year: 410, month: 0, day: 0, hour: 0, minute: 0, seconds: 0 } }
         });
         expect(r).toBe(true);
         expect(GameSockets.emit).toHaveBeenCalledTimes(3);
