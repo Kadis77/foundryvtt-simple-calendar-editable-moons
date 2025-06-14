@@ -326,6 +326,7 @@ export default class Calendar extends ConfigurationItemBase {
         // RTTS: Populate the RTTS month instances based on the calendar data
         let rttsMonthIndex = 0;
         let yearsSinceStart = 0;
+        this.rttsMonths = [];
         for (let i = 0; i < this.rttsMoons[RoadToTheSkyMoonIds.harvest].cycleLengths.length; i++){
             if (rttsMonthIndex >= 12) {
                 rttsMonthIndex = rttsMonthIndex & 12;
