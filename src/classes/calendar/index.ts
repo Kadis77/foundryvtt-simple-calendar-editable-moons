@@ -15,7 +15,6 @@ import Season from "./season";
 import Moon from "./moon";
 import GeneralSettings from "../configuration/general-settings";
 import ConfigurationItemBase from "../configuration/configuration-item-base";
-import PF2E from "../systems/pf2e";
 import Renderer from "../renderer";
 import {generateUniqueId} from "../utilities/string";
 import {DateToTimestamp, DaysBetweenDates, FormatDateTime, RttsToSeconds} from "../utilities/date-time";
@@ -374,15 +373,6 @@ export default class Calendar extends ConfigurationItemBase {
             if (config.currentDate.month > -1 && config.currentDate.month < this.months.length) {
                 this.months[config.currentDate.month].current = true;
                 this.months[config.currentDate.month].visible = true;
-                
-                if (config.currentDate.day > -1 && config.currentDate.day < this.months[config.currentDate.month].days.length) {
-                    this.months[config.currentDate.month].days[config.currentDate.day].current = true;
-                } else {
-                    Logger.warn(
-                        "Saved current day could not be found in this month, perhaps number of days has changed. Setting current day to first day of month"
-                    );
-                    this.months[config.currentDate.month].days[0].current = true;
-                }
             } else if (this.months.length) {
                 Logger.warn("Saved current month could not be found, perhaps months have changed. Setting current month to the first month");
                 this.months[0].current = true;
@@ -961,6 +951,7 @@ export default class Calendar extends ConfigurationItemBase {
         options = deepMerge({}, { updateMonth: true, updateApp: true, save: true, sync: true, showWarning: false }, options);
         if (canUser((<Game>game).user, SC.globalConfiguration.permissions.changeDateTime)) {
             const initialTimestamp = this.toSeconds();
+            
             let change = false;
             
             if (interval.year) {
@@ -984,6 +975,26 @@ export default class Calendar extends ConfigurationItemBase {
             }
 
             if (change) {
+                // Check if the new time is valid.
+                let newCurrentDate = this.getCurrentDate();
+                let minDate = this.getMinDay();
+                let maxDate = this.getMaxDay();
+                if (newCurrentDate.year > maxDate.year ||
+                    (newCurrentDate.year == maxDate.year && newCurrentDate.month > maxDate.month) ||
+                    (newCurrentDate.year == maxDate.year && newCurrentDate.month == maxDate.month && newCurrentDate.day == maxDate.day)) {
+                    if (this.timeKeeper.getStatus() != TimeKeeperStatus.Stopped) {
+                        Hook.emit(SimpleCalendarHooks.ClockStartStop, this);
+                    }
+                    this.setDateTime(maxDate);
+                }
+                else if (newCurrentDate.year < minDate.year) {
+                    if (this.timeKeeper.getStatus() != TimeKeeperStatus.Stopped) {
+                        Hook.emit(SimpleCalendarHooks.ClockStartStop, this);
+                    }
+                    this.setDateTime(minDate);
+                }
+                
+                
                 if (CalManager.isActiveCalendar(this.id)) {
                     const changeInSeconds = this.toSeconds() - initialTimestamp;
                     Hook.emit(SimpleCalendarHooks.DateTimeChange, this, changeInSeconds);
@@ -1205,7 +1216,7 @@ export default class Calendar extends ConfigurationItemBase {
             day: this.rttsMoons[RoadToTheSkyMoonIds.harvest].cycleLengths[monthsSinceStart - 1]
         }
     }
-    
+
     // RTTS: will adding a month make this date invalid?
     public canAddMonths(date: SimpleCalendar.Date, amount: number) {
         console.log("index canAddMonths: date=" + JSON.stringify(date) + ",amount=" + amount)
