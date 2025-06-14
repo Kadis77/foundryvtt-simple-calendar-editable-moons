@@ -42,7 +42,7 @@ export default class CalendarFull {
 
         let HTML = "";
         if (options.view === CalendarViews.Month) {
-            console.log("calendar-full render: about to build from month view");
+            console.log("calendar-full render: about to build from month view with date" + JSON.stringify(options.date));
             HTML = this.Build(calendar, options);
         } else if (options.view === CalendarViews.Year) {
             const vYear = options.date ? options.date.year : calendar.year.visibleYear;
@@ -121,7 +121,7 @@ export default class CalendarFull {
             }
             vYear = options.date.year;
             vRttsMonthIndex = calendar.getRttsMonthIndexFromDate(options.date.year, options.date.month);
-            console.log("calendar-full build: date was provided as " + JSON.stringify(options.date) + ", building calendar for vYean=" + vYear + " rttsMonth=" + vRttsMonthIndex);
+            console.log("calendar-full build: visible date was provided as " + JSON.stringify(options.date));
         } else {
             vYear = calendar.year.visibleYear;
             let rttsVisibleMonthAndDayIndex = calendar.getRttsMonthAndDayIndex("visible");
@@ -142,12 +142,14 @@ export default class CalendarFull {
                 options.selectedDates.end.month > 0 && options.selectedDates.end.month < calendar.months.length ? options.selectedDates.end.month : 0;
             ssDay = options.selectedDates.start.day || 0;
             seDay = options.selectedDates.end.day || 0;
+            console.log("calendar-full build: selected date was provided as " + ssDay + "/" + ssMonth);
         } else {
             ssYear = seYear = calendar.year.selectedYear;
             ssMonth = seMonth = calendar.getRttsMonthIndex("selected") % 12;
             if (ssMonth > -1) {
                 ssDay = seDay = calendar.rttsMonths[ssMonth].getDayIndex("selected");
             }
+            console.log("calendar-full build: selected date was provided as " + ssDay + "/" + ssMonth);
         }
 
         if (options.showSeasonName || options.colorToMatchSeason) {
@@ -243,8 +245,8 @@ export default class CalendarFull {
                             const inBetween = IsDayBetweenDates(
                                 calendar,
                                 checkDate,
-                                { year: ssYear, month: ssMonth, day: ssDay, hour: 0, minute: 0, seconds: 0 },
-                                { year: seYear, month: seMonth, day: seDay, hour: 0, minute: 0, seconds: 0 }
+                                { year: ssYear, month: ssMonth % 12, day: ssDay, hour: 0, minute: 0, seconds: 0 },
+                                { year: seYear, month: seMonth % 12, day: seDay, hour: 0, minute: 0, seconds: 0 }
                             );
                             switch (inBetween) {
                                 case DateRangeMatch.Exact:
@@ -278,16 +280,6 @@ export default class CalendarFull {
                             html += `<div class="fsc-day-notes">${CalendarFull.NoteIndicator(calendar, vYear, vOldMonthIndex || 0, dayIndex)}</div>`;
                         }
                         html += (<SimpleCalendar.HandlebarTemplateData.Day>weeks[i][x]).name;
-                        //if (options.showMoonPhases) {
-                        //    html += `<div class="fsc-moons">${CalendarFull.MoonPhaseIcons(
-                        //        calendar,
-                        //        vYear,
-                        //        vOldMonthIndex || 0,
-                        //        dayIndex,
-                        //        x !== 0 && x === weeks[i].length - 1,
-                        //        i === weeks.length - 1
-                        //    )}</div>`;
-                        //}
                         if (options.showRttsMoonPhases) {
                             html += `<div class="fsc-moons">${CalendarFull.RttsMoonPhaseIcons(
                                 calendar,
@@ -525,6 +517,7 @@ export default class CalendarFull {
                                         loopCount++;
                                     }
                                 } else if (clickType === CalendarClickEvents.day || clickType === CalendarClickEvents.dayContext) {
+                                    console.log("calendar-full: click type identified as " + clickType);
                                     let target = <HTMLElement>event.target;
                                     //If a child of the day div is clicked get the closest day
                                     const closestDay = target.closest(".fsc-day");
@@ -532,6 +525,7 @@ export default class CalendarFull {
                                         target = <HTMLElement>closestDay;
                                     }
                                     const dataDate = target.getAttribute("data-day");
+                                    console.log("calendar-full: date clicked is identidied as " + JSON.stringify(dataDate));
                                     if (dataDate) {
                                         const dayIndex = parseInt(dataDate);
                                         if (!isNaN(dayIndex)) {
@@ -626,6 +620,7 @@ export default class CalendarFull {
         if (target) {
             const action = target.getAttribute("data-action");
             const date = target.closest(".fsc-day-context-list")?.getAttribute("data-date");
+            console.log("calendar-full: DayContextClick identified with date " + JSON.stringify(date));
             if (action && date) {
                 const dateParts = date.split("/");
                 if (dateParts.length === 3) {

@@ -230,8 +230,6 @@ export default class ConfigurationApp extends FormApplication {
             <Calendar>this.object
         );
 
-        this.uiElementStates.disabledControls.pf2e = PF2E.isPF2E && (<Calendar>this.object).generalSettings.pf2eSync;
-
         const data = {
             ...super.getData(options),
             activeCalendarId: (<Calendar>this.object).id,

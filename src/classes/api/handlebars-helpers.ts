@@ -84,6 +84,7 @@ export class HandlebarsHelpers {
      * @param options
      */
     static FullCalendar(options: any) {
+        console.log("start of handlebars with options " + JSON.stringify(options));
         const renderOptions: SimpleCalendar.Renderer.CalendarOptions = { id: "" };
         let calendarId = "";
         if (Object.prototype.hasOwnProperty.call(options.hash, "allowChangeMonth")) {
@@ -136,8 +137,10 @@ export class HandlebarsHelpers {
         }
         let cal = CalManager.getCalendar(calendarId);
         if (!cal) {
+            console.log("about to fetch active calendar");
             cal = CalManager.getActiveCalendar();
         }
+        console.log("about to render from handlebars with options " + JSON.stringify(renderOptions));
         return new Handlebars.SafeString(Renderer.CalendarFull.Render(cal, renderOptions));
     }
 

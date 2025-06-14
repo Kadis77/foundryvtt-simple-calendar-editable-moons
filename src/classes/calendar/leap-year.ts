@@ -91,9 +91,6 @@ export default class LeapYear extends ConfigurationItemBase {
     isLeapYear(year: number): boolean {
         const activeCalendar = CalManager.getActiveCalendar();
         year = year - this.startingYear;
-        if (PF2E.isPF2E && activeCalendar.generalSettings.pf2eSync) {
-            PF2E.checkLeapYearRules(this);
-        }
         if (this.rule === LeapYearRules.Gregorian) {
             return year % 4 === 0 && (year % 100 !== 0 || (year % 100 === 0 && year % 400 === 0));
         } else if (this.rule === LeapYearRules.Custom) {

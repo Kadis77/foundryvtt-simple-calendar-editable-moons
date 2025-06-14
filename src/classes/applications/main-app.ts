@@ -113,6 +113,7 @@ export default class MainApp extends FormApplication {
      * Gets the data object to be used by Handlebars when rending the HTML template
      */
     getData(): Promise<FormApplication.Data<object>> | FormApplication.Data<object> {
+        console.log("about to get data...")
         const data = {
             ...super.getData(),
             compactViewDisplay: {
@@ -222,9 +223,10 @@ export default class MainApp extends FormApplication {
             force = true;
         }
         if (canUser((<Game>game).user, SC.globalConfiguration.permissions.viewCalendar)) {
-            if (this.visibleCalendar.timeKeeper.getStatus() !== TimeKeeperStatus.Started) {
-                this.visibleCalendar.setCurrentToVisible();
-            }
+            //if (this.visibleCalendar.timeKeeper.getStatus() !== TimeKeeperStatus.Started) {
+            //    console.log("main-app render about to call setCurrentToVisible. TimeKeeperStatus.Started=" + this.visibleCalendar.timeKeeper.getStatus());
+            //    this.visibleCalendar.setCurrentToVisible();
+            //}
             const mergedOptions: Application.RenderOptions = deepMerge({}, options);
             if (this.opening) {
                 this.uiElementStates.compactView = GameSettings.GetBooleanSettings(SettingNames.OpenCompact);
@@ -937,6 +939,7 @@ export default class MainApp extends FormApplication {
             options.selectedDates.start.month >= 0 &&
             options.selectedDates.start.month < this.visibleCalendar.months.length
         ) {
+            console.log("main-app: dayClick called with options" + JSON.stringify(options));
             const selectedDay = options.selectedDates.start.day;
             let allReadySelected = false;
             const currentlySelectedRttsMonth = this.visibleCalendar.getRttsMonth("selected");

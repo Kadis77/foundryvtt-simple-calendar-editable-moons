@@ -27,10 +27,6 @@ describe("Systems/PF2E Class Tests", () => {
         expect(PF2E.dateTheme).toBe("AR");
     });
 
-    test("Is PF2E", () => {
-        expect(PF2E.isPF2E).toBe(false);
-    });
-
     test("Get World Create Seconds", () => {
         const tCal = new Calendar("", "");
 

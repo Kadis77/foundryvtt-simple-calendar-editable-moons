@@ -773,10 +773,6 @@ export function formatDateTime(
 export function formatTimestamp(timestamp: number, format: string = "", calendarId: string = "active"): string | { date: string; time: string } {
     const activeCalendar = calendarId === "active" ? CalManager.getActiveCalendar() : CalManager.getCalendar(calendarId);
     if (activeCalendar) {
-        // If this is a Pathfinder 2E game, add the world creation seconds
-        if (PF2E.isPF2E && activeCalendar.generalSettings.pf2eSync) {
-            timestamp += PF2E.getWorldCreateSeconds(activeCalendar);
-        }
         const date = activeCalendar.rttsSecondsToDate(timestamp);
         if (format) {
             return FormatDateTime(date, format, activeCalendar);
@@ -1958,10 +1954,6 @@ export function timestampPlusInterval(currentSeconds: number, interval: SimpleCa
     const activeCalendar = calendarId === "active" ? CalManager.getActiveCalendar() : CalManager.getCalendar(calendarId);
     if (activeCalendar) {
         const clone = activeCalendar.clone(false);
-        // If this is a Pathfinder 2E game, add the world creation seconds to the interval seconds
-        if (PF2E.isPF2E && activeCalendar.generalSettings.pf2eSync) {
-            currentSeconds += PF2E.getWorldCreateSeconds(activeCalendar);
-        }
 
         const dateTime = clone.rttsSecondsToDate(currentSeconds);
         clone.updateTime(dateTime);

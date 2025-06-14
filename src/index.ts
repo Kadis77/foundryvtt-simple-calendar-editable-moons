@@ -58,10 +58,6 @@ Hooks.on("init", async () => {
     Chat.init();
 });
 Hooks.on("ready", async () => {
-    if (PF2E.isPF2E) {
-        PF2E.updatePF2EVariables(true);
-        ChatTimestamp.updateChatMessageTimestamps();
-    }
     //Initialize the note manager
     await NManager.initialize();
     //Initialize the Simple Calendar Class

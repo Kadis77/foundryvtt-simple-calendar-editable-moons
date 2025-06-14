@@ -180,16 +180,6 @@ export function RttsToSeconds(calendar: Calendar, rttsMonthIndex: number, dayInd
     //Get the days so for and add one to include the current day
     let daysSoFar = calendar.rttsDateToDays(rttsMonthIndex, dayIndex);
     let totalSeconds = calendar.time.getTotalSeconds(daysSoFar, includeToday);
-    // If this is a Pathfinder 2E game, subtract the world creation seconds
-    if (PF2E.isPF2E && calendar.generalSettings.pf2eSync) {
-        const newYZ = PF2E.newYearZero();
-        if (newYZ !== undefined) {
-            calendar.year.yearZero = newYZ;
-            daysSoFar = calendar.rttsDateToDays(rttsMonthIndex, dayIndex);
-        }
-        daysSoFar++;
-        totalSeconds = calendar.time.getTotalSeconds(daysSoFar, includeToday) - PF2E.getWorldCreateSeconds(calendar, false);
-    }
     return totalSeconds;
 }
 
@@ -273,13 +263,16 @@ export function IsDayBetweenDates(
     calendar: Calendar,
     checkDate: SimpleCalendar.DateTime,
     startDate: SimpleCalendar.DateTime,
-    endDate: SimpleCalendar.DateTime
+    endDate : SimpleCalendar.DateTime
 ) {
     let between = DateRangeMatch.None;
 
     let checkRttsMonthIndex = calendar.getRttsMonthIndexFromDate(checkDate.year, checkDate.month);
     let startRttsMonthIndex = calendar.getRttsMonthIndexFromDate(startDate.year, startDate.month);
     let endRttsMonthIndex = calendar.getRttsMonthIndexFromDate(endDate.year, endDate.month);
+    
+    //console.log("check/start/end dates: " + JSON.stringify(checkDate) + "/" + JSON.stringify(startDate) + "/" + JSON.stringify(endDate));
+    //console.log("check/start/end dates rtts month indexes: " + JSON.stringify(checkRttsMonthIndex) + "/" + JSON.stringify(startRttsMonthIndex) + "/" + JSON.stringify(endRttsMonthIndex));
     
     const checkSeconds = RttsToSeconds(calendar, checkRttsMonthIndex, checkDate.day, false);
     const startSeconds = RttsToSeconds(calendar, startRttsMonthIndex, startDate.day, false);
@@ -294,6 +287,7 @@ export function IsDayBetweenDates(
     } else if (checkSeconds < endSeconds && checkSeconds > startSeconds) {
         between = DateRangeMatch.Middle;
     }
+    //console.log("IsDayBetweenDates: "+ between);
     return between;
 }
 
@@ -344,10 +338,6 @@ export function TimestampToDateData(seconds: number, calendar: Calendar): Simple
             time: ""
         }
     };
-    // If this is a Pathfinder 2E game, add the world creation seconds
-    if (PF2E.isPF2E && calendar.generalSettings.pf2eSync) {
-        seconds += PF2E.getWorldCreateSeconds(calendar);
-    }
 
     const dateTime = calendar.rttsSecondsToDate(seconds);
     result.year = dateTime.year;
@@ -410,6 +400,7 @@ export function DateToTimestamp(date: SimpleCalendar.DateTimeParts, calendar: Ca
     const clone = calendar.clone(false);
     const mergedDate = MergeDateTimeObject(date, null, clone);
     const rttsMonthIndex = calendar.getRttsMonthIndexFromDate(mergedDate.year, mergedDate.month);
+    console.log("DateToTimestamp: about to call with rttsMonthIndex=" + rttsMonthIndex);
     clone.rttsUpdateMonth(rttsMonthIndex, "current", true, mergedDate.day);
     clone.year.numericRepresentation = mergedDate.year;
     clone.time.setTime(mergedDate.hour, mergedDate.minute, mergedDate.seconds);

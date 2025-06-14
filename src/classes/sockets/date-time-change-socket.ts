@@ -24,7 +24,7 @@ export default class DateTimeChangeSocket extends SocketBase {
             if (d.type === DateTimeChangeSocketTypes.setDate) {
                 MainApplication.setCurrentDate(d.interval.year || 0, d.interval.month || 0, d.interval.day || 0);
             } else if (d.type === DateTimeChangeSocketTypes.changeDateTime) {
-                calendar.changeDateTime(d.interval, { updateMonth: false });
+                calendar.changeDateTime(d.interval, { updateMonth: true });
             } else if (d.type === DateTimeChangeSocketTypes.advanceTimeToPreset && d.presetTimeOfDay) {
                 await AdvanceTimeToPreset(d.presetTimeOfDay, calendar);
             }

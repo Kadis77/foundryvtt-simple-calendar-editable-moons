@@ -39,10 +39,6 @@ export class ChatTimestamp {
             const cal = CalManager.getCalendar(timestamps["id"]);
             if (cal) {
                 let seconds = timestamps["timestamp"];
-                // If this is a Pathfinder 2E game, add the world creation seconds to the interval seconds
-                if (PF2E.isPF2E && cal.generalSettings.pf2eSync) {
-                    seconds += PF2E.getWorldCreateSeconds(cal);
-                }
                 const dateTime = cal.rttsSecondsToDate(seconds);
                 formattedDateTime = FormatDateTime(dateTime, `${cal.generalSettings.dateFormat.chatTime}`, cal);
             }

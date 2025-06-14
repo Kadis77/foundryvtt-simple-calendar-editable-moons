@@ -162,6 +162,8 @@ export default class Calendar extends ConfigurationItemBase {
         const currentRttsMonthDay = this.getRttsMonthAndDayIndex();
         const selectedRttsMonthDay = this.getRttsMonthAndDayIndex("selected");
         const visibleRttsMonthDay = this.getRttsMonthAndDayIndex("visible");
+        
+        console.log("from calendar toTemplate - visibleRttsMonthDay=" + JSON.stringify(visibleRttsMonthDay));
 
         if (selectedRttsMonthDay.month !== undefined) {
             sMonth = selectedRttsMonthDay.month % 12;
@@ -173,6 +175,7 @@ export default class Calendar extends ConfigurationItemBase {
         }
 
         const noteCounts = NManager.getNoteCountsForDay(this.id, sYear, sMonth, sDay);
+        console.log("from toTemplate: calendar=" + JSON.stringify(this));
         return {
             ...super.toTemplate(),
             calendarDisplayId: `sc_${this.id}_calendar`,
@@ -731,6 +734,7 @@ export default class Calendar extends ConfigurationItemBase {
      */
     resetRttsMonths(setting: string = "current") {
         const verifiedSetting = setting.toLowerCase() as "visible" | "current" | "selected";
+        console.log("resetRttsMonths: Resetting " + verifiedSetting);   
         this.rttsMonths.forEach((m) => {
             if (setting !== "visible") {
                 m.resetDays(setting);
@@ -772,7 +776,6 @@ export default class Calendar extends ConfigurationItemBase {
         const verifiedSetting = setting.toLowerCase() as "visible" | "current" | "selected";
 
         //Reset all the months settings
-
         console.log("rttsUpdateMonth: setting rtts month " + rttsMonthIndex + " setting "  + verifiedSetting);
         
         if (this.rttsMonths.length - 1  < rttsMonthIndex) {
@@ -872,6 +875,7 @@ export default class Calendar extends ConfigurationItemBase {
         const verifiedSetting = setting.toLowerCase() as "current" | "selected";
         const currentRttsMonth = this.getRttsMonth(verifiedSetting);
         if (currentRttsMonth) {
+            console.log("changeDay: " + verifiedSetting + " month is" + currentRttsMonth.rttsMonthId)
             const next = amount > 0;
             const currentDayIndex = currentRttsMonth.getDayIndex(verifiedSetting);
             
@@ -1098,10 +1102,6 @@ export default class Calendar extends ConfigurationItemBase {
      * @param {number} changeAmount The amount that the time has changed by
      */
     setFromTime(newTime: number, changeAmount: number) {
-        // If this is a Pathfinder 2E game, add the world creation seconds
-        if (PF2E.isPF2E && this.generalSettings.pf2eSync) {
-            newTime += PF2E.getWorldCreateSeconds(this);
-        }
         if (changeAmount !== 0) {
             // If the tracking rules are for self or mixed and the clock is running then we make the change.
             if (
@@ -1177,8 +1177,10 @@ export default class Calendar extends ConfigurationItemBase {
      * @param {DateTimeParts} parsedDate Interface that contains all of the individual parts of a date and time
      */
     updateTime(parsedDate: SimpleCalendar.DateTime) {
+        console.log("updateTime called with " + JSON.stringify(parsedDate));
         const rttsMonthIndex = this.getRttsMonthIndexFromDate(parsedDate.year, parsedDate.month);
         this.year.numericRepresentation = parsedDate.year;
+        console.log("updateTime: about to call rttsUpdateMonth");
         this.rttsUpdateMonth(rttsMonthIndex, "current", true);
         this.rttsMonths[rttsMonthIndex].updateDay(parsedDate.day);
         this.time.setTime(parsedDate.hour, parsedDate.minute, parsedDate.seconds);
