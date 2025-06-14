@@ -342,17 +342,18 @@ export function TimestampToDateData(seconds: number, calendar: Calendar): Simple
     const dateTime = calendar.rttsSecondsToDate(seconds);
     result.year = dateTime.year;
     result.month = dateTime.month;
+    let rttsMonthIndex = calendar.getRttsMonthIndexFromDate(dateTime.year, dateTime.month);
     result.day = dateTime.day;
     result.hour = dateTime.hour;
     result.minute = dateTime.minute;
     result.second = dateTime.seconds;
 
-    const month = calendar.months[dateTime.month];
-    const day = month.days[dateTime.day];
+    const rttsMonth = calendar.rttsMonths[rttsMonthIndex];
+    const month = calendar.months[result.month];
+    const day = rttsMonth.days[dateTime.day];
     result.dayOffset = month.numericRepresentationOffset;
     result.yearZero = calendar.year.yearZero;
     
-    let rttsMonthIndex = calendar.getRttsMonthIndexFromDate(dateTime.year, dateTime.month);
     result.dayOfTheWeek = calendar.rttsDayOfTheWeek(rttsMonthIndex, result.day);
     result.currentSeason = calendar.getSeason(result.month, result.day + 1);
     result.weekdays = calendar.weekdays.map((w) => {
@@ -362,10 +363,11 @@ export function TimestampToDateData(seconds: number, calendar: Calendar): Simple
     result.isLeapYear = calendar.year.leapYearRule.isLeapYear(result.year);
     result.sunrise = calendar.getSunriseSunsetTime(result.year, result.month, result.day, true);
     result.sunset = calendar.getSunriseSunsetTime(result.year, result.month, result.day, false);
+    console.log("result.midday before, result=" + JSON.stringify(result));
     result.midday =
         DateToTimestamp({ year: result.year, month: result.month, day: result.day, hour: 0, minute: 0, seconds: 0 }, calendar) +
         Math.floor(calendar.time.secondsPerDay / 2);
-
+    console.log("result.midday after");
     // Display Stuff
     result.display.year = dateTime.year.toString();
     result.display.yearName = calendar.year.getYearName(result.year);
@@ -400,7 +402,7 @@ export function DateToTimestamp(date: SimpleCalendar.DateTimeParts, calendar: Ca
     const clone = calendar.clone(false);
     const mergedDate = MergeDateTimeObject(date, null, clone);
     const rttsMonthIndex = calendar.getRttsMonthIndexFromDate(mergedDate.year, mergedDate.month);
-    console.log("DateToTimestamp: about to call with rttsMonthIndex=" + rttsMonthIndex);
+    console.log("DateToTimestamp: about to call with rttsMonthIndex=" + rttsMonthIndex + ",date=" + JSON.stringify(date) + ",mergedDate=" + JSON.stringify(mergedDate));
     clone.rttsUpdateMonth(rttsMonthIndex, "current", true, mergedDate.day);
     clone.year.numericRepresentation = mergedDate.year;
     clone.time.setTime(mergedDate.hour, mergedDate.minute, mergedDate.seconds);

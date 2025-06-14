@@ -13,6 +13,7 @@ export class Hook {
     public static emit(hook: SimpleCalendarHooks, calendar: Calendar, param: any = undefined) {
         let data: any = {};
         if (hook === SimpleCalendarHooks.DateTimeChange) {
+            console.log("emit param=" + JSON.stringify(param) + ",seconds=" + JSON.stringify(calendar.toSeconds() + "currentDate=" + JSON.stringify(calendar.getCurrentDate())));
             data["date"] = TimestampToDateData(calendar.toSeconds(), calendar);
             data["diff"] = param;
             data["moons"] = [];

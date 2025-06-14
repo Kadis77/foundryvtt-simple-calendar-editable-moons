@@ -174,7 +174,7 @@ export default class Calendar extends ConfigurationItemBase {
         }
 
         const noteCounts = NManager.getNoteCountsForDay(this.id, sYear, sMonth, sDay);
-        console.log("from toTemplate: calendar=" + JSON.stringify(this));
+        //console.log("from toTemplate: calendar=" + JSON.stringify(this));
         return {
             ...super.toTemplate(),
             calendarDisplayId: `sc_${this.id}_calendar`,
@@ -338,7 +338,7 @@ export default class Calendar extends ConfigurationItemBase {
                     this.rttsMoons[RoadToTheSkyMoonIds.harvest].cycleLengths[i]
                 )
             )
-            console.log("pushed new month of length " + this.rttsMoons[RoadToTheSkyMoonIds.harvest].cycleLengths[i]);
+            //console.log("pushed new month of length " + this.rttsMoons[RoadToTheSkyMoonIds.harvest].cycleLengths[i]);
         }
         
         const configMoons: SimpleCalendar.MoonData[] | undefined = config.moons || config.moonSettings;
@@ -905,13 +905,12 @@ export default class Calendar extends ConfigurationItemBase {
      * @param {number} seconds The seconds to convert
      */
     rttsSecondsToDate(seconds: number): SimpleCalendar.DateTime {
-        
         let daysSinceStart = Math.floor(seconds / 86400);
         let year = this.getMinDay().year;
         let rttsMonth = 0;
         let daysSoFar = 0;
         
-        for (let i = 0; i < this.rttsMonths.length; i++) {
+        for (let i = 0; i < this.rttsMonths.length - 1; i++) {
             if (daysSoFar + this.rttsMonths[i].numberOfDays > daysSinceStart) {
                 break;
             }
@@ -924,15 +923,21 @@ export default class Calendar extends ConfigurationItemBase {
             }
         }
         
+        console.log("rttsSecondsToDate:daysSoFar=" + daysSoFar + ",rttsMonth=" + rttsMonth + ",daysSinceStart=" + daysSinceStart);
+        
         let remainingSeconds = seconds % 86400;
-        let hour = Math.floor(remainingSeconds / 3600);
+        // Add the number of days based on hours
+        let day = daysSinceStart - daysSoFar;
+        day += Math.floor(Math.floor(remainingSeconds / 3600) / 24) - 1;
+        
+        let hour = Math.floor(remainingSeconds / 3600) % 24;
         let minutes = (remainingSeconds - (hour * 3600)) % 60;
         let sec = remainingSeconds - (hour * 3600) - (minutes * 60);
         
         return {
             year: year,
             month: rttsMonth % 12,
-            day: daysSinceStart - daysSoFar,
+            day: day,
             hour: hour,
             minute: minutes,
             seconds: sec
@@ -1213,7 +1218,7 @@ export default class Calendar extends ConfigurationItemBase {
         return {
             year: this.startDate.year + yearsSinceStart,
             month: this.startDate.month + remainder - 1,
-            day: this.rttsMoons[RoadToTheSkyMoonIds.harvest].cycleLengths[monthsSinceStart - 1]
+            day: this.rttsMoons[RoadToTheSkyMoonIds.harvest].cycleLengths[monthsSinceStart - 1] - 1
         }
     }
 

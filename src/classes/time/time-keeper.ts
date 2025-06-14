@@ -157,6 +157,10 @@ export default class TimeKeeper {
             const activeCalendar = CalManager.getCalendar(this.calendarId);
             if (activeCalendar) {
                 const changeAmount = activeCalendar.time.gameTimeRatio * this.updateFrequency;
+                
+                // Check if we should pause because this is the end of time
+                if (activeCalendar)
+                
                 activeCalendar.changeDateTime({ seconds: changeAmount }, { updateApp: false, save: false });
                 if (GameSettings.IsGm() && SC.primary && activeCalendar.generalSettings.gameWorldTimeIntegration === GameWorldTimeIntegrations.None) {
                     GameSockets.emit(<SimpleCalendar.SimpleCalendarSocket.Data>{ type: SocketTypes.clock, data: this.status }).catch(Logger.error);
