@@ -193,7 +193,7 @@ export default class Calendar extends ConfigurationItemBase {
                 noteReminderCount: noteCounts.reminderCount,
                 notes: NManager.getNotesForDay(this.id, sYear, sMonth, sDay)
             },
-            visibleDate: { year: this.year.visibleYear, month: visibleRttsMonthDay.month || 0 }
+            visibleDate: { year: this.year.visibleYear, month: ((visibleRttsMonthDay.month || 0) % 12)}
         };
     }
 
@@ -664,6 +664,7 @@ export default class Calendar extends ConfigurationItemBase {
      */
     rttsDaysIntoWeeks(rttsMonthIndex: number): (boolean | SimpleCalendar.HandlebarTemplateData.Day)[][] {
         const weeks = [];
+        console.log("rttsDaysIntoWeeks called with rttsMonthIndex=" + rttsMonthIndex)
         const dayOfWeekOffset = this.rttsMonthStartingDayOfWeek(rttsMonthIndex);
         const days = this.rttsMonths[rttsMonthIndex].getDaysForTemplate();
 
