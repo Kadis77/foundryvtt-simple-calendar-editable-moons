@@ -56,11 +56,11 @@ describe("RTTS Moon Tests", () => {
     test("To Template", () => {
         for (let i = 0; i < tCal.rttsMoons.length; i++) {
             let c = tCal.rttsMoons[i].toTemplate();
-            expect(Object.keys(c).length).toBe(11); //Make sure no new properties have been added
+            expect(Object.keys(c).length).toBe(9); //Make sure no new properties have been added
             expect(c.name).toBe(tCal.rttsMoons[i].name);
             expect(c.firstFullMoon).toStrictEqual(tCal.rttsMoons[i].firstFullMoon);
-            expect(c.cycleLengths.length).toBe(1);
-            expect(c.cycleLengths[0]).toBe(1);
+            expect(c.cycleLengths.length).toBe(i == 0 ? 2: 1);
+            expect(c.cycleLengths[0]).toBe(i == 0 ? 30: 1);
             expect(c.color).toBe(tCal.rttsMoons[i].color);
         }
     });

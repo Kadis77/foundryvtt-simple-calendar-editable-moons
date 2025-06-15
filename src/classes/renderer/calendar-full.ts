@@ -42,12 +42,12 @@ export default class CalendarFull {
 
         let HTML = "";
         if (options.view === CalendarViews.Month) {
-            console.log("calendar-full render: about to build from month view with date" + JSON.stringify(options.date));
+            // console.log("calendar-full render: about to build from month view with date" + JSON.stringify(options.date));
             HTML = this.Build(calendar, options);
         } else if (options.view === CalendarViews.Year) {
             const vYear = options.date ? options.date.year : calendar.year.visibleYear;
             
-            console.log("calendar-full Render: date=" + JSON.stringify(options.date));
+            // console.log("calendar-full Render: date=" + JSON.stringify(options.date));
 
             HTML = `<div class="fsc-year-view-wrapper" id="${options.id}"><div class="fsc-current-year">`;
             
@@ -55,7 +55,7 @@ export default class CalendarFull {
             let visibleMonthIndex = calendar.getRttsMonthIndex("visible");
             let canChangeMonthForward = visibleMonthIndex <= calendar.rttsMonths.length - 1;
             let canChangeMonthBack = visibleMonthIndex > 0;
-            console.log("render: visibleMonthIndex =" + visibleMonthIndex + ",rttsMonths,length=" + calendar.rttsMonths.length);
+            // console.log("render: visibleMonthIndex =" + visibleMonthIndex + ",rttsMonths,length=" + calendar.rttsMonths.length);
             
             if (options.allowChangeMonth) {
                 if (canChangeMonthBack) {
@@ -80,7 +80,7 @@ export default class CalendarFull {
                     day: 0
                 };
                 options.id = `${origId}-${i}`;
-                console.log("calendar-full render: about to build from year view");
+                // console.log("calendar-full render: about to build from year view");
                 HTML += this.Build(calendar, options);
             }
             HTML += "</div>";
@@ -121,7 +121,7 @@ export default class CalendarFull {
             }
             vYear = options.date.year;
             vRttsMonthIndex = calendar.getRttsMonthIndexFromDate(options.date.year, options.date.month);
-            console.log("calendar-full build: visible date was provided as " + JSON.stringify(options.date));
+            // console.log("calendar-full build: visible date was provided as " + JSON.stringify(options.date));
         } else {
             vYear = calendar.year.visibleYear;
             let rttsVisibleMonthAndDayIndex = calendar.getRttsMonthAndDayIndex("visible");
@@ -142,14 +142,14 @@ export default class CalendarFull {
                 options.selectedDates.end.month > 0 && options.selectedDates.end.month < calendar.months.length ? options.selectedDates.end.month : 0;
             ssDay = options.selectedDates.start.day || 0;
             seDay = options.selectedDates.end.day || 0;
-            console.log("calendar-full build: selected date was provided as " + ssDay + "/" + ssMonth);
+            // console.log("calendar-full build: selected date was provided as " + ssDay + "/" + ssMonth);
         } else {
             ssYear = seYear = calendar.year.selectedYear;
             ssMonth = seMonth = calendar.getRttsMonthIndex("selected") % 12;
             if (ssMonth > -1) {
                 ssDay = seDay = calendar.rttsMonths[ssMonth].getDayIndex("selected");
             }
-            console.log("calendar-full build: selected date was provided as " + ssDay + "/" + ssMonth);
+            // console.log("calendar-full build: selected date was provided as " + ssDay + "/" + ssMonth);
         }
 
         if (options.showSeasonName || options.colorToMatchSeason) {
@@ -483,7 +483,7 @@ export default class CalendarFull {
                     const dataVis = currentMonthYear.getAttribute("data-visible");
                     if (dataVis) {
                         const my = dataVis.split("/");
-                        console.log("eventListener: my=" + dataVis);
+                        // console.log("eventListener: my=" + dataVis);
                         if (my.length === 2) {
                             let monthIndex = parseInt(my[0]);
                             let yearNumber = parseInt(my[1]);
@@ -517,7 +517,7 @@ export default class CalendarFull {
                                         loopCount++;
                                     }
                                 } else if (clickType === CalendarClickEvents.day || clickType === CalendarClickEvents.dayContext) {
-                                    console.log("calendar-full: click type identified as " + clickType);
+                                    // console.log("calendar-full: click type identified as " + clickType);
                                     let target = <HTMLElement>event.target;
                                     //If a child of the day div is clicked get the closest day
                                     const closestDay = target.closest(".fsc-day");
@@ -525,7 +525,7 @@ export default class CalendarFull {
                                         target = <HTMLElement>closestDay;
                                     }
                                     const dataDate = target.getAttribute("data-day");
-                                    console.log("calendar-full: date clicked is identidied as " + JSON.stringify(dataDate));
+                                    // console.log("calendar-full: date clicked is identidied as " + JSON.stringify(dataDate));
                                     if (dataDate) {
                                         const dayIndex = parseInt(dataDate);
                                         if (!isNaN(dayIndex)) {
@@ -595,14 +595,14 @@ export default class CalendarFull {
                     }
                 }
                 if (funcs.onMonthChange !== null && (clickType === CalendarClickEvents.previous || clickType === CalendarClickEvents.next)) {
-                    console.log("calendar-full EventListener: about to call month change functions");
+                    // console.log("calendar-full EventListener: about to call month change functions");
                     funcs.onMonthChange(clickType, options);
                 } else if (funcs.onDayClick !== null && clickType === CalendarClickEvents.day) {
                     funcs.onDayClick(options);
                 } else if (funcs.onYearChange !== null && clickType === CalendarClickEvents.year) {
                     funcs.onYearChange(options);
                 }
-                console.log("calendar-full EventListener: about to render with options=" + JSON.stringify(options))
+                // console.log("calendar-full EventListener: about to render with options=" + JSON.stringify(options))
                 const newHTML = CalendarFull.Render(calendar, options);
                 const temp = document.createElement("div");
                 temp.innerHTML = newHTML;
@@ -620,7 +620,7 @@ export default class CalendarFull {
         if (target) {
             const action = target.getAttribute("data-action");
             const date = target.closest(".fsc-day-context-list")?.getAttribute("data-date");
-            console.log("calendar-full: DayContextClick identified with date " + JSON.stringify(date));
+            // console.log("calendar-full: DayContextClick identified with date " + JSON.stringify(date));
             if (action && date) {
                 const dateParts = date.split("/");
                 if (dateParts.length === 3) {

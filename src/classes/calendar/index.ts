@@ -162,7 +162,7 @@ export default class Calendar extends ConfigurationItemBase {
         const selectedRttsMonthDay = this.getRttsMonthAndDayIndex("selected");
         const visibleRttsMonthDay = this.getRttsMonthAndDayIndex("visible");
         
-        console.log("from calendar toTemplate - visibleRttsMonthDay=" + JSON.stringify(visibleRttsMonthDay));
+        //console.log("from calendar toTemplate - visibleRttsMonthDay=" + JSON.stringify(visibleRttsMonthDay));
 
         if (selectedRttsMonthDay.month !== undefined) {
             sMonth = selectedRttsMonthDay.month % 12;
@@ -726,7 +726,7 @@ export default class Calendar extends ConfigurationItemBase {
      */
     resetRttsMonths(setting: string = "current") {
         const verifiedSetting = setting.toLowerCase() as "visible" | "current" | "selected";
-        console.log("resetRttsMonths: Resetting " + verifiedSetting);   
+        //console.log("resetRttsMonths: Resetting " + verifiedSetting);   
         this.rttsMonths.forEach((m) => {
             if (setting !== "visible") {
                 m.resetDays(setting);
@@ -768,7 +768,7 @@ export default class Calendar extends ConfigurationItemBase {
         const verifiedSetting = setting.toLowerCase() as "visible" | "current" | "selected";
 
         //Reset all the months settings
-        console.log("rttsUpdateMonth: setting rtts month " + rttsMonthIndex + " setting "  + verifiedSetting);
+        //console.log("rttsUpdateMonth: setting rtts month " + rttsMonthIndex + " setting "  + verifiedSetting);
         
         if (this.rttsMonths.length - 1  < rttsMonthIndex) {
             console.warn("rttsUpdateMonth: Tried to set " + verifiedSetting + " month to rttsIndex " + rttsMonthIndex + ". Month does not exist");
@@ -987,15 +987,15 @@ export default class Calendar extends ConfigurationItemBase {
                 if (newCurrentDate.year > maxDate.year ||
                     (newCurrentDate.year == maxDate.year && newCurrentDate.month > maxDate.month) ||
                     (newCurrentDate.year == maxDate.year && newCurrentDate.month == maxDate.month && newCurrentDate.day == maxDate.day)) {
-                    console.log("timekeeper: past the max day!");
+                    //console.log("timekeeper: past the max day!");
                     if (this.timeKeeper.getStatus() != TimeKeeperStatus.Stopped) {
-                        console.log("emitting an event...!");
+                        //console.log("emitting an event...!");
                         this.timeKeeper.setStatus(TimeKeeperStatus.Stopped);
                     }
                     this.setDateTime({year: maxDate.year, month: maxDate.month, day: maxDate.day, hour: 23, minute: 59, seconds: 59});
                 }
                 else if (newCurrentDate.year < minDate.year) {
-                    console.log("timekeeper: past the min day!");
+                    //console.log("timekeeper: past the min day!");
                     if (this.timeKeeper.getStatus() != TimeKeeperStatus.Stopped) {
                         this.timeKeeper.setStatus(TimeKeeperStatus.Stopped);
                     }
