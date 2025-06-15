@@ -987,14 +987,17 @@ export default class Calendar extends ConfigurationItemBase {
                 if (newCurrentDate.year > maxDate.year ||
                     (newCurrentDate.year == maxDate.year && newCurrentDate.month > maxDate.month) ||
                     (newCurrentDate.year == maxDate.year && newCurrentDate.month == maxDate.month && newCurrentDate.day == maxDate.day)) {
+                    console.log("timekeeper: past the max day!");
                     if (this.timeKeeper.getStatus() != TimeKeeperStatus.Stopped) {
-                        Hook.emit(SimpleCalendarHooks.ClockStartStop, this);
+                        console.log("emitting an event...!");
+                        this.timeKeeper.setStatus(TimeKeeperStatus.Stopped);
                     }
-                    this.setDateTime(maxDate);
+                    this.setDateTime({year: maxDate.year, month: maxDate.month, day: maxDate.day, hour: 23, minute: 59, seconds: 59});
                 }
                 else if (newCurrentDate.year < minDate.year) {
+                    console.log("timekeeper: past the min day!");
                     if (this.timeKeeper.getStatus() != TimeKeeperStatus.Stopped) {
-                        Hook.emit(SimpleCalendarHooks.ClockStartStop, this);
+                        this.timeKeeper.setStatus(TimeKeeperStatus.Stopped);
                     }
                     this.setDateTime(minDate);
                 }
