@@ -916,6 +916,7 @@ export default class ConfigurationApp extends FormApplication {
                         const cycleIndex = parseInt((<HTMLElement>p).getAttribute("data-index") || "");
                         if (!isNaN(cycleIndex) && cycleIndex >= 0 && cycleIndex < (<Calendar>this.object).rttsMoons[index].cycleLengths.length) {
                             (<Calendar>this.object).rttsMoons[index].cycleLengths[cycleIndex] = <number>getNumericInputValue(".fsc-rtts-cycle-length", 1, false, p);
+                            (<Calendar>this.object).rttsMoons[index].recalculateFullMoonDates((<Calendar>this.object));
                         }
                      });
                 }
@@ -1249,7 +1250,7 @@ export default class ConfigurationApp extends FormApplication {
                     if (dataRttsMoonIndex) {
                         const rttsMoonIndex = parseInt(dataRttsMoonIndex);
                         if (!isNaN(rttsMoonIndex) && rttsMoonIndex < (<Calendar>this.object).rttsMoons.length) {
-                            (<Calendar>this.object).rttsMoons[rttsMoonIndex].cycleLengths.push(1);
+                            (<Calendar>this.object).rttsMoons[rttsMoonIndex].pushCycle((<Calendar>this.object), 1);
                             if (rttsMoonIndex == RoadToTheSkyMoonIds.harvest) {
                                 (<Calendar>this.object).onRttsMonthDeleted();
                             }
@@ -1312,8 +1313,8 @@ export default class ConfigurationApp extends FormApplication {
                                     const rttsMoonIndex = parseInt(dataRttsMoonIndex);
                                     if (rttsMoonIndex < (<Calendar>this.object).rttsMoons.length) {
                                         if (index < (<Calendar>this.object).rttsMoons[rttsMoonIndex].cycleLengths.length) {
-                                            (<Calendar>this.object).rttsMoons[rttsMoonIndex].cycleLengths.splice(index, 1);
-                                            // Do any required reset of names of momths
+                                            (<Calendar>this.object).rttsMoons[rttsMoonIndex].deleteCycle((<Calendar>this.object), index);
+                                            // Do any required reset of names of months
                                             (<Calendar>this.object).onRttsMonthDeleted();
                                         }
                                     }

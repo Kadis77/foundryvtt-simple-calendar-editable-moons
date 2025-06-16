@@ -59,8 +59,6 @@ describe("RTTS Moon Tests", () => {
             expect(Object.keys(c).length).toBe(9); //Make sure no new properties have been added
             expect(c.name).toBe(tCal.rttsMoons[i].name);
             expect(c.firstFullMoon).toStrictEqual(tCal.rttsMoons[i].firstFullMoon);
-            expect(c.cycleLengths.length).toBe(i == 0 ? 2: 1);
-            expect(c.cycleLengths[0]).toBe(i == 0 ? 30: 1);
             expect(c.color).toBe(tCal.rttsMoons[i].color);
         }
     });

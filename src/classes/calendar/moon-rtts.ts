@@ -15,6 +15,11 @@ export class RoadToTheSkyMoon extends ConfigurationItemBase {
      */
     cycleLengths: number[] = [];
     /**
+     * An array of historic full moon dayes
+     * @type {number[]}
+     */
+    fullMoonDates: SimpleCalendar.Date[] = [];
+    /**
      * When the first new moon took place. Used as a reference for calculating the position of the current cycle
      */
     firstFullMoon: SimpleCalendar.FirstFullMoonDate = {
@@ -69,6 +74,7 @@ export class RoadToTheSkyMoon extends ConfigurationItemBase {
         const c = new RoadToTheSkyMoon(this.rttsMoonId);
         c.id = this.id;
         c.cycleLengths = Object.assign([], this.cycleLengths);
+        c.fullMoonDates = Object.assign([], this.fullMoonDates);
         c.firstFullMoon.year = this.firstFullMoon.year;
         c.firstFullMoon.month = this.firstFullMoon.month;
         c.firstFullMoon.day = this.firstFullMoon.day;
@@ -84,6 +90,7 @@ export class RoadToTheSkyMoon extends ConfigurationItemBase {
             rttsMoonId: this.rttsMoonId,
             name: this.name,
             cycleLengths: this.cycleLengths,
+            fullMoonDates: this.fullMoonDates,
             firstFullMoon: {
                 year: this.firstFullMoon.year,
                 month: this.firstFullMoon.month,
@@ -97,10 +104,24 @@ export class RoadToTheSkyMoon extends ConfigurationItemBase {
      * Converts this RTTS moon into a template used for displaying the RTTS moon in HTML
      */
     toTemplate(): SimpleCalendar.HandlebarTemplateData.RttsMoon {
+        let cycles = [];
+        for (let i = 0; i < this.cycleLengths.length; i++) {
+            let dateString = "TBD";
+            if (this.fullMoonDates.length > i && this.fullMoonDates[i]) {
+                dateString = this.fullMoonDates[i].day + "/" + this.fullMoonDates[i].month + "/" + this.fullMoonDates[i].year;
+            }
+            cycles.push(
+                {
+                    id: "rttsMoonCycle-" + this.name + "-" + i,
+                    cycleLength: this.cycleLengths[i],
+                    startDate: dateString
+                });
+        }
+        
         return {
             ...super.toTemplate(),
             name: this.name,
-            cycleLengths: this.cycleLengths,
+            cycles: cycles,
             firstFullMoon: {
                 year: 410,
                 month: 0,
@@ -120,6 +141,7 @@ export class RoadToTheSkyMoon extends ConfigurationItemBase {
             
             this.rttsMoonId = config.rttsMoonId;
             this.cycleLengths = config.cycleLengths;
+            this.fullMoonDates = config.fullMoonDates;
             this.firstFullMoon = {
                 year: 410,
                 month: 0,
@@ -228,6 +250,49 @@ export class RoadToTheSkyMoon extends ConfigurationItemBase {
             return this.getDateMoonPhase(calendar, yearNum, monthIndex, dayIndex);
         }
         return this.moonPhaseFromConfig(RoadToTheSkyMoonPhaseIds.full, 1);
+    }
+
+    pushCycle(calendar: Calendar, phaseLength: number) {
+        this.cycleLengths.push(phaseLength);
+        this.recalculateFullMoonDates(calendar);
+    }
+
+    deleteCycle(calendar: Calendar, cycleIndex: number) {
+        this.cycleLengths.splice(cycleIndex, 1)
+        this.recalculateFullMoonDates(calendar);
+    }
+
+    recalculateFullMoonDates(calendar: Calendar) {
+        console.log("about to recalculate start dates for moon " + this.name);
+        this.fullMoonDates = [];
+        // If this is the harvest moon, it will always be the first of the month.
+        if (this.rttsMoonId == RoadToTheSkyMoonIds.harvest) {
+            let monthIndex = 0;
+            let yearIndex = this.firstFullMoon.year;
+            for (let i = 0; i < this.cycleLengths.length; i++) {
+                this.fullMoonDates.push({year: yearIndex, month: monthIndex, day: 0});
+                monthIndex++;
+                if (monthIndex >= 12) {
+                    monthIndex = monthIndex % 12;
+                    yearIndex++;
+                }
+            }
+        }
+        else {
+            let currentDate = calendar.getMinDay();
+            for (let i = 0; i < this.cycleLengths.length; i++) {
+                this.fullMoonDates.push({year: currentDate.year, month: currentDate.month, day: currentDate.day});
+                let resultDate = calendar.getDatePlusDays(currentDate, this.cycleLengths[i]);
+                if (resultDate != null) {
+                    currentDate = resultDate;
+                }
+                else {
+                    break;
+                }
+            }
+        }
+
+        console.log("finished! dates are " + JSON.stringify(this.fullMoonDates));
     }
 
 

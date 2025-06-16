@@ -340,6 +340,8 @@ export default class Calendar extends ConfigurationItemBase {
             )
             //console.log("pushed new month of length " + this.rttsMoons[RoadToTheSkyMoonIds.harvest].cycleLengths[i]);
         }
+        // Push some cycle days
+        this.onRttsMonthDeleted();
         
         const configMoons: SimpleCalendar.MoonData[] | undefined = config.moons || config.moonSettings;
         if (Array.isArray(configMoons)) {
@@ -1268,6 +1270,64 @@ export default class Calendar extends ConfigurationItemBase {
     }
 
     /**
+     * Returns a date if the number of days are added, or nil if the day is not set.
+     */
+    getDatePlusDays(date: SimpleCalendar.Date, numDays: number) {
+        let dateInDays = this.getDateInDays(date);
+        if (dateInDays < 0) {
+            return null;
+        }
+        else {
+            let newDateInDays = dateInDays + numDays;
+            return this.getDaysAsDate(newDateInDays);
+        }
+    }
+    
+    // Convert a date to the number of days since the min day
+    getDateInDays(date: SimpleCalendar.Date) : number {
+        let minDay = this.getMinDay();
+        let monthsToAdd = ((date.year - minDay.year) * 12) + date.month;
+        let daysSoFar = 0;
+        for (let i = 0; i < monthsToAdd; i++) {
+            if (i >= this.rttsMonths.length) {
+                return -1;
+            }
+            else {
+                daysSoFar += this.rttsMonths[i].numberOfDays;
+            }
+        }
+        daysSoFar += date.day;
+        return daysSoFar;
+    }
+
+    // Convert a number of days since the min day to a date, or nil if the date is not set
+    getDaysAsDate(numDays: number) {
+        let daysLeft = numDays;
+        let rttsMonthIndex = 0;
+        for (let i = 0; i < this.rttsMonths.length; i++) {
+            if (daysLeft < this.rttsMonths[i].numberOfDays) {
+                break;
+            }
+            else {
+                daysLeft -= this.rttsMonths[i].numberOfDays;
+                rttsMonthIndex++;
+            }
+        }
+        // If the date is not set, return nil
+        if (!this.rttsDoesDayExist(rttsMonthIndex, daysLeft)) {
+            return null;
+        }
+        else {
+            let minDay = this.getMinDay();
+            return {
+                year: minDay.year - Math.floor(rttsMonthIndex / 12),
+                month: rttsMonthIndex % 12,
+                day: daysLeft
+            }
+        }
+    }
+
+    /**
      * Reassigns the names of RTTS months
      */
     onRttsMonthDeleted() {
@@ -1281,6 +1341,9 @@ export default class Calendar extends ConfigurationItemBase {
             rm.name = RoadToTheSkyMonthConfigs[m].name;
             rm.description = RoadToTheSkyMonthConfigs[m].description;
             rm.numericRepresentation = RoadToTheSkyMonthConfigs[m].numericRepresentation;
+        }
+        for (let j = 0; j < this.rttsMoons.length; j++) {
+            this.rttsMoons[j].recalculateFullMoonDates(this);
         }
     }
 }

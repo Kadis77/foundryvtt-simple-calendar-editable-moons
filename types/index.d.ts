@@ -1476,9 +1476,14 @@ declare global {
              */
             interface RttsMoon extends IDataItemBase {
                 name: string;
-                cycleLengths: number[];
+                cycles: RttsMoonCycle[];
                 firstFullMoon: FirstFullMoonDate;
                 color: string;
+            }
+
+            interface RttsMoonCycle extends IDataItemBase {
+                cycleLength: number;
+                startDate: string;
             }
 
             /**
@@ -2245,6 +2250,8 @@ declare global {
             firstFullMoon: FirstFullMoonDate;
             /** An array of historic cycle lengths */
             cycleLengths: number[];
+            /** An array of historic full moon dates */
+            fullMoonDates: Date[];
             /** The moon phase for the current date. */
             currentPhase?: MoonPhase;
             /** The color associated with the moon. */
