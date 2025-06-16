@@ -2226,8 +2226,6 @@ declare global {
         interface RttsMonthData extends IDataItemBase {
             /**  Which RTTS month this represents. */
             rttsMonthId: RoadToTheSkyMonthIds;
-            /**  How many years since the start this is. */
-            yearsSinceStart: number;
             /** The abbreviated name of the month. */
             abbreviation: string;
             /** The name of the month. */

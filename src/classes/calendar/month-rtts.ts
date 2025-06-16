@@ -12,10 +12,6 @@ export default class RoadToTheSkyMonth extends ConfigurationItemBase {
      */
     rttsMonthId: RoadToTheSkyMonthIds = RoadToTheSkyMonthIds.dew;
     /**
-     * How many years since the start days this is.
-     */
-    yearsSinceStart: number = 0;
-    /**
      * A list of all the days in this month
      */
     days: Day[] = [];
@@ -51,7 +47,6 @@ export default class RoadToTheSkyMonth extends ConfigurationItemBase {
     ) {
         super(RoadToTheSkyMonthConfigs[rttsMonthId].name, rttsMonthId);
         this.rttsMonthId = rttsMonthId;
-        this.yearsSinceStart = yearsSinceStart;
         this.name = RoadToTheSkyMonthConfigs[rttsMonthId].name;
         this.abbreviation = this.name.substring(0, 3);
         this.numberOfDays = numberOfDays;
@@ -83,8 +78,7 @@ export default class RoadToTheSkyMonth extends ConfigurationItemBase {
             name: this.name,
             description: this.description,
             abbreviation: this.abbreviation,
-            numberOfDays: this.numberOfDays,
-            yearsSinceStart: this.yearsSinceStart,
+            numberOfDays: this.numberOfDays
         };
     }
 
@@ -112,7 +106,7 @@ export default class RoadToTheSkyMonth extends ConfigurationItemBase {
      * @return {RttsMonth}
      */
     clone(): RoadToTheSkyMonth {
-        const m = new RoadToTheSkyMonth(this.rttsMonthId, this.yearsSinceStart, this.numberOfDays);
+        const m = new RoadToTheSkyMonth(this.rttsMonthId, this.numberOfDays);
         m.id = this.id;
         m.name = this.name;
         m.description = this.description;
@@ -135,7 +129,6 @@ export default class RoadToTheSkyMonth extends ConfigurationItemBase {
         if (config && Object.keys(config).length) {
             super.loadFromSettings(config);
             this.rttsMonthId = config.rttsMonthId;
-            this.yearsSinceStart = config.yearsSinceStart;
             this.numberOfDays = parseInt(config.numberOfDays.toString());
             if (Object.prototype.hasOwnProperty.call(config, "abbreviation")) {
                 this.abbreviation = config.abbreviation;

@@ -42,7 +42,7 @@ export default class CalendarFull {
 
         let HTML = "";
         if (options.view === CalendarViews.Month) {
-            // console.log("calendar-full render: about to build from month view with date" + JSON.stringify(options.date));
+            //console.log("calendar-full render: about to build from month view with date" + JSON.stringify(options.date));
             HTML = this.Build(calendar, options);
         } else if (options.view === CalendarViews.Year) {
             const vYear = options.date ? options.date.year : calendar.year.visibleYear;
@@ -121,7 +121,7 @@ export default class CalendarFull {
             }
             vYear = options.date.year;
             vRttsMonthIndex = calendar.getRttsMonthIndexFromDate(options.date.year, options.date.month);
-            // console.log("calendar-full build: visible date was provided as " + JSON.stringify(options.date));
+            //onsole.log("calendar-full build: visible date was provided as " + JSON.stringify(options.date));
         } else {
             vYear = calendar.year.visibleYear;
             let rttsVisibleMonthAndDayIndex = calendar.getRttsMonthAndDayIndex("visible");
@@ -145,11 +145,12 @@ export default class CalendarFull {
             // console.log("calendar-full build: selected date was provided as " + ssDay + "/" + ssMonth);
         } else {
             ssYear = seYear = calendar.year.selectedYear;
-            ssMonth = seMonth = calendar.getRttsMonthIndex("selected") % 12;
-            if (ssMonth > -1) {
-                ssDay = seDay = calendar.rttsMonths[ssMonth].getDayIndex("selected");
+            let selectedRttsMonth = calendar.getRttsMonthIndex("selected");
+            ssMonth = seMonth = selectedRttsMonth % 12;
+            if (selectedRttsMonth > -1) {
+                ssDay = seDay = calendar.rttsMonths[selectedRttsMonth].getDayIndex("selected");
             }
-            // console.log("calendar-full build: selected date was provided as " + ssDay + "/" + ssMonth);
+            //console.log("calendar-full build: selected date was provided as " + ssDay + "/" + ssMonth + ". calendar.year.selectedYear=" + calendar.year.selectedYear + ",calendar.getRttsMonthIndex(\"selected\") % 12=" + calendar.getRttsMonthIndex("selected") % 12);
         }
 
         if (options.showSeasonName || options.colorToMatchSeason) {

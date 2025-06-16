@@ -957,6 +957,8 @@ export default class MainApp extends FormApplication {
                     rttsMonth.selected = true;
                     rttsMonth.days[selectedDay].selected = true;
                     this.visibleCalendar.year.selectedYear = this.visibleCalendar.year.visibleYear;
+
+                    console.log("rttsMonth=" + rttsMonth + ",selectedDay=" + selectedDay + ",this.visibleCalendar.year.selectedYear=" + this.visibleCalendar.year.selectedYear);
                 }
             }
             this.updateApp();

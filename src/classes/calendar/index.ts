@@ -512,6 +512,9 @@ export default class Calendar extends ConfigurationItemBase {
     getRttsMonthIndex(setting: string = "current") {
         const verifiedSetting = setting.toLowerCase() as "visible" | "current" | "selected";
         return this.rttsMonths.findIndex((m) => {
+            if (verifiedSetting == "selected" && m[verifiedSetting]) {
+                console.log("identified month as " + JSON.stringify(m));
+            }
             return m[verifiedSetting];
         });
     }
