@@ -45,8 +45,8 @@ describe("Note Sheet Class Tests", () => {
 
         nd = {
             calendarId: "test",
-            startDate: { year: 410, month: 0, day: 0, hour: 0, minute: 0, seconds: 0 },
-            endDate: { year: 410, month: 0, day: 0, hour: 0, minute: 0, seconds: 0 },
+            startDate: { year: 420, month: 0, day: 0, hour: 0, minute: 0, seconds: 0 },
+            endDate: { year: 420, month: 0, day: 0, hour: 0, minute: 0, seconds: 0 },
             allDay: false,
             repeats: NoteRepeat.Yearly,
             order: 1,
@@ -547,15 +547,15 @@ describe("Note Sheet Class Tests", () => {
         ns.journalData.flags[ModuleName] = { noteData: {} };
         await ns.dateSelectorSelect({
             timeSelected: false,
-            startDate: { year: 410, month: 0, day: 0, hour: 0, minute: 0, seconds: 0 },
-            endDate: { year: 410, month: 0, day: 0, hour: 0, minute: 0, seconds: 0 }
+            startDate: { year: 420, month: 0, day: 0, hour: 0, minute: 0, seconds: 0 },
+            endDate: { year: 420, month: 0, day: 0, hour: 0, minute: 0, seconds: 0 }
         });
         expect(ns.updateNoteRepeatDropdown).toHaveBeenCalledTimes(1);
 
         await ns.dateSelectorSelect({
             timeSelected: false,
-            startDate: { year: 410, month: 1, day: 1, hour: 0, minute: 0, seconds: 0 },
-            endDate: { year: 410, month: 1, day: 1, hour: 0, minute: 0, seconds: 0 }
+            startDate: { year: 420, month: 1, day: 1, hour: 0, minute: 0, seconds: 0 },
+            endDate: { year: 420, month: 1, day: 1, hour: 0, minute: 0, seconds: 0 }
         });
         expect(ns.updateNoteRepeatDropdown).toHaveBeenCalledTimes(2);
     });
@@ -623,8 +623,8 @@ describe("Note Sheet Class Tests", () => {
         ns.journalData.flags[ModuleName] = {
             noteData: {
                 repeats: 0,
-                startDate: { year: 410, month: 0, day: 0, hour: 0, minute: 0, seconds: 0 },
-                endDate: { year: 410, month: 0, day: 0, hour: 0, minute: 0, seconds: 0 }
+                startDate: { year: 420, month: 0, day: 0, hour: 0, minute: 0, seconds: 0 },
+                endDate: { year: 420, month: 0, day: 0, hour: 0, minute: 0, seconds: 0 }
             }
         };
 
@@ -635,7 +635,7 @@ describe("Note Sheet Class Tests", () => {
         ns.journalData.flags[ModuleName] = {
             noteData: {
                 repeats: 0,
-                startDate: { year: 410, month: 0, day: 0, hour: 0, minute: 0, seconds: 0 },
+                startDate: { year: 420, month: 0, day: 0, hour: 0, minute: 0, seconds: 0 },
                 endDate: { year: 1, month: 1, day: 0, hour: 0, minute: 0, seconds: 0 }
             }
         };
@@ -646,8 +646,8 @@ describe("Note Sheet Class Tests", () => {
         ns.journalData.flags[ModuleName] = {
             noteData: {
                 repeats: 0,
-                startDate: { year: 410, month: 0, day: 0, hour: 0, minute: 0, seconds: 0 },
-                endDate: { year: 410, month: 1, day: 1, hour: 0, minute: 0, seconds: 0 }
+                startDate: { year: 420, month: 0, day: 0, hour: 0, minute: 0, seconds: 0 },
+                endDate: { year: 420, month: 1, day: 1, hour: 0, minute: 0, seconds: 0 }
             }
         };
         ns.updateNoteRepeatDropdown();
@@ -657,8 +657,8 @@ describe("Note Sheet Class Tests", () => {
         ns.journalData.flags[ModuleName] = {
             noteData: {
                 repeats: 0,
-                startDate: { year: 410, month: 0, day: 0, hour: 0, minute: 0, seconds: 0 },
-                endDate: { year: 410, month: 0, day: 8, hour: 0, minute: 0, seconds: 0 }
+                startDate: { year: 420, month: 0, day: 0, hour: 0, minute: 0, seconds: 0 },
+                endDate: { year: 420, month: 0, day: 8, hour: 0, minute: 0, seconds: 0 }
             }
         };
         ns.updateNoteRepeatDropdown();

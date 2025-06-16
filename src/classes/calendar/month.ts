@@ -47,7 +47,7 @@ export default class Month extends ConfigurationItemBase {
      */
     startingWeekday: number | null = null;
     /**
-     * The cycle of the harvest moon since 410 that this month corresponds to
+     * The cycle of the harvest moon since 420 that this month corresponds to
      */
     harvestMoonCyclesSinceStart: number = 0;
 
@@ -58,7 +58,7 @@ export default class Month extends ConfigurationItemBase {
      * @param numericRepresentationOffset When numbering days offset them by this amount
      * @param numberOfDays The number of days in this month
      * @param numberOfLeapYearDays The number of days in this month on a leap year
-     * @param harvestMoonCyclesSinceStart The number of harvest moons that have passed since Dew Month 410
+     * @param harvestMoonCyclesSinceStart The number of harvest moons that have passed since Dew Month 420
      */
     constructor(
         name: string = "",

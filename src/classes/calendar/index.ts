@@ -91,9 +91,9 @@ export default class Calendar extends ConfigurationItemBase {
      */
     combatChangeTriggered: boolean = false;
     /**
-     * RTTS: Start Date is always month 1, 410
+     * RTTS: Start Date is always month 1, 420
      */
-    startDate: SimpleCalendar.Date = {year: 410, month: 0, day: 0};
+    startDate: SimpleCalendar.Date = {year: 420, month: 0, day: 0};
 
     /**
      * Construct a new Calendar class
@@ -444,7 +444,7 @@ export default class Calendar extends ConfigurationItemBase {
      */
     getDateTime(): SimpleCalendar.DateTime {
         const dt: SimpleCalendar.DateTime = {
-            year: 410,
+            year: 420,
             month: 0,
             day: 0,
             hour: 0,
@@ -1240,7 +1240,7 @@ export default class Calendar extends ConfigurationItemBase {
             }
         }
         else if (amount < 0) {
-            if (date.year == 410 && date.month + amount < 0) {
+            if (date.year == 420 && date.month + amount < 0) {
                 return false;
             }
         }

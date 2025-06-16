@@ -293,7 +293,7 @@ export default class ConfigurationApp extends FormApplication {
             },
             noteCategories: <SimpleCalendar.NoteCategory[]>[],
             predefined: this.predefindCalendars,
-            qsCalDate: { year: 410, month: 0, day: 0, hour: 0, minute: 0, allDay: true },
+            qsCalDate: { year: 420, month: 0, day: 0, hour: 0, minute: 0, allDay: true },
             seasonColors: [
                 {
                     value: "#ffffff",
@@ -1191,7 +1191,7 @@ export default class ConfigurationApp extends FormApplication {
                     newMoon.firstNewMoon = {
                         yearReset: MoonYearResetOptions.None,
                         yearX: 0,
-                        year: 410,
+                        year: 420,
                         month: 1,
                         day: 1
                     };

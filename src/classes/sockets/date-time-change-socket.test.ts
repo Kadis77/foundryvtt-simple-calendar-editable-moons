@@ -45,13 +45,13 @@ describe('Date Time Change Socket Tests', () => {
         expect(tCal.changeDateTime).toHaveBeenCalledTimes(0);
         expect(MainApplication.setCurrentDate).not.toHaveBeenCalled();
 
-        r = await s.process({type: SocketTypes.dateTimeChange, data: {type: DateTimeChangeSocketTypes.changeDateTime, interval: {year: 410, month: 0, day: 0}}}, tCal);
+        r = await s.process({type: SocketTypes.dateTimeChange, data: {type: DateTimeChangeSocketTypes.changeDateTime, interval: {year: 420, month: 0, day: 0}}}, tCal);
         expect(r).toBe(true);
         expect(tCal.changeDateTime).toHaveBeenCalledTimes(1);
         expect(MainApplication.setCurrentDate).toHaveBeenCalledTimes(0);
         expect(DateUtils.AdvanceTimeToPreset).toHaveBeenCalledTimes(0);
 
-        r = await s.process({type: SocketTypes.dateTimeChange, data: {type: DateTimeChangeSocketTypes.setDate, interval: {year: 410, month: 0, day: 0}}}, tCal);
+        r = await s.process({type: SocketTypes.dateTimeChange, data: {type: DateTimeChangeSocketTypes.setDate, interval: {year: 420, month: 0, day: 0}}}, tCal);
         expect(r).toBe(true);
         expect(tCal.changeDateTime).toHaveBeenCalledTimes(1);
         expect(MainApplication.setCurrentDate).toHaveBeenCalledTimes(1);

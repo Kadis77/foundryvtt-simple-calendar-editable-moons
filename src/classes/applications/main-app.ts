@@ -201,7 +201,7 @@ export default class MainApp extends FormApplication {
                     ),
                     time: c.generalSettings.showClock
                         ? FormatDateTime(
-                              { year: 410, month: 0, day: 0, hour: ct.hour, minute: ct.minute, seconds: ct.seconds },
+                              { year: 420, month: 0, day: 0, hour: ct.hour, minute: ct.minute, seconds: ct.seconds },
                               c.generalSettings.dateFormat.time,
                               c
                           )
@@ -988,7 +988,7 @@ export default class MainApp extends FormApplication {
      * @param e
      */
     
-    // TODO: Block going back before 410
+    // TODO: Block going back before 420
     public timeUnitClick(e: Event) {
         const target = <HTMLElement>e.currentTarget;
         const dataType = target.getAttribute("data-type");

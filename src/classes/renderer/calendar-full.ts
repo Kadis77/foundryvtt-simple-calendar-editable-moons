@@ -529,8 +529,8 @@ export default class CalendarFull {
                                     if (dataDate) {
                                         const dayIndex = parseInt(dataDate);
                                         if (!isNaN(dayIndex)) {
-                                            const start = { year: 410, month: 0, day: 0 };
-                                            const end = { year: 410, month: 0, day: 0 };
+                                            const start = { year: 420, month: 0, day: 0 };
+                                            const end = { year: 420, month: 0, day: 0 };
 
                                             if (options.allowSelectDateRange) {
                                                 if (!options.selectedDates || options.selectedDates.end.year !== null) {
@@ -712,7 +712,7 @@ export default class CalendarFull {
                                 if (sunrise && sunset) {
                                     sunrise.textContent = FormatDateTime(
                                         {
-                                            year: 410,
+                                            year: 420,
                                             month: 0,
                                             day: 0,
                                             ...GetPresetTimeOfDay(PresetTimeOfDay.Sunrise, calendar, {
@@ -726,7 +726,7 @@ export default class CalendarFull {
                                     );
                                     sunset.textContent = FormatDateTime(
                                         {
-                                            year: 410,
+                                            year: 420,
                                             month: 0,
                                             day: 0,
                                             ...GetPresetTimeOfDay(PresetTimeOfDay.Sunset, calendar, {

@@ -27,7 +27,7 @@ export class RoadToTheSkyMoon extends ConfigurationItemBase {
          * The year of the first full moon
          * @type {number}
          */
-        year: 410,
+        year: 420,
         /**
          * The month of the first full moon
          * @type {number}
@@ -123,7 +123,7 @@ export class RoadToTheSkyMoon extends ConfigurationItemBase {
             name: this.name,
             cycles: cycles,
             firstFullMoon: {
-                year: 410,
+                year: 420,
                 month: 0,
                 day: 0
             },
@@ -143,7 +143,7 @@ export class RoadToTheSkyMoon extends ConfigurationItemBase {
             this.cycleLengths = config.cycleLengths;
             this.fullMoonDates = config.fullMoonDates;
             this.firstFullMoon = {
-                year: 410,
+                year: 420,
                 month: 0,
                 day: 0
             };
@@ -263,7 +263,7 @@ export class RoadToTheSkyMoon extends ConfigurationItemBase {
     }
 
     recalculateFullMoonDates(calendar: Calendar) {
-        console.log("about to recalculate start dates for moon " + this.name);
+        //console.log("about to recalculate start dates for moon " + this.name);
         this.fullMoonDates = [];
         // If this is the harvest moon, it will always be the first of the month.
         if (this.rttsMoonId == RoadToTheSkyMoonIds.harvest) {
@@ -292,7 +292,7 @@ export class RoadToTheSkyMoon extends ConfigurationItemBase {
             }
         }
 
-        console.log("finished! dates are " + JSON.stringify(this.fullMoonDates));
+        //console.log("finished! dates are " + JSON.stringify(this.fullMoonDates));
     }
 
 
