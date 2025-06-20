@@ -361,13 +361,14 @@ export function TimestampToDateData(seconds: number, calendar: Calendar): Simple
     });
     result.showWeekdayHeadings = calendar.year.showWeekdayHeadings;
     result.isLeapYear = calendar.year.leapYearRule.isLeapYear(result.year);
+    console.log("result.sunrise before, result=" + JSON.stringify(result) +",datetime=" + JSON.stringify(dateTime));
     result.sunrise = calendar.getSunriseSunsetTime(result.year, result.month, result.day, true);
+    console.log("result.sunrise after");
     result.sunset = calendar.getSunriseSunsetTime(result.year, result.month, result.day, false);
-    //console.log("result.midday before, result=" + JSON.stringify(result));
     result.midday =
         DateToTimestamp({ year: result.year, month: result.month, day: result.day, hour: 0, minute: 0, seconds: 0 }, calendar) +
         Math.floor(calendar.time.secondsPerDay / 2);
-    //console.log("result.midday after");
+
     // Display Stuff
     result.display.year = dateTime.year.toString();
     result.display.yearName = calendar.year.getYearName(result.year);

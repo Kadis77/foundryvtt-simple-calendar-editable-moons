@@ -542,7 +542,7 @@ export const RoadToTheSkyMoonConfigs: any[] = [
     {
         id: "harvest",
         name: "Harvest Moon",
-        color: "#F9FF33",
+        color: "#FFD700",
     },
     {
         id: "lantern",

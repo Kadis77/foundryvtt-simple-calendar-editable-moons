@@ -28,6 +28,8 @@ import {Hook} from "../api/hook";
 import PF1E from "../systems/pf1e";
 import {RoadToTheSkyMoon} from "./moon-rtts";
 import RoadToTheSkyMonth from "./month-rtts";
+import * as sea from "node:sea";
+import {Set} from "@league-of-foundry-developers/foundry-vtt-types/src/foundry/client/pixi/core/interaction/targets";
 
 export default class Calendar extends ConfigurationItemBase {
     /**
@@ -284,13 +286,14 @@ export default class Calendar extends ConfigurationItemBase {
 
         // RTTS: Add hardcoded RTTS seasons
         this.seasons = [];
-        for (let i = 1; i < RoadToTheSkySeasonConfigs.length; i++) {
+        for (let i = 0; i < RoadToTheSkySeasonConfigs.length; i++) {
             let seasonConfig = RoadToTheSkySeasonConfigs[i];
             let season = new Season(seasonConfig.name, seasonConfig.startingMonth, seasonConfig.startingDay);
             season.color = seasonConfig.color;
             season.icon = seasonConfig.icon;
             season.sunriseTime = seasonConfig.sunriseTime;
             season.sunsetTime = seasonConfig.sunsetTime;
+            this.seasons.push(season);
         }
 
         // RTTS: Add hardcoded RTTS moons
@@ -561,27 +564,24 @@ export default class Calendar extends ConfigurationItemBase {
      */
     getSeason(monthIndex: number, dayIndex: number) {
         let season = new Season("", 0, 0);
+        console.log("from getSeason: monthIndex=" + monthIndex + ", dayIndex=" + dayIndex);
+        console.log("seasons are:" + JSON.stringify(this.seasons));
         if (dayIndex >= 0 && monthIndex >= 0) {
-            let currentSeason: Season | null = null;
-            const sortedSeasons = this.seasons.sort((a, b) => {
-                return a.startingMonth - b.startingMonth || a.startingDay - b.startingDay;
-            });
-
-            for (let i = 0; i < sortedSeasons.length; i++) {
-                if (sortedSeasons[i].startingMonth === monthIndex && sortedSeasons[i].startingDay <= dayIndex) {
-                    currentSeason = sortedSeasons[i];
-                } else if (sortedSeasons[i].startingMonth < monthIndex) {
-                    currentSeason = sortedSeasons[i];
-                }
+            // hardcoded values
+            if (monthIndex <= 2) {
+                season = this.seasons[0];
             }
-            if (currentSeason === null) {
-                currentSeason = sortedSeasons[sortedSeasons.length - 1];
+            else if (monthIndex > 2 && monthIndex <= 5) {
+                season = this.seasons[1];
             }
-
-            if (currentSeason) {
-                season = currentSeason.clone();
+            else if (monthIndex > 5 && monthIndex <= 8) {
+                season = this.seasons[2];
+            }
+            else if (monthIndex > 8 && monthIndex <= 11) {
+                season = this.seasons[3];
             }
         }
+        console.log("from getSeason: season=" + JSON.stringify(season));
         return season;
     }
 
@@ -594,59 +594,23 @@ export default class Calendar extends ConfigurationItemBase {
      * @param [calculateTimestamp=true] If to add the date timestamp to the sunrise/sunset time
      */
     getSunriseSunsetTime(year: number, monthIndex: number, dayIndex: number, sunrise: boolean = true, calculateTimestamp: boolean = true) {
-        const activeCalendar = CalManager.getActiveCalendar();
-        const sortedSeasons = this.seasons.sort((a, b) => {
-            return a.startingMonth - b.startingMonth || a.startingDay - b.startingDay;
-        });
-        let seasonIndex = sortedSeasons.length - 1;
-        for (let i = 0; i < sortedSeasons.length; i++) {
-            if (sortedSeasons[i].startingMonth === monthIndex && sortedSeasons[i].startingDay <= dayIndex) {
-                seasonIndex = i;
-            } else if (sortedSeasons[i].startingMonth < monthIndex) {
-                seasonIndex = i;
-            }
+        // Hardcoded, because why not
+        let season = this.getSeason(monthIndex, dayIndex);
+        let time = 0;
+        if (sunrise) {
+            time = season.sunriseTime;
         }
-        const nextSeasonIndex = (seasonIndex + 1) % this.seasons.length;
-        if (seasonIndex < sortedSeasons.length && nextSeasonIndex < sortedSeasons.length) {
-            const season = sortedSeasons[seasonIndex];
-            const nextSeason = sortedSeasons[nextSeasonIndex];
-            let seasonYear = year;
-            let nextSeasonYear = seasonYear;
-
-            //If the current season is the last season of the year we need to check to see if the year for this season is the year before the current date
-            if (seasonIndex === sortedSeasons.length - 1) {
-                if (
-                    monthIndex < sortedSeasons[seasonIndex].startingMonth ||
-                    (sortedSeasons[seasonIndex].startingMonth === monthIndex && dayIndex < sortedSeasons[seasonIndex].startingDay)
-                ) {
-                    seasonYear = year - 1;
-                }
-                nextSeasonYear = seasonYear + 1;
-            }
-            const daysBetweenSeasonStartAndDay = DaysBetweenDates(
-                activeCalendar,
-                { year: seasonYear, month: season.startingMonth, day: season.startingDay, hour: 0, minute: 0, seconds: 0 },
-                { year: year, month: monthIndex, day: dayIndex, hour: 0, minute: 0, seconds: 0 }
-            );
-            const daysBetweenSeasons = DaysBetweenDates(
-                activeCalendar,
-                { year: seasonYear, month: season.startingMonth, day: season.startingDay, hour: 0, minute: 0, seconds: 0 },
-                { year: nextSeasonYear, month: nextSeason.startingMonth, day: nextSeason.startingDay, hour: 0, minute: 0, seconds: 0 }
-            );
-            const diff = sunrise ? nextSeason.sunriseTime - season.sunriseTime : nextSeason.sunsetTime - season.sunsetTime;
-            const averageChangePerDay = diff / daysBetweenSeasons;
-            const sunriseChangeForDay = daysBetweenSeasonStartAndDay * averageChangePerDay;
-            const finalSunriseTime = Math.round((sunrise ? season.sunriseTime : season.sunsetTime) + sunriseChangeForDay);
-            if (calculateTimestamp) {
-                return (
-                    DateToTimestamp({ year: year, month: monthIndex, day: dayIndex, hour: 0, minute: 0, seconds: 0 }, activeCalendar) +
-                    finalSunriseTime
-                );
-            } else {
-                return finalSunriseTime;
-            }
+        else {
+            time = season.sunsetTime;
         }
-        return 0;
+        if (calculateTimestamp) {
+            return (
+                DateToTimestamp({ year: year, month: monthIndex, day: dayIndex, hour: 0, minute: 0, seconds: 0 }, this) +
+                time
+            );
+        } else {
+            return time;
+        }
     }
 
     //-------------------------------
@@ -773,30 +737,35 @@ export default class Calendar extends ConfigurationItemBase {
         const verifiedSetting = setting.toLowerCase() as "visible" | "current" | "selected";
 
         //Reset all the months settings
-        //console.log("rttsUpdateMonth: setting rtts month " + rttsMonthIndex + " setting "  + verifiedSetting);
+        console.log("rttsUpdateMonth: setting rtts month " + rttsMonthIndex + " setting "  + verifiedSetting);
         
-        if (this.rttsMonths.length - 1  < rttsMonthIndex) {
+        if (rttsMonthIndex > this.rttsMonths.length - 1) {
             console.warn("rttsUpdateMonth: Tried to set " + verifiedSetting + " month to rttsIndex " + rttsMonthIndex + ". Month does not exist");
             return;
         }
 
+        console.log("rttsUpdateMonth 1");
         this.resetRttsMonths(setting);
         this.rttsMonths[rttsMonthIndex][verifiedSetting] = true;
 
         // If we are adjusting the current date we need to propagate that down to the days of the new month as well
         // We also need to set the visibility of the new month to true
         if (verifiedSetting === "current") {
+            console.log("rttsUpdateMonth 2");
             //Get the current RTTS months current day
             let currentDay: number;
 
             if (setDay !== null) {
-                currentDay = setDay;
+                console.log("rttsUpdateMonth u3 setDay=" + setDay);
+                currentDay = setDay < 0 || this.rttsMonths[rttsMonthIndex].days.length >= setDay ? 0 : setDay;
             } else {
+                console.log("rttsUpdateMonth 4");
                 const currentRttsMonthDayIndex = this.getRttsMonthAndDayIndex();
+                console.log("u2 currentRttsMonthDayIndex=" + JSON.stringify(currentRttsMonthDayIndex));
                 currentDay = currentRttsMonthDayIndex.day || 0;
             }
-
-            this.rttsMonths[rttsMonthIndex].updateDay(currentDay);
+            console.log("rttsUpdateMonth: setting rtts day " + currentDay + " setting "  + verifiedSetting + " month =" + JSON.stringify(this.rttsMonths[rttsMonthIndex].name));
+            this.rttsMonths[rttsMonthIndex].updateDay(currentDay, verifiedSetting);
         }
     }
 
@@ -933,7 +902,7 @@ export default class Calendar extends ConfigurationItemBase {
         let remainingSeconds = seconds % 86400;
         // Add the number of days based on hours
         let day = daysSinceStart - daysSoFar;
-        day += Math.floor(Math.floor(remainingSeconds / 3600) / 24) - 1;
+        day += Math.floor(Math.floor(remainingSeconds / 3600) / 24);
         
         let hour = Math.floor(remainingSeconds / 3600) % 24;
         let minutes = (remainingSeconds - (hour * 3600)) % 60;
@@ -966,18 +935,22 @@ export default class Calendar extends ConfigurationItemBase {
             
             if (interval.year) {
                 this.changeYear(interval.year, "current");
+                console.log("timekeeper: 1");
                 change = true;
             }
             if (interval.month) {
                 this.changeMonth(interval.month, "current");
+                console.log("timekeeper: 2");
                 change = true;
             }
             if (interval.day) {
-                this.changeDay(interval.day);
+                this.changeDay(interval.day, "current");
+                console.log("timekeeper: 3");
                 change = true;
             }
             if (interval.hour || interval.minute || interval.seconds) {
                 const dayChange = this.time.changeTime(interval.hour, interval.minute, interval.seconds);
+                console.log("timekeeper: day change=" + dayChange);
                 if (dayChange !== 0) {
                     this.changeDay(dayChange);
                 }
@@ -992,15 +965,15 @@ export default class Calendar extends ConfigurationItemBase {
                 if (newCurrentDate.year > maxDate.year ||
                     (newCurrentDate.year == maxDate.year && newCurrentDate.month > maxDate.month) ||
                     (newCurrentDate.year == maxDate.year && newCurrentDate.month == maxDate.month && newCurrentDate.day == maxDate.day)) {
-                    //console.log("timekeeper: past the max day!");
+                    console.log("timekeeper: past the max day!");
                     if (this.timeKeeper.getStatus() != TimeKeeperStatus.Stopped) {
-                        //console.log("emitting an event...!");
+                        console.log("emitting an event...!");
                         this.timeKeeper.setStatus(TimeKeeperStatus.Stopped);
                     }
                     this.setDateTime({year: maxDate.year, month: maxDate.month, day: maxDate.day, hour: 23, minute: 59, seconds: 59});
                 }
                 else if (newCurrentDate.year < minDate.year) {
-                    //console.log("timekeeper: past the min day!");
+                    console.log("timekeeper: past the min day!");
                     if (this.timeKeeper.getStatus() != TimeKeeperStatus.Stopped) {
                         this.timeKeeper.setStatus(TimeKeeperStatus.Stopped);
                     }
@@ -1262,7 +1235,7 @@ export default class Calendar extends ConfigurationItemBase {
             rttsMonthIndex = this.months.length - 1;
         }
 
-        let daysIntoMonth = dayIndex + 1;
+        let daysIntoMonth = dayIndex;
         let daysSoFar = 0;
         for (let i = 0; i < rttsMonthIndex && i < this.rttsMoons[RoadToTheSkyMoonIds.harvest].cycleLengths.length; i++) {
             daysSoFar += this.rttsMoons[RoadToTheSkyMoonIds.harvest].cycleLengths[i];

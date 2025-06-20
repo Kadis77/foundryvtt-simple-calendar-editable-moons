@@ -168,8 +168,10 @@ export default class MainApp extends FormApplication {
         } else if (data.changeDateTime) {
             data.message = GameSettings.Localize("FSC.ViewingDifferentCalendar");
         }
+        console.log("this.uiElementStates.compactView=" + this.uiElementStates.compactView);
         if (this.uiElementStates.compactView) {
             const season = this.visibleCalendar.getCurrentSeason();
+            console.log("season=" + JSON.stringify(season));
             data.compactViewDisplay.currentSeasonName = season.name;
             data.compactViewDisplay.currentSeasonIcon = GetIcon(season.icon, season.color, season.color);
             if (data.compactViewDisplay.currentSeasonIcon === "") {

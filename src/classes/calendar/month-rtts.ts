@@ -176,6 +176,7 @@ export default class RoadToTheSkyMonth extends ConfigurationItemBase {
      */
     changeDay(amount: number, isLeapYear: boolean = false, setting: string = "current") {
         const targetDayIndex = this.getDayIndex(setting);
+        console.log("changeDay targetDayIndex=" + targetDayIndex);
         let changeAmount = 0;
         if (targetDayIndex > -1) {
             const newIndex = targetDayIndex + amount;
@@ -209,7 +210,7 @@ export default class RoadToTheSkyMonth extends ConfigurationItemBase {
         const verifiedSetting = setting.toLowerCase() as "current" | "selected";
         this.resetDays(setting);
         if (dayIndex < 0 || dayIndex >= this.numberOfDays) {
-            this.days[this.numberOfDays - 1][verifiedSetting] = true;
+            this.days[0][verifiedSetting] = true;
         } else if (this.days[dayIndex]) {
             this.days[dayIndex][verifiedSetting] = true;
         }
