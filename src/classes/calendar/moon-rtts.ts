@@ -316,14 +316,14 @@ export class RoadToTheSkyMoon extends ConfigurationItemBase {
                 name: "Half Moon",
                 length: 1,
                 singleDay: true,
-                icon: Icons.FirstQuarter
+                icon: Icons.LastQuarter
             }
         } else if (phaseId == RoadToTheSkyMoonPhaseIds.waxingH) {
             return {
                 name: "Half Moon",
                 length: 1,
                 singleDay: true,
-                icon: Icons.LastQuarter
+                icon: Icons.FirstQuarter
             }
         } else if (phaseId == RoadToTheSkyMoonPhaseIds.waningG) {
             return {
