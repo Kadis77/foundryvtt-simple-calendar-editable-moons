@@ -515,9 +515,6 @@ export default class Calendar extends ConfigurationItemBase {
     getRttsMonthIndex(setting: string = "current") {
         const verifiedSetting = setting.toLowerCase() as "visible" | "current" | "selected";
         return this.rttsMonths.findIndex((m) => {
-            if (verifiedSetting == "selected" && m[verifiedSetting]) {
-                console.log("identified month as " + JSON.stringify(m));
-            }
             return m[verifiedSetting];
         });
     }
@@ -737,7 +734,7 @@ export default class Calendar extends ConfigurationItemBase {
         const verifiedSetting = setting.toLowerCase() as "visible" | "current" | "selected";
 
         //Reset all the months settings
-        console.log("rttsUpdateMonth: setting rtts month " + rttsMonthIndex + " setting "  + verifiedSetting);
+        // console.log("rttsUpdateMonth: setting rtts month " + rttsMonthIndex + " setting "  + verifiedSetting);
         
         if (rttsMonthIndex > this.rttsMonths.length - 1) {
             console.warn("rttsUpdateMonth: Tried to set " + verifiedSetting + " month to rttsIndex " + rttsMonthIndex + ". Month does not exist");
@@ -960,22 +957,22 @@ export default class Calendar extends ConfigurationItemBase {
             
             if (interval.year) {
                 this.changeYear(interval.year, "current");
-                console.log("timekeeper: 1");
+                // console.log("timekeeper: 1");
                 change = true;
             }
             if (interval.month) {
                 this.changeMonth(interval.month, "current");
-                console.log("timekeeper: 2");
+                // console.log("timekeeper: 2");
                 change = true;
             }
             if (interval.day) {
                 this.changeDay(interval.day, "current");
-                console.log("timekeeper: 3");
+                // console.log("timekeeper: 3");
                 change = true;
             }
             if (interval.hour || interval.minute || interval.seconds) {
                 const dayChange = this.time.changeTime(interval.hour, interval.minute, interval.seconds);
-                console.log("timekeeper: day change=" + dayChange);
+                // console.log("timekeeper: day change=" + dayChange);
                 if (dayChange !== 0) {
                     this.changeDay(dayChange);
                 }
@@ -990,15 +987,15 @@ export default class Calendar extends ConfigurationItemBase {
                 if (newCurrentDate.year > maxDate.year ||
                     (newCurrentDate.year == maxDate.year && newCurrentDate.month > maxDate.month) ||
                     (newCurrentDate.year == maxDate.year && newCurrentDate.month == maxDate.month && newCurrentDate.day == maxDate.day)) {
-                    console.log("timekeeper: past the max day!");
+                    // console.log("timekeeper: past the max day!");
                     if (this.timeKeeper.getStatus() != TimeKeeperStatus.Stopped) {
-                        console.log("emitting an event...!");
+                        // console.log("emitting an event...!");
                         this.timeKeeper.setStatus(TimeKeeperStatus.Stopped);
                     }
                     this.setDateTime({year: maxDate.year, month: maxDate.month, day: maxDate.day, hour: 23, minute: 59, seconds: 59});
                 }
                 else if (newCurrentDate.year < minDate.year) {
-                    console.log("timekeeper: past the min day!");
+                    // console.log("timekeeper: past the min day!");
                     if (this.timeKeeper.getStatus() != TimeKeeperStatus.Stopped) {
                         this.timeKeeper.setStatus(TimeKeeperStatus.Stopped);
                     }

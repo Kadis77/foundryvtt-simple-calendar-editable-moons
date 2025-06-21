@@ -219,7 +219,7 @@ export class DateSelector {
         let timeSelectors = "";
 
         if (this.showDateSelector) {
-            console.log("build showDateSelector", JSON.stringify(this.selectedDate));
+            // console.log("build showDateSelector", JSON.stringify(this.selectedDate));
             
             calendar = Renderer.CalendarFull.Render(this.calendar, {
                 id: this.calendarId,

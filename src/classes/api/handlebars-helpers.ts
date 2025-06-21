@@ -137,10 +137,10 @@ export class HandlebarsHelpers {
         }
         let cal = CalManager.getCalendar(calendarId);
         if (!cal) {
-            console.log("about to fetch active calendar");
+            // console.log("about to fetch active calendar");
             cal = CalManager.getActiveCalendar();
         }
-        console.log("about to render from handlebars with options " + JSON.stringify(renderOptions));
+        // console.log("about to render from handlebars with options " + JSON.stringify(renderOptions));
         return new Handlebars.SafeString(Renderer.CalendarFull.Render(cal, renderOptions));
     }
 

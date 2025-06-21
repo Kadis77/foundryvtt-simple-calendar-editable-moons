@@ -113,7 +113,7 @@ export default class MainApp extends FormApplication {
      * Gets the data object to be used by Handlebars when rending the HTML template
      */
     getData(): Promise<FormApplication.Data<object>> | FormApplication.Data<object> {
-        console.log("about to get data...")
+        // console.log("about to get data...")
         const data = {
             ...super.getData(),
             compactViewDisplay: {
@@ -168,7 +168,7 @@ export default class MainApp extends FormApplication {
         } else if (data.changeDateTime) {
             data.message = GameSettings.Localize("FSC.ViewingDifferentCalendar");
         }
-        console.log("this.uiElementStates.compactView=" + this.uiElementStates.compactView);
+        // console.log("this.uiElementStates.compactView=" + this.uiElementStates.compactView);
         for (let i = 0; i < this.addonButtons.length; i++) {
             data.mainViewDisplay.addonButtons += `<button class="fsc-control fsc-grey fsc-addon-button ${this.addonButtons[i].customClass}" data-sc-abi="${i}" data-tooltip="${this.addonButtons[i].title}"><span class="fa ${this.addonButtons[i].iconClass}"></span></button>`;
             if (this.addonButtons[i].showSidePanel) {
@@ -854,14 +854,14 @@ export default class MainApp extends FormApplication {
             year: this.visibleCalendar.year.visibleYear, month: (rttsVisibleMonthAndDayIndex.month ?? 0) % 12,
             day: 0
         }, clickType == CalendarClickEvents.previous ? -1 : 1);
-        console.log("main-app: changeMonth: rttsVisibleMonthAndDayIndex=" + JSON.stringify(rttsVisibleMonthAndDayIndex) + ", canChangeMonth=" + canChangeMonth + ",clickType=" + JSON.stringify(clickType));
+        // console.log("main-app: changeMonth: rttsVisibleMonthAndDayIndex=" + JSON.stringify(rttsVisibleMonthAndDayIndex) + ", canChangeMonth=" + canChangeMonth + ",clickType=" + JSON.stringify(clickType));
         
         if (canChangeMonth) {
             this.visibleCalendar.changeMonth(clickType == CalendarClickEvents.previous ? -1 : 1, "visible", null);
         }
 
         const newRttsVisibleMonthAndDayIndex = this.visibleCalendar.getRttsMonthAndDayIndex("visible");
-        console.log("main-app: changeMonth: after change, newRttsVisibleMonthAndDayIndex=" + JSON.stringify(newRttsVisibleMonthAndDayIndex));
+        // console.log("main-app: changeMonth: after change, newRttsVisibleMonthAndDayIndex=" + JSON.stringify(newRttsVisibleMonthAndDayIndex));
         
         MainApp.setWidthHeight(this);
     }
@@ -878,7 +878,7 @@ export default class MainApp extends FormApplication {
             options.selectedDates.start.month >= 0 &&
             options.selectedDates.start.month < this.visibleCalendar.months.length
         ) {
-            console.log("main-app: dayClick called with options" + JSON.stringify(options));
+            // console.log("main-app: dayClick called with options" + JSON.stringify(options));
             const selectedDay = options.selectedDates.start.day;
             let allReadySelected = false;
             const currentlySelectedRttsMonth = this.visibleCalendar.getRttsMonth("selected");
@@ -897,7 +897,7 @@ export default class MainApp extends FormApplication {
                     rttsMonth.days[selectedDay].selected = true;
                     this.visibleCalendar.year.selectedYear = this.visibleCalendar.year.visibleYear;
 
-                    console.log("rttsMonth=" + rttsMonth + ",selectedDay=" + selectedDay + ",this.visibleCalendar.year.selectedYear=" + this.visibleCalendar.year.selectedYear);
+                    // console.log("rttsMonth=" + rttsMonth + ",selectedDay=" + selectedDay + ",this.visibleCalendar.year.selectedYear=" + this.visibleCalendar.year.selectedYear);
                 }
             }
             this.updateApp();
