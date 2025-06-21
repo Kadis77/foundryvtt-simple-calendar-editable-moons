@@ -169,49 +169,39 @@ export default class MainApp extends FormApplication {
             data.message = GameSettings.Localize("FSC.ViewingDifferentCalendar");
         }
         console.log("this.uiElementStates.compactView=" + this.uiElementStates.compactView);
-        if (this.uiElementStates.compactView) {
-            const season = this.visibleCalendar.getCurrentSeason();
-            console.log("season=" + JSON.stringify(season));
-            data.compactViewDisplay.currentSeasonName = season.name;
-            data.compactViewDisplay.currentSeasonIcon = GetIcon(season.icon, season.color, season.color);
-            if (data.compactViewDisplay.currentSeasonIcon === "") {
-                data.compactViewDisplay.currentSeasonIcon = `<span style="color:${season.color};">${season.name.slice(0, 2)}</span>`;
-            }
-        } else {
-            for (let i = 0; i < this.addonButtons.length; i++) {
-                data.mainViewDisplay.addonButtons += `<button class="fsc-control fsc-grey fsc-addon-button ${this.addonButtons[i].customClass}" data-sc-abi="${i}" data-tooltip="${this.addonButtons[i].title}"><span class="fa ${this.addonButtons[i].iconClass}"></span></button>`;
-                if (this.addonButtons[i].showSidePanel) {
-                    if (this.uiElementStates[`fsc-addon-button-side-drawer-${i}`] === undefined) {
-                        this.uiElementStates[`fsc-addon-button-side-drawer-${i}`] = false;
-                    }
-                    data.mainViewDisplay.addonButtonSidePanels += `<div class="fsc-side-drawer fsc-addon-button-side-drawer-${i} fsc-addon-button-side-drawer ${
-                        data.sideDrawerDirection
-                    } ${this.uiElementStates[`fsc-addon-button-side-drawer-${i}`] ? "fsc-open" : "fsc-closed"}" data-sc-abi="${i}"></div>`;
+        for (let i = 0; i < this.addonButtons.length; i++) {
+            data.mainViewDisplay.addonButtons += `<button class="fsc-control fsc-grey fsc-addon-button ${this.addonButtons[i].customClass}" data-sc-abi="${i}" data-tooltip="${this.addonButtons[i].title}"><span class="fa ${this.addonButtons[i].iconClass}"></span></button>`;
+            if (this.addonButtons[i].showSidePanel) {
+                if (this.uiElementStates[`fsc-addon-button-side-drawer-${i}`] === undefined) {
+                    this.uiElementStates[`fsc-addon-button-side-drawer-${i}`] = false;
                 }
+                data.mainViewDisplay.addonButtonSidePanels += `<div class="fsc-side-drawer fsc-addon-button-side-drawer-${i} fsc-addon-button-side-drawer ${
+                    data.sideDrawerDirection
+                } ${this.uiElementStates[`fsc-addon-button-side-drawer-${i}`] ? "fsc-open" : "fsc-closed"}" data-sc-abi="${i}"></div>`;
             }
-            data.mainViewDisplay.showChangeCalendarControls = canUser((<Game>game).user, SC.globalConfiguration.permissions.changeActiveCalendar);
-            data.mainViewDisplay.calendarList = CalManager.getAllCalendars().map((c) => {
-                const cd = c.getCurrentDate();
-                const ct = c.time.getCurrentTime();
-                return {
-                    id: c.id,
-                    name: c.name,
-                    date: FormatDateTime(
-                        { year: cd.year, month: cd.month, day: cd.day, hour: 0, minute: 0, seconds: 0 },
-                        c.generalSettings.dateFormat.date,
-                        c
-                    ),
-                    time: c.generalSettings.showClock
-                        ? FormatDateTime(
-                              { year: 420, month: 0, day: 0, hour: ct.hour, minute: ct.minute, seconds: ct.seconds },
-                              c.generalSettings.dateFormat.time,
-                              c
-                          )
-                        : "",
-                    clockRunning: c.timeKeeper.getStatus() === TimeKeeperStatus.Started
-                };
-            });
         }
+        data.mainViewDisplay.showChangeCalendarControls = canUser((<Game>game).user, SC.globalConfiguration.permissions.changeActiveCalendar);
+        data.mainViewDisplay.calendarList = CalManager.getAllCalendars().map((c) => {
+            const cd = c.getCurrentDate();
+            const ct = c.time.getCurrentTime();
+            return {
+                id: c.id,
+                name: c.name,
+                date: FormatDateTime(
+                    { year: cd.year, month: cd.month, day: cd.day, hour: 0, minute: 0, seconds: 0 },
+                    c.generalSettings.dateFormat.date,
+                    c
+                ),
+                time: c.generalSettings.showClock
+                    ? FormatDateTime(
+                        { year: 420, month: 0, day: 0, hour: ct.hour, minute: ct.minute, seconds: ct.seconds },
+                        c.generalSettings.dateFormat.time,
+                        c
+                    )
+                    : "",
+                clockRunning: c.timeKeeper.getStatus() === TimeKeeperStatus.Started
+            };
+        });
         return data;
     }
 
@@ -231,7 +221,7 @@ export default class MainApp extends FormApplication {
             //}
             const mergedOptions: Application.RenderOptions = deepMerge({}, options);
             if (this.opening) {
-                this.uiElementStates.compactView = GameSettings.GetBooleanSettings(SettingNames.OpenCompact);
+                this.uiElementStates.compactView = false;
 
                 this.opening = false;
             }
@@ -239,9 +229,6 @@ export default class MainApp extends FormApplication {
             const persistentClass = SC.clientSettings.persistentOpen ? "fsc-persistent" : "";
 
             let scaleClass = "";
-            if (this.uiElementStates.compactView) {
-                scaleClass = `sc-scale-${SC.clientSettings.compactViewScale}`;
-            }
 
             mergedOptions.classes = ["simple-calendar", GetThemeName(), persistentClass, scaleClass];
             return super.render(force, mergedOptions);
@@ -301,15 +288,6 @@ export default class MainApp extends FormApplication {
         return Promise.resolve();
     }
 
-    toggleCompactView(event: Event) {
-        event.preventDefault();
-        event.stopPropagation();
-        this.uiElementStates.compactView = !this.uiElementStates.compactView;
-        this.visibleCalendar.resetRttsMonths("selected");
-        this.hideDrawers();
-        this.render(true);
-    }
-
     _activateHeaderButtons(
         html: JQuery,
         windowData: { id: string; classes: string; appId: number; title: string; headerButtons: Application.HeaderButton[] }
@@ -359,11 +337,6 @@ export default class MainApp extends FormApplication {
         //@ts-ignore
         drag.handlers["dragUp"] = [(<Game>game).release.generation < 11 ? "mouseup" : "pointerup", this.appDragEnd.bind(drag), false];
 
-        // Make the outer window minimizable
-        if (this.options.minimizable) {
-            header.addEventListener("dblclick", this.toggleCompactView.bind(this));
-        }
-
         // Set the outer frame z-index
         if (Object.keys(ui.windows).length === 0) _maxZ = 100 - 1;
         this.position.zIndex = Math.min(++_maxZ, 9999);
@@ -389,63 +362,43 @@ export default class MainApp extends FormApplication {
                 height += header.offsetHeight;
             }
             const wrapper = <HTMLElement>main.querySelector(".fsc-main-wrapper");
-            if (wrapper) {
-                if (ma.uiElementStates.compactView) {
-                    wrapper.querySelectorAll(".fsc-section").forEach((e) => {
-                        height += (<HTMLElement>e).offsetHeight;
-                    });
-                    const minCalendarWidth = 225;
-                    const currentDate = <HTMLElement>wrapper.querySelector(".fsc-date .fsc-date-text");
-                    const controls = wrapper.querySelectorAll(".fsc-unit-controls .fsc-control-group");
-                    let curDateWidth = 0,
-                        controlWidth = 0;
-                    if (currentDate) {
-                        curDateWidth = currentDate.offsetWidth;
-                    }
-                    if (controls.length) {
-                        controls.forEach((e) => {
-                            controlWidth += (<HTMLElement>e).offsetWidth;
-                        });
-                    }
-                    width = Math.max(minCalendarWidth, curDateWidth, controlWidth);
-                } else {
-                    wrapper.querySelectorAll(".fsc-section").forEach((s) => {
-                        height += (<HTMLElement>s).offsetHeight;
-                    });
-                    const minCalendarWidth = 200;
-                    const currentDate = <HTMLElement>wrapper.querySelector(".fsc-calendar .fsc-calendar-header .fsc-current-date");
-                    const week = <HTMLElement>wrapper.querySelector(".fsc-calendar .fsc-days .fsc-week");
-                    const clock = <HTMLElement>wrapper.querySelector(".fsc-clock-display .fsc-clock");
-                    const yearView = <HTMLElement>wrapper.querySelector(".fsc-year-view");
-                    let weekWidth = 0,
-                        clockWidth = 0,
-                        yearViewWidth = 0;
+            wrapper.querySelectorAll(".fsc-section").forEach((s) => {
+                height += (<HTMLElement>s).offsetHeight;
+            });
+            const minCalendarWidth = 200;
+            const currentDate = <HTMLElement>wrapper.querySelector(".fsc-calendar .fsc-calendar-header .fsc-current-date");
+            const week = <HTMLElement>wrapper.querySelector(".fsc-calendar .fsc-days .fsc-week");
+            const clock = <HTMLElement>wrapper.querySelector(".fsc-clock-display .fsc-clock");
+            const yearView = <HTMLElement>wrapper.querySelector(".fsc-year-view");
+            let weekWidth = 0,
+                clockWidth = 0,
+                yearViewWidth = 0;
 
-                    if (yearView) {
-                        yearViewWidth = yearView.offsetWidth;
-                        yearViewWidth += 16; //Spacing between calendars
-                    }
-                    if (week) {
-                        weekWidth = week.offsetWidth < minCalendarWidth ? minCalendarWidth : week.offsetWidth;
-                        if (currentDate) {
-                            currentDate.style.maxWidth = `${weekWidth}px`;
-                        }
-                    } else if (currentDate) {
-                        Array.from(currentDate.children).forEach((c) => {
-                            weekWidth += (<HTMLElement>c).offsetWidth;
-                        });
-                        weekWidth += 20; //Margins on prev/next buttons
-                    }
-                    if (clock) {
-                        Array.from(clock.children).forEach((c) => {
-                            clockWidth += (<HTMLElement>c).offsetWidth;
-                        });
-                        clockWidth += 8; //Clock Icon Margin
-                    }
-                    width = Math.max(weekWidth, clockWidth, yearViewWidth);
-                    width += 10; //Calendar Padding
-                    width += 70; //Action list width + Margin
+            if (yearView) {
+                yearViewWidth = yearView.offsetWidth;
+                yearViewWidth += 16; //Spacing between calendars
+            }
+            if (week) {
+                weekWidth = week.offsetWidth < minCalendarWidth ? minCalendarWidth : week.offsetWidth;
+                if (currentDate) {
+                    currentDate.style.maxWidth = `${weekWidth}px`;
                 }
+            } else if (currentDate) {
+                Array.from(currentDate.children).forEach((c) => {
+                    weekWidth += (<HTMLElement>c).offsetWidth;
+                });
+                weekWidth += 20; //Margins on prev/next buttons
+            }
+            if (clock) {
+                Array.from(clock.children).forEach((c) => {
+                    clockWidth += (<HTMLElement>c).offsetWidth;
+                });
+                clockWidth += 8; //Clock Icon Margin
+            }
+            width = Math.max(weekWidth, clockWidth, yearViewWidth);
+            width += 10; //Calendar Padding
+            width += 70; //Action list width + Margin
+                
                 //Add in the border thickness for the main app
                 const appWindowBorder = parseInt(window.getComputedStyle(main).borderWidth);
                 if (!isNaN(appWindowBorder)) {
@@ -479,38 +432,22 @@ export default class MainApp extends FormApplication {
             }
 
             const options: Partial<Application.Position> = {};
-            if (ma.uiElementStates.compactView && GameSettings.GetBooleanSettings(SettingNames.RememberCompactPosition)) {
-                const pos = <SimpleCalendar.AppPosition>GameSettings.GetObjectSettings(SettingNames.AppCompactPosition);
-                if (pos.top !== undefined && pos.top >= 0) {
-                    options.top = pos.top;
-                }
-                if (pos.left !== undefined && pos.left >= 0) {
-                    options.left = pos.left;
-                }
-            } else if (GameSettings.GetBooleanSettings(SettingNames.RememberPosition)) {
-                const pos = <SimpleCalendar.AppPosition>GameSettings.GetObjectSettings(SettingNames.AppPosition);
-                if (pos.top !== undefined && pos.top >= 0) {
-                    options.top = pos.top;
-                }
-                if (pos.left !== undefined && pos.left >= 0) {
-                    options.left = pos.left;
-                }
+            if (GameSettings.GetBooleanSettings(SettingNames.RememberPosition)) {
+            const pos = <SimpleCalendar.AppPosition>GameSettings.GetObjectSettings(SettingNames.AppPosition);
+            if (pos.top !== undefined && pos.top >= 0) {
+                options.top = pos.top;
+            }
+            if (pos.left !== undefined && pos.left >= 0) {
+                options.left = pos.left;
             }
             //Foundry does weird things if you pass in a height with a top, so we have to do these changes in a specific order
             //depending on which view we are entering.
-            if (ma.uiElementStates.compactView) {
-                ma.setPosition({ height: height, width: width });
-                if (GameSettings.GetBooleanSettings(SettingNames.RememberCompactPosition)) {
-                    ma.setPosition(options);
-                }
-            } else {
-                if (GameSettings.GetBooleanSettings(SettingNames.RememberPosition)) {
-                    ma.setPosition(options);
-                }
-                ma.setPosition({ height: height, width: width });
-
-                ma.addonButtonSidePanelContentRender(main);
+            if (GameSettings.GetBooleanSettings(SettingNames.RememberPosition)) {
+                ma.setPosition(options);
             }
+            ma.setPosition({ height: height, width: width });
+
+            ma.addonButtonSidePanelContentRender(main);
         }
     }
 

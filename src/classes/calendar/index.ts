@@ -564,8 +564,8 @@ export default class Calendar extends ConfigurationItemBase {
      */
     getSeason(monthIndex: number, dayIndex: number) {
         let season = new Season("", 0, 0);
-        console.log("from getSeason: monthIndex=" + monthIndex + ", dayIndex=" + dayIndex);
-        console.log("seasons are:" + JSON.stringify(this.seasons));
+        // console.log("from getSeason: monthIndex=" + monthIndex + ", dayIndex=" + dayIndex);
+        // console.log("seasons are:" + JSON.stringify(this.seasons));
         if (dayIndex >= 0 && monthIndex >= 0) {
             // hardcoded values
             if (monthIndex <= 2) {
@@ -581,7 +581,7 @@ export default class Calendar extends ConfigurationItemBase {
                 season = this.seasons[3];
             }
         }
-        console.log("from getSeason: season=" + JSON.stringify(season));
+        // console.log("from getSeason: season=" + JSON.stringify(season));
         return season;
     }
 
@@ -623,7 +623,7 @@ export default class Calendar extends ConfigurationItemBase {
      */
     rttsDaysIntoWeeks(rttsMonthIndex: number): (boolean | SimpleCalendar.HandlebarTemplateData.Day)[][] {
         const weeks = [];
-        console.log("rttsDaysIntoWeeks called with rttsMonthIndex=" + rttsMonthIndex)
+        // console.log("rttsDaysIntoWeeks called with rttsMonthIndex=" + rttsMonthIndex)
         const dayOfWeekOffset = this.rttsMonthStartingDayOfWeek(rttsMonthIndex);
         const days = this.rttsMonths[rttsMonthIndex].getDaysForTemplate();
 
@@ -744,27 +744,27 @@ export default class Calendar extends ConfigurationItemBase {
             return;
         }
 
-        console.log("rttsUpdateMonth 1");
+        // console.log("rttsUpdateMonth 1");
         this.resetRttsMonths(setting);
         this.rttsMonths[rttsMonthIndex][verifiedSetting] = true;
 
         // If we are adjusting the current date we need to propagate that down to the days of the new month as well
         // We also need to set the visibility of the new month to true
         if (verifiedSetting === "current") {
-            console.log("rttsUpdateMonth 2");
+            // console.log("rttsUpdateMonth 2");
             //Get the current RTTS months current day
             let currentDay: number;
 
             if (setDay !== null) {
-                console.log("rttsUpdateMonth u3 setDay=" + setDay);
+                // console.log("rttsUpdateMonth u3 setDay=" + setDay);
                 currentDay = setDay < 0 || this.rttsMonths[rttsMonthIndex].days.length >= setDay ? 0 : setDay;
             } else {
-                console.log("rttsUpdateMonth 4");
+                // console.log("rttsUpdateMonth 4");
                 const currentRttsMonthDayIndex = this.getRttsMonthAndDayIndex();
-                console.log("u2 currentRttsMonthDayIndex=" + JSON.stringify(currentRttsMonthDayIndex));
+                // console.log("u2 currentRttsMonthDayIndex=" + JSON.stringify(currentRttsMonthDayIndex));
                 currentDay = currentRttsMonthDayIndex.day || 0;
             }
-            console.log("rttsUpdateMonth: setting rtts day " + currentDay + " setting "  + verifiedSetting + " month =" + JSON.stringify(this.rttsMonths[rttsMonthIndex].name));
+            // console.log("rttsUpdateMonth: setting rtts day " + currentDay + " setting "  + verifiedSetting + " month =" + JSON.stringify(this.rttsMonths[rttsMonthIndex].name));
             this.rttsMonths[rttsMonthIndex].updateDay(currentDay, verifiedSetting);
         }
     }
@@ -839,7 +839,7 @@ export default class Calendar extends ConfigurationItemBase {
      */
     changeDay(amount: number, setting: string = "current") {
         const verifiedSetting = setting.toLowerCase() as "current" | "selected";
-        const currentRttsMonth = this.getRttsMonth(verifiedSetting);
+        let currentRttsMonth = this.getRttsMonth(verifiedSetting);
         if (currentRttsMonth) {
             console.log("changeDay: " + verifiedSetting + " month is" + currentRttsMonth.rttsMonthId)
             const next = amount > 0;
@@ -849,8 +849,11 @@ export default class Calendar extends ConfigurationItemBase {
                 this.changeMonth(1, verifiedSetting, 0);
                 this.changeDay(amount - (currentRttsMonth.numberOfDays - currentDayIndex), verifiedSetting);
             } else if (!next && currentDayIndex + amount < 0) {
-                this.changeMonth(-1, verifiedSetting, -1);
-                this.changeDay(amount + currentDayIndex + 1, verifiedSetting);
+                let amountAfterMonthChange = amount + currentDayIndex;
+                // TODO bug is here
+                this.changeMonth(-1, verifiedSetting);
+                currentRttsMonth = this.getRttsMonth(verifiedSetting);
+                currentRttsMonth?.changeDay(currentRttsMonth?.numberOfDays + amountAfterMonthChange);
             } else {
                 currentRttsMonth.changeDay(amount, false, verifiedSetting);
             }
@@ -880,16 +883,19 @@ export default class Calendar extends ConfigurationItemBase {
      */
     rttsSecondsToDate(seconds: number): SimpleCalendar.DateTime {
         let daysSinceStart = Math.floor(seconds / 86400);
+        console.log("rttsSecondsToDate=" + daysSinceStart);
         let year = this.getMinDay().year;
         let rttsMonth = 0;
         let daysSoFar = 0;
         
-        for (let i = 0; i < this.rttsMonths.length - 1; i++) {
+        for (let i = 0; i < this.rttsMonths.length; i++) {
             if (daysSoFar + this.rttsMonths[i].numberOfDays > daysSinceStart) {
+                //console.log("adding the days from rtts month " + i + "would exceed days. Breaking with year=" + year + ",rttsMonth=" + rttsMonth, ",daysSoFar=" + daysSoFar);
                 break;
             }
             else {
-                if (i > 0 && i % 12 == 0){
+                //console.log("entering the loop. i=" + i);
+                if (i > 0 && ((i + 1) % 12) == 0){
                     year++;
                 }
                 rttsMonth++;
@@ -897,7 +903,7 @@ export default class Calendar extends ConfigurationItemBase {
             }
         }
         
-        console.log("rttsSecondsToDate:daysSoFar=" + daysSoFar + ",rttsMonth=" + rttsMonth + ",daysSinceStart=" + daysSinceStart);
+        //console.log("rttsSecondsToDate:daysSoFar=" + daysSoFar + ",rttsMonth=" + rttsMonth + ",daysSinceStart=" + daysSinceStart);
         
         let remainingSeconds = seconds % 86400;
         // Add the number of days based on hours
