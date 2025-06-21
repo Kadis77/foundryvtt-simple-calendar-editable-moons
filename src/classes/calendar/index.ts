@@ -733,7 +733,7 @@ export default class Calendar extends ConfigurationItemBase {
      * @param next If the change moved the calendar forward(true) or back(false) this is used to determine the direction to go if the new month has 0 days
      * @param setDay If to set the months day to a specific one
      */
-    rttsUpdateMonth(rttsMonthIndex: number, setting: string, next: boolean, setDay: null | number = null) {
+    rttsUpdateMonth(rttsMonthIndex: number, setting: string, next: boolean, setDay: null | number = null, checkFullMoons = false) {
         const verifiedSetting = setting.toLowerCase() as "visible" | "current" | "selected";
 
         //Reset all the months settings
@@ -766,6 +766,9 @@ export default class Calendar extends ConfigurationItemBase {
             }
             // console.log("rttsUpdateMonth: setting rtts day " + currentDay + " setting "  + verifiedSetting + " month =" + JSON.stringify(this.rttsMonths[rttsMonthIndex].name));
             this.rttsMonths[rttsMonthIndex].updateDay(currentDay, verifiedSetting);
+            if (checkFullMoons) {
+                this.checkFullMoons();
+            }
         }
     }
 
@@ -791,8 +794,9 @@ export default class Calendar extends ConfigurationItemBase {
      * @param amount If we are moving forward (true) or back (false) one month
      * @param setting The month property we are changing. Can be 'visible', 'current' or 'selected'
      * @param setDay If to set the months day to a specific one
+     * @param checkFullMoons
      */
-    changeMonth(amount: number, setting: string = "visible", setDay: null | number = null): void {
+    changeMonth(amount: number, setting: string = "visible", setDay: null | number = null, checkFullMoons = false): void {
         const verifiedSetting = setting.toLowerCase() as "visible" | "current" | "selected";
         const next = amount > 0;
         
@@ -828,7 +832,7 @@ export default class Calendar extends ConfigurationItemBase {
             }
             
             // Change the month
-            this.rttsUpdateMonth(currentMonthIndex + amount, setting, next, setDay);
+            this.rttsUpdateMonth(currentMonthIndex + amount, setting, next, setDay, checkFullMoons);
         }
     }
 
@@ -868,6 +872,7 @@ export default class Calendar extends ConfigurationItemBase {
         console.log("checkFullMoons: new current date =" + JSON.stringify(currentDate));
         for (let i = 0; i < this.rttsMoons.length; i++) {
             // Lazy, just check the icon
+            console.log(JSON.stringify(this.rttsMoons[i].getDateMoonPhase(this, currentDate.year, currentDate.month, currentDate.day)));
             if (this.rttsMoons[i].getDateMoonPhase(this, currentDate.year, currentDate.month, currentDate.day).icon == Icons.Full) {
                 this.rttsMoons[i].pushFullMoonChatMessage(this, false);
             }

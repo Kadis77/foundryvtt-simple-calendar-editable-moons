@@ -220,20 +220,6 @@ export default class CalendarFull {
         html += `<div class="fsc-season">${seasonIcon}<span class="fsc-season-name ${
             showSeasonClickable ? "fsc-description-clickable" : ""
         }">${seasonName}</span></div>`;
-        //Weekday Headings
-        //if (calendar.year.showWeekdayHeadings) {
-        //    html += `<div class="fsc-weekdays">${calendar.weekdays
-        //        .map((w) => {
-        //            return `<div class="fsc-weekday ${w.restday ? "fsc-weekend" : ""} ${
-        //                w.description && options.showDescriptions ? "fsc-description-clickable" : ""
-        //            }" data-tooltip="${w.name}">${w.abbreviation}</div>`;
-        //        })
-        //        .join("")}</div>`;
-        //    weekdayDescriptions = calendar.weekdays.map((w) => {
-        //        return w.description;
-        //    });
-        //}
-        //Close header div
         
         html += "</div>";
 

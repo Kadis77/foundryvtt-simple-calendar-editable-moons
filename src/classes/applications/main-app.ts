@@ -857,7 +857,7 @@ export default class MainApp extends FormApplication {
         console.log("main-app: changeMonth: rttsVisibleMonthAndDayIndex=" + JSON.stringify(rttsVisibleMonthAndDayIndex) + ", canChangeMonth=" + canChangeMonth + ",clickType=" + JSON.stringify(clickType));
         
         if (canChangeMonth) {
-            this.visibleCalendar.changeMonth(clickType == CalendarClickEvents.previous ? -1 : 1, "visible");
+            this.visibleCalendar.changeMonth(clickType == CalendarClickEvents.previous ? -1 : 1, "visible", null);
         }
 
         const newRttsVisibleMonthAndDayIndex = this.visibleCalendar.getRttsMonthAndDayIndex("visible");
