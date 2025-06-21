@@ -1,5 +1,5 @@
 import {
-    GameWorldTimeIntegrations,
+    GameWorldTimeIntegrations, Icons,
     RoadToTheSkyMonthConfigs,
     RoadToTheSkyMoonIds,
     RoadToTheSkySeasonConfigs,
@@ -840,7 +840,7 @@ export default class Calendar extends ConfigurationItemBase {
     changeDay(amount: number, setting: string = "current") {
         const verifiedSetting = setting.toLowerCase() as "current" | "selected";
         let currentRttsMonth = this.getRttsMonth(verifiedSetting);
-        if (currentRttsMonth) {
+        if (currentRttsMonth && amount !== 0) {
             console.log("changeDay: " + verifiedSetting + " month is" + currentRttsMonth.rttsMonthId)
             const next = amount > 0;
             const currentDayIndex = currentRttsMonth.getDayIndex(verifiedSetting);
@@ -853,9 +853,23 @@ export default class Calendar extends ConfigurationItemBase {
                 // TODO bug is here
                 this.changeMonth(-1, verifiedSetting);
                 currentRttsMonth = this.getRttsMonth(verifiedSetting);
-                currentRttsMonth?.changeDay(currentRttsMonth?.numberOfDays + amountAfterMonthChange);
+                currentRttsMonth?.changeDay(currentRttsMonth?.numberOfDays + amountAfterMonthChange, false, verifiedSetting);
             } else {
                 currentRttsMonth.changeDay(amount, false, verifiedSetting);
+            }
+            
+            this.checkFullMoons();
+        }
+    }
+    
+    // Check if we should push a reminder about the moons
+    checkFullMoons() {
+        let currentDate = this.getCurrentDate();
+        console.log("checkFullMoons: new current date =" + JSON.stringify(currentDate));
+        for (let i = 0; i < this.rttsMoons.length; i++) {
+            // Lazy, just check the icon
+            if (this.rttsMoons[i].getDateMoonPhase(this, currentDate.year, currentDate.month, currentDate.day).icon == Icons.Full) {
+                this.rttsMoons[i].pushFullMoonChatMessage(this, false);
             }
         }
     }
@@ -1189,6 +1203,8 @@ export default class Calendar extends ConfigurationItemBase {
         this.rttsUpdateMonth(rttsMonthIndex, "current", true);
         this.rttsMonths[rttsMonthIndex].updateDay(parsedDate.day);
         this.time.setTime(parsedDate.hour, parsedDate.minute, parsedDate.seconds);
+        
+        this.checkFullMoons();
     }
     
     // RTTS: Get the minimum day to display

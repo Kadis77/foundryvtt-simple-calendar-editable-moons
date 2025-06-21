@@ -93,10 +93,10 @@ describe("RTTS Moon Tests", () => {
         // Before the first full moon date, the moon is always the default full
         let dateToGet = tCal.daysToDate(firstFullMoonDays - 5);
         let moonPhaseOnDate = m.getDateMoonPhase(tCal, dateToGet.year, dateToGet.month, dateToGet.day);
-        expect(moonPhaseOnDate.name).toBe("Full Moon");
+        expect(moonPhaseOnDate.name).toBe("Unknown");
         expect(moonPhaseOnDate.length).toBe(1);
         expect(moonPhaseOnDate.singleDay).toBe(false);
-        expect(moonPhaseOnDate.icon).toBe(Icons.Full);
+        expect(moonPhaseOnDate.icon).toBe(Icons.NewMoon);
         
         // Get the phases based on cycles of each length
         // 1 Day Cycle: Full Moon Only
@@ -370,10 +370,10 @@ describe("RTTS Moon Tests", () => {
         // After the defined dates, the moon is always the default full.
         dateToGet = tCal.daysToDate(tCal.rttsDateToDays(tCal.getRttsMonthIndexFromDate(dateToGet.year, dateToGet.month), dateToGet.day) + 1);
         moonPhaseOnDate = m.getDateMoonPhase(tCal, dateToGet.year, dateToGet.month, dateToGet.day);
-        expect(moonPhaseOnDate.name).toBe("Full Moon");
+        expect(moonPhaseOnDate.name).toBe("Unknown");
         expect(moonPhaseOnDate.length).toBe(1);
         expect(moonPhaseOnDate.singleDay).toBe(false);
-        expect(moonPhaseOnDate.icon).toBe(Icons.Full);
+        expect(moonPhaseOnDate.icon).toBe(Icons.NewMoon);
     });
     
     test("Get Moon Phase", () => {

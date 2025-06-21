@@ -2,6 +2,7 @@ import {Icons, RoadToTheSkyMoonConfigs, RoadToTheSkyMoonIds, RoadToTheSkyMoonPha
 import ConfigurationItemBase from "../configuration/configuration-item-base";
 import Calendar from "./index";
 import {SimpleCalendar} from "../../../types";
+import {Logger} from "../logging";
 
 export class RoadToTheSkyMoon extends ConfigurationItemBase {
     /**
@@ -354,13 +355,25 @@ export class RoadToTheSkyMoon extends ConfigurationItemBase {
                 icon: Icons.WaxingCrescent
             }
         }
-        // Something went wrong. Just return a false full moon.
+        // Something went wrong. Just return a false new moon.
         return {
-            name: "Full Moon",
+            name: "Unknown",
             length: 1,
             singleDay: false,
-            icon: Icons.Full
+            icon: Icons.NewMoon
         }
+    }
+
+    public pushFullMoonChatMessage(calendar: Calendar, initialLoad: boolean): boolean {
+        const reminderText = (this.rttsMoonId == RoadToTheSkyMoonIds.lantern || this.rttsMoonId == RoadToTheSkyMoonIds.eye) ? (this.name + " is full tonight.") : ("The " + this.name + " is full tonight.");
+        if (calendar && (!initialLoad || (initialLoad && calendar.generalSettings.postNoteRemindersOnFoundryLoad))) {
+            ChatMessage.create({
+                speaker: { alias: "Reminder" },
+                content: `<div style="display: flex;margin-bottom: 0.5rem;"><div class="note-category"><span class="fa fa-calendar"></span> ${reminderText}</div></div>`
+            }).catch(Logger.error);
+            return true;
+        }
+        return false;
     }
 }
 
