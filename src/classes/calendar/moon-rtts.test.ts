@@ -48,7 +48,7 @@ describe("RTTS Moon Tests", () => {
     test("To Config", () => {
         for (let i = 0; i < tCal.rttsMoons.length; i++) {
             let c = tCal.rttsMoons[i].toConfig();
-            expect(Object.keys(c).length).toBe(6); //Make sure no new properties have been added
+            expect(Object.keys(c).length).toBe(7); //Make sure no new properties have been added
             expect(c.name).toBe(tCal.rttsMoons[i].name);
         }
     });
@@ -135,7 +135,7 @@ describe("RTTS Moon Tests", () => {
         expect(moonPhaseOnDate.name).toBe("Half Moon");
         expect(moonPhaseOnDate.length).toBe(1);
         expect(moonPhaseOnDate.singleDay).toBe(true);
-        expect(moonPhaseOnDate.icon).toBe(Icons.FirstQuarter);
+        expect(moonPhaseOnDate.icon).toBe(Icons.LastQuarter);
 
         dateToGet = tCal.daysToDate(tCal.rttsDateToDays(tCal.getRttsMonthIndexFromDate(dateToGet.year, dateToGet.month), dateToGet.day) + 1);
         moonPhaseOnDate = m.getDateMoonPhase(tCal, dateToGet.year, dateToGet.month, dateToGet.day);
@@ -157,7 +157,7 @@ describe("RTTS Moon Tests", () => {
         expect(moonPhaseOnDate.name).toBe("Half Moon");
         expect(moonPhaseOnDate.length).toBe(1);
         expect(moonPhaseOnDate.singleDay).toBe(true);
-        expect(moonPhaseOnDate.icon).toBe(Icons.FirstQuarter);
+        expect(moonPhaseOnDate.icon).toBe(Icons.LastQuarter);
 
         dateToGet = tCal.daysToDate(tCal.rttsDateToDays(tCal.getRttsMonthIndexFromDate(dateToGet.year, dateToGet.month), dateToGet.day) + 1);
         moonPhaseOnDate = m.getDateMoonPhase(tCal, dateToGet.year, dateToGet.month, dateToGet.day);
@@ -171,7 +171,7 @@ describe("RTTS Moon Tests", () => {
         expect(moonPhaseOnDate.name).toBe("Half Moon");
         expect(moonPhaseOnDate.length).toBe(1);
         expect(moonPhaseOnDate.singleDay).toBe(true);
-        expect(moonPhaseOnDate.icon).toBe(Icons.LastQuarter);
+        expect(moonPhaseOnDate.icon).toBe(Icons.FirstQuarter);
 
         // 5 Day Cycle: Full, waning gibbous, half, new, half
         dateToGet = tCal.daysToDate(tCal.rttsDateToDays(tCal.getRttsMonthIndexFromDate(dateToGet.year, dateToGet.month), dateToGet.day) + 1);
@@ -193,7 +193,7 @@ describe("RTTS Moon Tests", () => {
         expect(moonPhaseOnDate.name).toBe("Half Moon");
         expect(moonPhaseOnDate.length).toBe(1);
         expect(moonPhaseOnDate.singleDay).toBe(true);
-        expect(moonPhaseOnDate.icon).toBe(Icons.FirstQuarter);
+        expect(moonPhaseOnDate.icon).toBe(Icons.LastQuarter);
 
         dateToGet = tCal.daysToDate(tCal.rttsDateToDays(tCal.getRttsMonthIndexFromDate(dateToGet.year, dateToGet.month), dateToGet.day) + 1);
         moonPhaseOnDate = m.getDateMoonPhase(tCal, dateToGet.year, dateToGet.month, dateToGet.day);
@@ -207,7 +207,7 @@ describe("RTTS Moon Tests", () => {
         expect(moonPhaseOnDate.name).toBe("Half Moon");
         expect(moonPhaseOnDate.length).toBe(1);
         expect(moonPhaseOnDate.singleDay).toBe(true);
-        expect(moonPhaseOnDate.icon).toBe(Icons.LastQuarter);
+        expect(moonPhaseOnDate.icon).toBe(Icons.FirstQuarter);
 
         // 6 Day Cycle: Full, waning gibbous, half, new, waxing crescent, half
         dateToGet = tCal.daysToDate(tCal.rttsDateToDays(tCal.getRttsMonthIndexFromDate(dateToGet.year, dateToGet.month), dateToGet.day) + 1);
@@ -229,7 +229,7 @@ describe("RTTS Moon Tests", () => {
         expect(moonPhaseOnDate.name).toBe("Half Moon");
         expect(moonPhaseOnDate.length).toBe(1);
         expect(moonPhaseOnDate.singleDay).toBe(true);
-        expect(moonPhaseOnDate.icon).toBe(Icons.FirstQuarter);
+        expect(moonPhaseOnDate.icon).toBe(Icons.LastQuarter);
 
         dateToGet = tCal.daysToDate(tCal.rttsDateToDays(tCal.getRttsMonthIndexFromDate(dateToGet.year, dateToGet.month), dateToGet.day) + 1);
         moonPhaseOnDate = m.getDateMoonPhase(tCal, dateToGet.year, dateToGet.month, dateToGet.day);
@@ -250,7 +250,7 @@ describe("RTTS Moon Tests", () => {
         expect(moonPhaseOnDate.name).toBe("Half Moon");
         expect(moonPhaseOnDate.length).toBe(1);
         expect(moonPhaseOnDate.singleDay).toBe(true);
-        expect(moonPhaseOnDate.icon).toBe(Icons.LastQuarter);
+        expect(moonPhaseOnDate.icon).toBe(Icons.FirstQuarter);
 
         // 7 Day Cycle: Full, waning gibbous, half, waning crescent, new, waxing crescent, half
         dateToGet = tCal.daysToDate(tCal.rttsDateToDays(tCal.getRttsMonthIndexFromDate(dateToGet.year, dateToGet.month), dateToGet.day) + 1);
@@ -272,7 +272,7 @@ describe("RTTS Moon Tests", () => {
         expect(moonPhaseOnDate.name).toBe("Half Moon");
         expect(moonPhaseOnDate.length).toBe(1);
         expect(moonPhaseOnDate.singleDay).toBe(true);
-        expect(moonPhaseOnDate.icon).toBe(Icons.FirstQuarter);
+        expect(moonPhaseOnDate.icon).toBe(Icons.LastQuarter);
 
         dateToGet = tCal.daysToDate(tCal.rttsDateToDays(tCal.getRttsMonthIndexFromDate(dateToGet.year, dateToGet.month), dateToGet.day) + 1);
         moonPhaseOnDate = m.getDateMoonPhase(tCal, dateToGet.year, dateToGet.month, dateToGet.day);
@@ -300,7 +300,7 @@ describe("RTTS Moon Tests", () => {
         expect(moonPhaseOnDate.name).toBe("Half Moon");
         expect(moonPhaseOnDate.length).toBe(1);
         expect(moonPhaseOnDate.singleDay).toBe(true);
-        expect(moonPhaseOnDate.icon).toBe(Icons.LastQuarter);
+        expect(moonPhaseOnDate.icon).toBe(Icons.FirstQuarter);
 
         // 30 Day Cycle: Full, waning gibbous, half, waning crescent, new, waxing crescent, half, waxing gibbous
         dateToGet = tCal.daysToDate(tCal.rttsDateToDays(tCal.getRttsMonthIndexFromDate(dateToGet.year, dateToGet.month), dateToGet.day) + 1);
@@ -324,7 +324,7 @@ describe("RTTS Moon Tests", () => {
         expect(moonPhaseOnDate.name).toBe("Half Moon");
         expect(moonPhaseOnDate.length).toBe(1);
         expect(moonPhaseOnDate.singleDay).toBe(true);
-        expect(moonPhaseOnDate.icon).toBe(Icons.FirstQuarter);
+        expect(moonPhaseOnDate.icon).toBe(Icons.LastQuarter);
 
         for (let i = 0; i < 6; i++){
             dateToGet = tCal.daysToDate(tCal.rttsDateToDays(tCal.getRttsMonthIndexFromDate(dateToGet.year, dateToGet.month), dateToGet.day) + 1);
@@ -356,7 +356,7 @@ describe("RTTS Moon Tests", () => {
         expect(moonPhaseOnDate.name).toBe("Half Moon");
         expect(moonPhaseOnDate.length).toBe(1);
         expect(moonPhaseOnDate.singleDay).toBe(true);
-        expect(moonPhaseOnDate.icon).toBe(Icons.LastQuarter);
+        expect(moonPhaseOnDate.icon).toBe(Icons.FirstQuarter);
 
         for (let i = 0; i < 6; i++){
             dateToGet = tCal.daysToDate(tCal.rttsDateToDays(tCal.getRttsMonthIndexFromDate(dateToGet.year, dateToGet.month), dateToGet.day) + 1);
