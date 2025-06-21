@@ -592,62 +592,62 @@ export const RoadToTheSkyMonthConfigs : any[] = [
     {
         id: "dew",
         name: "Dew Month",
-        constellation: "Dragon"
+        constellation: "Constellation of the Dragon"
     },
     {
         id: "seed",
         name: "Seed Month",
-        constellation: "Lovers"
+        constellation: "Constellation of the Lovers"
     },
     {
         id: "rain",
         name: "Rain's Month",
-        constellation: "Charioteer"
+        constellation: "Constellation of the Charioteer"
     },
     {
         id: "song",
         name: "Song's Month",
-        constellation: "Winding River"
+        constellation: "Constellation of the Winding River"
     },
     {
         id: "sun",
         name: "Sun's Month",
-        constellation: "Hunter"
+        constellation: "Constellation of the Hunter"
     },
     {
         id: "sky",
         name: "Sky Month",
-        constellation: "Ship"
+        constellation: "Constellation of the Ship"
     },
     {
         id: "iron",
         name: "Iron Month",
-        constellation: "Wolf"
+        constellation: "Constellation of the Wolf"
     },
     {
         id: "gold",
         name: "Gold Month",
-        constellation: "Scythe"
+        constellation: "Constellation of the Scythe"
     },
     {
         id: "stone",
         name: "Stone Month",
-        constellation: "Two Fishes"
+        constellation: "Constellation of the Two Fishes"
     },
     {
         id: "frost",
         name: "Frost Month",
-        constellation: "Crab"
+        constellation: "Constellation of the Crab"
     },
     {
         id: "dusk",
         name: "Dusk Month",
-        constellation: "Tower"
+        constellation: "Constellation of the Tower"
     },
     {
         id: "lamp",
         name: "Lamp's Month",
-        constellation: "Raptor"
+        constellation: "Constellation of the Raptor"
     }
 ]
 
@@ -692,4 +692,13 @@ export const RoadToTheSkySeasonConfigs : any[] = [
         sunriseTime:21600,
         sunsetTime:64800
     }
+]
+
+export const RttsYearNames : string[] = [
+    "Year of the Great Conjunction",
+    "Year of the Lancer's Pennant",
+    "Year of Golomor's Wrath",
+    "Year of the Gilded Sail",
+    "Year of the Unlit Star",
+    "A Year Yet Unnamed"
 ]

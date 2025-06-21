@@ -3,7 +3,14 @@ import { deepMerge } from "../utilities/object";
 import { FormatDateTime, GetPresetTimeOfDay, IsDayBetweenDates } from "../utilities/date-time";
 import { GetIcon } from "../utilities/visual";
 import { GameSettings } from "../foundry-interfacing/game-settings";
-import { CalendarClickEvents, CalendarViews, DateRangeMatch, NoteRepeat, PresetTimeOfDay } from "../../constants";
+import {
+    CalendarClickEvents,
+    CalendarViews,
+    DateRangeMatch,
+    NoteRepeat,
+    PresetTimeOfDay, RoadToTheSkyMonthConfigs,
+    RttsYearNames
+} from "../../constants";
 import RendererUtilities from "./utilities";
 import { CalManager, MainApplication, NManager, SC } from "../index";
 import { canUser } from "../utilities/permissions";
@@ -172,6 +179,7 @@ export default class CalendarFull {
         html += `<input class="fsc-render-options" type="hidden" value="${encodeURIComponent(JSON.stringify(options))}"/>`;
         //Put the header together
         html += `<div class="fsc-calendar-header">`;
+        
         //Visible date change and current date
         html += `<div class="fsc-current-date">`;
         
@@ -183,9 +191,14 @@ export default class CalendarFull {
         } else {
             html += `<span></span>`;
         }
+
+        // Year name
+        let yearIndex = vYear % calendar.getMinDay().year;
+        let yearName = RttsYearNames.length > yearIndex ? RttsYearNames[yearIndex] : "";
+        
         html += `<span class="fsc-month-year ${
             showMonthClickable ? "fsc-description-clickable" : ""
-        }" data-visible="${vOldMonthIndex}/${vYear}">${FormatDateTime(
+        }" data-visible="${vOldMonthIndex}/${vYear}" data-tooltip="${yearName}">${FormatDateTime(
             { year: vYear, month: vOldMonthIndex || 0, day: 0, hour: 0, minute: 0, seconds: 0 },
             monthYearFormat,
             calendar,
@@ -197,26 +210,31 @@ export default class CalendarFull {
             html += `<span></span>`;
         }
         html += "</div>";
-        //Season Name
-        if (options.showSeasonName) {
-            html += `<div class="fsc-season">${seasonIcon}<span class="fsc-season-name ${
-                showSeasonClickable ? "fsc-description-clickable" : ""
-            }">${seasonName}</span></div>`;
+
+        // Constellation
+        let constellationNameText =  RoadToTheSkyMonthConfigs.length > (vOldMonthIndex || 0) ? RoadToTheSkyMonthConfigs[(vOldMonthIndex || 0)].constellation : "";
+        if (constellationNameText != "") {
+            html += `<div class="fsc-season"><span class="fsc-season-name">${constellationNameText}</span></div>`;
         }
+        
+        html += `<div class="fsc-season">${seasonIcon}<span class="fsc-season-name ${
+            showSeasonClickable ? "fsc-description-clickable" : ""
+        }">${seasonName}</span></div>`;
         //Weekday Headings
-        if (calendar.year.showWeekdayHeadings) {
-            html += `<div class="fsc-weekdays">${calendar.weekdays
-                .map((w) => {
-                    return `<div class="fsc-weekday ${w.restday ? "fsc-weekend" : ""} ${
-                        w.description && options.showDescriptions ? "fsc-description-clickable" : ""
-                    }" data-tooltip="${w.name}">${w.abbreviation}</div>`;
-                })
-                .join("")}</div>`;
-            weekdayDescriptions = calendar.weekdays.map((w) => {
-                return w.description;
-            });
-        }
+        //if (calendar.year.showWeekdayHeadings) {
+        //    html += `<div class="fsc-weekdays">${calendar.weekdays
+        //        .map((w) => {
+        //            return `<div class="fsc-weekday ${w.restday ? "fsc-weekend" : ""} ${
+        //                w.description && options.showDescriptions ? "fsc-description-clickable" : ""
+        //            }" data-tooltip="${w.name}">${w.abbreviation}</div>`;
+        //        })
+        //        .join("")}</div>`;
+        //    weekdayDescriptions = calendar.weekdays.map((w) => {
+        //        return w.description;
+        //    });
+        //}
         //Close header div
+        
         html += "</div>";
 
         //Generate day list
