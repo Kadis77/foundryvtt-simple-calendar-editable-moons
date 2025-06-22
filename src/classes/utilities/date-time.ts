@@ -339,7 +339,7 @@ export function TimestampToDateData(seconds: number, calendar: Calendar): Simple
         }
     };
 
-    const dateTime = calendar.rttsSecondsToDate(seconds, true);
+    const dateTime = calendar.rttsSecondsToDate(seconds);
     result.year = dateTime.year;
     result.month = dateTime.month;
     let rttsMonthIndex = calendar.getRttsMonthIndexFromDate(dateTime.year, dateTime.month);
