@@ -2488,6 +2488,7 @@ declare global {
             updateApp?: boolean;
             fromCalSync?: boolean;
             bypassPermissionCheck?: boolean;
+            suppressFullMoonNotification?: boolean;
         };
     }
 

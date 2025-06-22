@@ -1751,7 +1751,7 @@ export function secondsToInterval(seconds: number, calendarId: string = "active"
 export function setDate(date: SimpleCalendar.DateTimeParts, calendarId: string = "active"): boolean {
     const activeCalendar = calendarId === "active" ? CalManager.getActiveCalendar() : CalManager.getCalendar(calendarId);
     if (activeCalendar) {
-        return activeCalendar.setDateTime(date, { showWarning: true });
+        return activeCalendar.setDateTime(date, { showWarning: true, suppressFullMoonNotification: true });
     } else {
         Logger.error(`SimpleCalendar.api.setDate - Unable to find a calendar with the passed in ID of "${calendarId}"`);
     }
@@ -1956,7 +1956,7 @@ export function timestampPlusInterval(currentSeconds: number, interval: SimpleCa
         const clone = activeCalendar.clone(false);
 
         const dateTime = clone.rttsSecondsToDate(currentSeconds);
-        clone.updateTime(dateTime);
+        clone.updateTime(dateTime, false);
         if (interval.year) {
             clone.changeYear(interval.year, "current");
         }

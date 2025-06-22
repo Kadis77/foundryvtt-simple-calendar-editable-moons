@@ -50,8 +50,8 @@ export default class PF2E {
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
             this.worldCreatedOn = Math.floor(game.pf2e.worldClock.worldCreatedOn / 1000);
-            this.pf2eVersionCompare214 = compareSemanticVersions(FoundryVTTGameData.systemVersion, PF2E.pf2eVersion214);
-            this.pf2eVersionCompare3 = compareSemanticVersions(FoundryVTTGameData.systemVersion, PF2E.pf2eVersion3);
+            //this.pf2eVersionCompare214 = compareSemanticVersions(FoundryVTTGameData.systemVersion, PF2E.pf2eVersion214);
+            //this.pf2eVersionCompare3 = compareSemanticVersions(FoundryVTTGameData.systemVersion, PF2E.pf2eVersion3);
         }
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
@@ -75,19 +75,20 @@ export default class PF2E {
         //  - The World Create Time Stamp Offset (Used by PF2E to calculate the current world time) - This is a timestamp in Real world time
         //  - The offset from year 0 to Jan 1 1970 (This is because the World Create Time Stamp is based on a timestamp from 1970 so need to make up that difference)
         if (Object.prototype.hasOwnProperty.call(game, "pf2e")) {
+            this.updatePF2EVariables(true);
             let worldCreateTimeStamp = this.worldCreatedOn;
-            if (this.dateTheme === "AR" || this.dateTheme === "IC") {
-                worldCreateTimeStamp += 62167219200;
-            }
+            //if (this.dateTheme === "AR" || this.dateTheme === "IC") {
+            //    worldCreateTimeStamp += 62167219200;
+            //}
             seconds += worldCreateTimeStamp;
 
             // the PF2E System all calendars are based off of the gregorian calendar.
             // Now with update 2.15.0 all calendars are no longer adding arbitrary numbers to the display of the year but instead using the correct year
-            if (!adjustByDay && this.pf2eVersionCompare214 > 0 && this.pf2eVersionCompare3 <= 0) {
-                seconds += calendar.time.secondsPerDay;
-            } else if (adjustByDay && (this.pf2eVersionCompare214 <= 0 || this.pf2eVersionCompare3 >= 0)) {
-                seconds -= calendar.time.secondsPerDay;
-            }
+            //if (!adjustByDay && this.pf2eVersionCompare214 > 0 && this.pf2eVersionCompare3 <= 0) {
+            //    seconds += calendar.time.secondsPerDay;
+            //} else if (adjustByDay && (this.pf2eVersionCompare214 <= 0 || this.pf2eVersionCompare3 >= 0)) {
+            //    seconds -= calendar.time.secondsPerDay;
+            //}
         }
         return seconds;
     }

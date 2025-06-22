@@ -30,6 +30,7 @@ import {RoadToTheSkyMoon} from "./moon-rtts";
 import RoadToTheSkyMonth from "./month-rtts";
 import * as sea from "node:sea";
 import {Set} from "@league-of-foundry-developers/foundry-vtt-types/src/foundry/client/pixi/core/interaction/targets";
+import PF2E from "../systems/pf2e";
 
 export default class Calendar extends ConfigurationItemBase {
     /**
@@ -896,8 +897,19 @@ export default class Calendar extends ConfigurationItemBase {
     /**
      * Convert a number of seconds to year, month, day, hour, minute, seconds
      * @param {number} seconds The seconds to convert
+     * @param includePf2eAdjustment
      */
-    rttsSecondsToDate(seconds: number): SimpleCalendar.DateTime {
+    rttsSecondsToDate(seconds: number, includePf2eAdjustment = false): SimpleCalendar.DateTime {
+        if (includePf2eAdjustment) {
+            console.log("initalSec=" + seconds);
+            let pf2esec = PF2E.getWorldCreateSeconds(this, false) % 86400;
+            seconds -= pf2esec;
+            if (seconds < 0) {
+                seconds = 86400 + seconds;
+            }
+            console.log("pf2esec=" + pf2esec + ",seconds=" + seconds);
+        }
+        
         let daysSinceStart = Math.floor(seconds / 86400);
         console.log("rttsSecondsToDate=" + daysSinceStart);
         let year = this.getMinDay().year;
@@ -1066,7 +1078,9 @@ export default class Calendar extends ConfigurationItemBase {
             if (date.day === undefined) {
                 processedDate.day = rttsMonthDayIndex.day || 0;
             }
-            this.updateTime(processedDate);
+            
+            let checkFullMoons = !options.suppressFullMoonNotification;
+            this.updateTime(processedDate, checkFullMoons);
 
             const changeInSeconds = this.toSeconds() - initialTimestamp;
 
@@ -1197,7 +1211,7 @@ export default class Calendar extends ConfigurationItemBase {
      * Updates the year's data with passed in date information
      * @param {DateTimeParts} parsedDate Interface that contains all of the individual parts of a date and time
      */
-    updateTime(parsedDate: SimpleCalendar.DateTime) {
+    updateTime(parsedDate: SimpleCalendar.DateTime, checkFullMoons : boolean = true) {
         console.log("updateTime called with " + JSON.stringify(parsedDate));
         const rttsMonthIndex = this.getRttsMonthIndexFromDate(parsedDate.year, parsedDate.month);
         this.year.numericRepresentation = parsedDate.year;
@@ -1206,7 +1220,9 @@ export default class Calendar extends ConfigurationItemBase {
         this.rttsMonths[rttsMonthIndex].updateDay(parsedDate.day);
         this.time.setTime(parsedDate.hour, parsedDate.minute, parsedDate.seconds);
         
-        this.checkFullMoons();
+        if (checkFullMoons) {
+            this.checkFullMoons();
+        }
     }
     
     // RTTS: Get the minimum day to display
