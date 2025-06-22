@@ -388,7 +388,7 @@ export default class Calendar extends ConfigurationItemBase {
             // RTTS month current date setting
             // Set Current RTTS Month and Day
 
-            let rttsMonthIndex = config.currentDate.month + ((Math.max(this.year.selectedYear - minDay.year, 0)) * 12);
+            let rttsMonthIndex = config.currentDate.month + ((Math.max(config.currentDate.year - minDay.year, 0)) * 12);
             console.log("calculated index is " + rttsMonthIndex);
             if (this.rttsMonths.length >= rttsMonthIndex) {
                 this.rttsMonths[rttsMonthIndex].current = true;
