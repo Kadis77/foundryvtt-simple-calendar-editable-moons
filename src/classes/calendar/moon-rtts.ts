@@ -109,7 +109,7 @@ export class RoadToTheSkyMoon extends ConfigurationItemBase {
         for (let i = 0; i < this.cycleLengths.length; i++) {
             let dateString = "TBD";
             if (this.fullMoonDates.length > i && this.fullMoonDates[i]) {
-                dateString = this.fullMoonDates[i].day + 1 + "/" + this.fullMoonDates[i].month + "/" + this.fullMoonDates[i].year;
+                dateString = this.fullMoonDates[i].day + 1 + "/" + this.fullMoonDates[i].month + 1 + "/" + this.fullMoonDates[i].year;
             }
             cycles.push(
                 {
