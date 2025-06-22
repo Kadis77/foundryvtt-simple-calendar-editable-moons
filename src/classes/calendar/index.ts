@@ -1320,7 +1320,7 @@ export default class Calendar extends ConfigurationItemBase {
         else {
             let minDay = this.getMinDay();
             return {
-                year: minDay.year - Math.floor(rttsMonthIndex / 12),
+                year: minDay.year + Math.floor(rttsMonthIndex / 12),
                 month: rttsMonthIndex % 12,
                 day: daysLeft
             }

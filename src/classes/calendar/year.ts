@@ -41,7 +41,7 @@ export default class Year extends ConfigurationItemBase {
      * The year to use that is considered year 0
      * @type {number}
      */
-    yearZero: number = 0;
+    yearZero: number = 420;
     /**
      * The leap year rules for the calendar
      * @type {LeapYear}

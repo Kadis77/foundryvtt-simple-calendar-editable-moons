@@ -97,26 +97,7 @@ export default class PF2E {
      * @return {number|undefined} If no adjustment, undefined otherwise the new year zero is returned
      */
     public static newYearZero(): number | undefined {
-        let yearZero;
-        if (Object.prototype.hasOwnProperty.call(game, "pf2e")) {
-            //If we are using the Gregorian Calendar that ties into the pathfinder world we need to set the year zero to 1875
-            if (this.dateTheme === "AD") {
-                if (this.pf2eVersionCompare214 > 0 && this.pf2eVersionCompare3 <= 0) {
-                    yearZero = 1970;
-                } else {
-                    yearZero = 1875;
-                }
-            } else if (this.dateTheme === "CE") {
-                yearZero = 1970;
-            } else if (this.dateTheme === "AR") {
-                if (this.pf2eVersionCompare214 > 0 && this.pf2eVersionCompare3 <= 0) {
-                    yearZero = 0;
-                } else {
-                    yearZero = 2700;
-                }
-            }
-        }
-        return yearZero;
+        return 420;
     }
 
     /**

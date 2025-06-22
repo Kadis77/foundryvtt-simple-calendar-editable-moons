@@ -772,7 +772,7 @@ export default class ConfigurationApp extends FormApplication {
             (<Calendar>this.object).year.numericRepresentation = <number>getNumericInputValue("#scCurrentYear", 0, false, this.appWindow);
             (<Calendar>this.object).year.prefix = getTextInputValue("#scYearPreFix", "", this.appWindow);
             (<Calendar>this.object).year.postfix = getTextInputValue("#scYearPostFix", "", this.appWindow);
-            (<Calendar>this.object).year.yearZero = <number>getNumericInputValue("#scYearZero", 0, false, this.appWindow);
+            (<Calendar>this.object).year.yearZero = <number>getNumericInputValue("#scYearZero", 420, false, this.appWindow);
 
             (<Calendar>this.object).year.yearNamingRule = <YearNamingRules>(
                 getTextInputValue("#scYearNameBehaviour", <string>YearNamingRules.Default, this.appWindow)
