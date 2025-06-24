@@ -405,7 +405,7 @@ export function DateToTimestamp(date: SimpleCalendar.DateTimeParts, calendar: Ca
     const mergedDate = MergeDateTimeObject(date, null, clone);
     const rttsMonthIndex = calendar.getRttsMonthIndexFromDate(mergedDate.year, mergedDate.month);
     // console.log("DateToTimestamp: about to call with rttsMonthIndex=" + rttsMonthIndex + ",date=" + JSON.stringify(date) + ",mergedDate=" + JSON.stringify(mergedDate));
-    clone.rttsUpdateMonth(rttsMonthIndex, "current", true, mergedDate.day);
+    clone.rttsUpdateMonth(rttsMonthIndex, "current", true, mergedDate.day, false);
     clone.year.numericRepresentation = mergedDate.year;
     clone.time.setTime(mergedDate.hour, mergedDate.minute, mergedDate.seconds);
     return clone.toSeconds();

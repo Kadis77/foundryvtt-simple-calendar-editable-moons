@@ -1198,17 +1198,19 @@ export default class Calendar extends ConfigurationItemBase {
     /**
      * Updates the year's data with passed in date information
      * @param {DateTimeParts} parsedDate Interface that contains all of the individual parts of a date and time
+     * @param checkFullMoons
      */
     updateTime(parsedDate: SimpleCalendar.DateTime, checkFullMoons : boolean = true) {
         console.log("updateTime called with " + JSON.stringify(parsedDate));
         const rttsMonthIndex = this.getRttsMonthIndexFromDate(parsedDate.year, parsedDate.month);
+        const currentDate = this.getCurrentDate();
         this.year.numericRepresentation = parsedDate.year;
         console.log("updateTime: about to call rttsUpdateMonth");
         this.rttsUpdateMonth(rttsMonthIndex, "current", true);
         this.rttsMonths[rttsMonthIndex].updateDay(parsedDate.day);
         this.time.setTime(parsedDate.hour, parsedDate.minute, parsedDate.seconds);
         
-        if (checkFullMoons) {
+        if (!(currentDate.day === parsedDate.day && currentDate.month === parsedDate.month && currentDate.year === parsedDate.year) && checkFullMoons) {
             this.checkFullMoons();
         }
     }
