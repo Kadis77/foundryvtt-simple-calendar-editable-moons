@@ -3,6 +3,7 @@ import ConfigurationItemBase from "../configuration/configuration-item-base";
 import Calendar from "./index";
 import {SimpleCalendar} from "../../../types";
 import {Logger} from "../logging";
+import {isPrimaryGM} from "../api";
 
 export class RoadToTheSkyMoon extends ConfigurationItemBase {
     /**
@@ -367,7 +368,7 @@ export class RoadToTheSkyMoon extends ConfigurationItemBase {
 
     public pushFullMoonChatMessage(calendar: Calendar, initialLoad: boolean): boolean {
         const reminderText = (this.rttsMoonId == RoadToTheSkyMoonIds.lantern || this.rttsMoonId == RoadToTheSkyMoonIds.eye) ? (this.name + " is full tonight.") : ("The " + this.name + " is full tonight.");
-        if (calendar && (!initialLoad || (initialLoad && calendar.generalSettings.postNoteRemindersOnFoundryLoad))) {
+        if (calendar && (!initialLoad || (initialLoad && calendar.generalSettings.postNoteRemindersOnFoundryLoad)) && isPrimaryGM()) {
             ChatMessage.create({
                 speaker: { alias: "Reminder" },
                 content: `<div style="display: flex;margin-bottom: 0.5rem;"><div class="note-category"><span class="fa fa-calendar"></span> ${reminderText}</div></div>`
