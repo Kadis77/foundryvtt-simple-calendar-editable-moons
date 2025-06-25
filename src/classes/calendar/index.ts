@@ -389,7 +389,7 @@ export default class Calendar extends ConfigurationItemBase {
             // Set Current RTTS Month and Day
 
             let rttsMonthIndex = config.currentDate.month + ((Math.max(config.currentDate.year - minDay.year, 0)) * 12);
-            console.log("calculated index is " + rttsMonthIndex);
+            // console.log("calculated index is " + rttsMonthIndex);
             if (this.rttsMonths.length >= rttsMonthIndex) {
                 this.rttsMonths[rttsMonthIndex].current = true;
                 this.rttsMonths[rttsMonthIndex].visible = true;
@@ -737,7 +737,7 @@ export default class Calendar extends ConfigurationItemBase {
         // console.log("rttsUpdateMonth: setting rtts month " + rttsMonthIndex + " setting "  + verifiedSetting);
         
         if (rttsMonthIndex > this.rttsMonths.length - 1) {
-            console.warn("rttsUpdateMonth: Tried to set " + verifiedSetting + " month to rttsIndex " + rttsMonthIndex + ". Month does not exist");
+            // console.warn("rttsUpdateMonth: Tried to set " + verifiedSetting + " month to rttsIndex " + rttsMonthIndex + ". Month does not exist");
             return;
         }
 
@@ -776,7 +776,7 @@ export default class Calendar extends ConfigurationItemBase {
      */
     changeYear(amount: number, setting: string = "visible") {
         const verifiedSetting = setting.toLowerCase() as "visible" | "current" | "selected";
-        console.log("index change year: about to change " + setting + " year by " + amount);
+        // console.log("index change year: about to change " + setting + " year by " + amount);
         if (verifiedSetting === "visible") {
             this.year.visibleYear = this.year.visibleYear + amount;
         } else if (verifiedSetting === "selected") {
@@ -808,15 +808,15 @@ export default class Calendar extends ConfigurationItemBase {
             currentYearIndex = this.year.numericRepresentation;
         }
         
-        console.log("Change month calculation: The current " + verifiedSetting + " month is " + currentYearIndex + "/" + currentMonthIndex % 12 + " and rttsMonthIndex="  + currentMonthIndex); 
+        // console.log("Change month calculation: The current " + verifiedSetting + " month is " + currentYearIndex + "/" + currentMonthIndex % 12 + " and rttsMonthIndex="  + currentMonthIndex); 
         
         // Find out if this date is valid
         let canAddMonths = this.canAddMonths({year: currentYearIndex, month : currentMonthIndex % 12, day: 0}, amount);
-        console.log("Change month calculation: canAddMonths="  + canAddMonths);
+        // console.log("Change month calculation: canAddMonths="  + canAddMonths);
         
         if (canAddMonths) {
             // Do we need to change the year as well?
-            console.log("changeMonth: checking if we need to change the year");
+            // console.log("changeMonth: checking if we need to change the year");
             let yearChangeAmount = 0;
             if (next && (currentMonthIndex % 12) + amount >= 12) {
                 yearChangeAmount = (this.getMinDay().year + Math.floor((currentMonthIndex + amount) / 12)) - currentYearIndex;
@@ -842,7 +842,7 @@ export default class Calendar extends ConfigurationItemBase {
         const verifiedSetting = setting.toLowerCase() as "current" | "selected";
         let currentRttsMonth = this.getRttsMonth(verifiedSetting);
         if (currentRttsMonth && amount !== 0) {
-            console.log("changeDay: " + verifiedSetting + " month is" + currentRttsMonth.rttsMonthId)
+            // console.log("changeDay: " + verifiedSetting + " month is" + currentRttsMonth.rttsMonthId)
             const next = amount > 0;
             const currentDayIndex = currentRttsMonth.getDayIndex(verifiedSetting);
             
@@ -866,10 +866,10 @@ export default class Calendar extends ConfigurationItemBase {
     // Check if we should push a reminder about the moons
     checkFullMoons() {
         let currentDate = this.getCurrentDate();
-        console.log("checkFullMoons: new current date =" + JSON.stringify(currentDate));
+        // console.log("checkFullMoons: new current date =" + JSON.stringify(currentDate));
         for (let i = 0; i < this.rttsMoons.length; i++) {
             // Lazy, just check the icon
-            console.log(JSON.stringify(this.rttsMoons[i].getDateMoonPhase(this, currentDate.year, currentDate.month, currentDate.day)));
+            // console.log(JSON.stringify(this.rttsMoons[i].getDateMoonPhase(this, currentDate.year, currentDate.month, currentDate.day)));
             if (this.rttsMoons[i].getDateMoonPhase(this, currentDate.year, currentDate.month, currentDate.day).icon == Icons.Full) {
                 this.rttsMoons[i].pushFullMoonChatMessage(this, false);
             }
@@ -899,14 +899,14 @@ export default class Calendar extends ConfigurationItemBase {
      */
     rttsSecondsToDate(seconds: number): SimpleCalendar.DateTime {
         let daysSinceStart = Math.floor(seconds / 86400);
-        console.log("rttsSecondsToDate=" + daysSinceStart);
+        // console.log("rttsSecondsToDate=" + daysSinceStart);
         let year = this.getMinDay().year;
         let rttsMonth = 0;
         let daysSoFar = 0;
         
         for (let i = 0; i < this.rttsMonths.length; i++) {
             if (daysSoFar + this.rttsMonths[i].numberOfDays > daysSinceStart) {
-                //console.log("adding the days from rtts month " + i + "would exceed days. Breaking with year=" + year + ",rttsMonth=" + rttsMonth, ",daysSoFar=" + daysSoFar);
+                // console.log("adding the days from rtts month " + i + "would exceed days. Breaking with year=" + year + ",rttsMonth=" + rttsMonth, ",daysSoFar=" + daysSoFar);
                 break;
             }
             else {
@@ -1201,11 +1201,11 @@ export default class Calendar extends ConfigurationItemBase {
      * @param checkFullMoons
      */
     updateTime(parsedDate: SimpleCalendar.DateTime, checkFullMoons : boolean = true) {
-        console.log("updateTime called with " + JSON.stringify(parsedDate));
+        // console.log("updateTime called with " + JSON.stringify(parsedDate));
         const rttsMonthIndex = this.getRttsMonthIndexFromDate(parsedDate.year, parsedDate.month);
         const currentDate = this.getCurrentDate();
         this.year.numericRepresentation = parsedDate.year;
-        console.log("updateTime: about to call rttsUpdateMonth");
+        // console.log("updateTime: about to call rttsUpdateMonth");
         this.rttsUpdateMonth(rttsMonthIndex, "current", true);
         this.rttsMonths[rttsMonthIndex].updateDay(parsedDate.day);
         this.time.setTime(parsedDate.hour, parsedDate.minute, parsedDate.seconds);
@@ -1235,7 +1235,7 @@ export default class Calendar extends ConfigurationItemBase {
 
     // RTTS: will adding a month make this date invalid?
     public canAddMonths(date: SimpleCalendar.Date, amount: number) {
-        console.log("index canAddMonths: date=" + JSON.stringify(date) + ",amount=" + amount)
+        // console.log("index canAddMonths: date=" + JSON.stringify(date) + ",amount=" + amount)
         if (amount > 0) {
             let maxDay = this.getMaxDay();
             if (date.year > maxDay.year) {
