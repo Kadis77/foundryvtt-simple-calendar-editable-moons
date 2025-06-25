@@ -766,24 +766,24 @@ export default class ConfigurationApp extends FormApplication {
                 (getCheckBoxGroupValues("scCompactControlLayout", this.appWindow)[0] || "full")
             );
 
-            //----------------------------------
-            // Calendar: Year Settings
-            //----------------------------------
-            (<Calendar>this.object).year.numericRepresentation = <number>getNumericInputValue("#scCurrentYear", 0, false, this.appWindow);
-            (<Calendar>this.object).year.prefix = getTextInputValue("#scYearPreFix", "", this.appWindow);
-            (<Calendar>this.object).year.postfix = getTextInputValue("#scYearPostFix", "", this.appWindow);
-            (<Calendar>this.object).year.yearZero = <number>getNumericInputValue("#scYearZero", 420, false, this.appWindow);
-
-            (<Calendar>this.object).year.yearNamingRule = <YearNamingRules>(
-                getTextInputValue("#scYearNameBehaviour", <string>YearNamingRules.Default, this.appWindow)
-            );
-            (<Calendar>this.object).year.yearNamesStart = <number>getNumericInputValue("#scYearNamesStart", 0, false, this.appWindow);
-            this.appWindow.querySelectorAll(".fsc-year-settings .fsc-year-names>.fsc-row:not(.fsc-head)").forEach((e) => {
-                const index = parseInt((<HTMLElement>e).getAttribute("data-index") || "");
-                if (!isNaN(index) && index >= 0 && index < (<Calendar>this.object).year.yearNames.length) {
-                    (<Calendar>this.object).year.yearNames[index] = getTextInputValue(".fsc-year-name", "New Named Year", e);
-                }
-            });
+            ////----------------------------------
+            //// Calendar: Year Settings
+            ////----------------------------------
+            //(<Calendar>this.object).year.numericRepresentation = <number>getNumericInputValue("#scCurrentYear", 0, false, this.appWindow);
+            //(<Calendar>this.object).year.prefix = getTextInputValue("#scYearPreFix", "", this.appWindow);
+            //(<Calendar>this.object).year.postfix = getTextInputValue("#scYearPostFix", "", this.appWindow);
+            //(<Calendar>this.object).year.yearZero = <number>getNumericInputValue("#scYearZero", 420, false, this.appWindow);
+//
+            //(<Calendar>this.object).year.yearNamingRule = <YearNamingRules>(
+            //    getTextInputValue("#scYearNameBehaviour", <string>YearNamingRules.Default, this.appWindow)
+            //);
+            //(<Calendar>this.object).year.yearNamesStart = <number>getNumericInputValue("#scYearNamesStart", 0, false, this.appWindow);
+            //this.appWindow.querySelectorAll(".fsc-year-settings .fsc-year-names>.fsc-row:not(.fsc-head)").forEach((e) => {
+            //    const index = parseInt((<HTMLElement>e).getAttribute("data-index") || "");
+            //    if (!isNaN(index) && index >= 0 && index < (<Calendar>this.object).year.yearNames.length) {
+            //        (<Calendar>this.object).year.yearNames[index] = getTextInputValue(".fsc-year-name", "New Named Year", e);
+            //    }
+            //});
 
             //----------------------------------
             // Calendar: Month Settings
