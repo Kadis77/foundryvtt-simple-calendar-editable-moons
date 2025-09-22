@@ -78,7 +78,7 @@ Hooks.on("updateCombat", SC.combatUpdate.bind(SC));
 Hooks.on("deleteCombat", SC.combatDelete.bind(SC));
 Hooks.on("pauseGame", SC.gamePaused.bind(SC));
 Hooks.on("preCreateChatMessage", Chat.createChatMessage);
-Hooks.on("renderChatMessage", Chat.onRenderChatMessage);
+Hooks.on("renderChatMessageHTML", Chat.onRenderChatMessage);
 Hooks.on("renderMainApp", MainApp.setWidthHeight);
 Hooks.on("renderNoteSheet", NoteSheet.SetHeight);
 Hooks.on("createJournalEntry", NManager.journalEntryUpdate.bind(NManager, 0));
