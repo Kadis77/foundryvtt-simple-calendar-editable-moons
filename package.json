@@ -1,8 +1,8 @@
 {
   "name": "foundryvtt-simple-calendar",
   "description": "A simple calendar module for keeping track of game days and events. Custom version for use in Road to the Sky.",
-  "version": "2.4.18",
-  "author": "Dean Vigoren (vigorator)",
+  "version": "0.12.0",
+  "author": "Kadis",
   "keywords": [
     "foundryvtt",
     "foundry-vtt",
