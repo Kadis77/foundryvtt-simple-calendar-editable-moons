@@ -19,6 +19,7 @@ import { canUser } from "../utilities/permissions";
 import NoteStub from "../notes/note-stub";
 import { deepMerge } from "../utilities/object";
 import { NoteSheet } from "../notes/note-sheet";
+import { GetDataReturnType } from "@league-of-foundry-developers/foundry-vtt-types/utils";
 
 /**
  * Contains all functionality for displaying/updating the simple calendar
@@ -112,10 +113,10 @@ export default class MainApp extends FormApplication {
     /**
      * Gets the data object to be used by Handlebars when rending the HTML template
      */
-    getData(): Promise<FormApplication.Data<object>> | FormApplication.Data<object> {
+    async getData(): Promise<GetDataReturnType<FormApplication.FormApplicationData>> {
         // console.log("about to get data...")
         const data = {
-            ...super.getData(),
+            ...(await super.getData()),
             compactViewDisplay: {
                 currentSeasonName: "",
                 currentSeasonIcon: "",
@@ -210,7 +211,7 @@ export default class MainApp extends FormApplication {
      * @param force
      * @param options
      */
-    render(force?: boolean, options?: Application.RenderOptions<FormApplicationOptions>): unknown {
+    render(force?: boolean, options?: Application.RenderOptions<FormApplication.Options>): this {
         if (typeof force === "undefined") {
             force = true;
         }
@@ -233,7 +234,7 @@ export default class MainApp extends FormApplication {
             mergedOptions.classes = ["simple-calendar", GetThemeName(), persistentClass, scaleClass];
             return super.render(force, mergedOptions);
         }
-        return;
+        return this;
     }
 
     /**
@@ -320,7 +321,7 @@ export default class MainApp extends FormApplication {
         };
 
         // Render the template and return the promise
-        const template = await renderTemplate("templates/app-window.html", windowData);
+        const template = await foundry.applications.handlebars.renderTemplate("templates/app-window.html", windowData);
         let html = $(template);
 
         // Activate header button click listeners after a slight timeout to prevent immediate interaction
@@ -328,8 +329,8 @@ export default class MainApp extends FormApplication {
 
         // Make the outer window draggable
         const header = html.find("header")[0];
-        new Draggable(this, html, header, this.options.resizable);
-        const drag = new Draggable(this, html, header, this.options.resizable);
+        new foundry.applications.ux.Draggable.implementation(this, html, header, this.options.resizable);
+        const drag = new foundry.applications.ux.Draggable.implementation(this, html, header, this.options.resizable);
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         //@ts-ignore
         drag.handlers["dragMove"] = [(<Game>game).release.generation < 11 ? "mousemove" : "pointermove", this.appDragMove.bind(drag), false];
@@ -337,9 +338,16 @@ export default class MainApp extends FormApplication {
         //@ts-ignore
         drag.handlers["dragUp"] = [(<Game>game).release.generation < 11 ? "mouseup" : "pointerup", this.appDragEnd.bind(drag), false];
 
+        // Make the outer window minimizable
+        if (this.options.minimizable) {
+            header.addEventListener("dblclick", this.toggleCompactView.bind(this));
+        }
+
         // Set the outer frame z-index
-        if (Object.keys(ui.windows).length === 0) _maxZ = 100 - 1;
-        this.position.zIndex = Math.min(++_maxZ, 9999);
+        if (Object.keys(ui.windows).length === 0) {
+            foundry.applications.api.ApplicationV2._maxZ = 100 - 1;
+        }
+        this.position.zIndex = Math.min(++foundry.applications.api.ApplicationV2._maxZ, 9999);
         html.css({ zIndex: this.position.zIndex });
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         //@ts-ignore
@@ -347,6 +355,15 @@ export default class MainApp extends FormApplication {
 
         // Return the outer frame
         return html;
+    }
+
+    toggleCompactView(event: Event) {
+        event.preventDefault();
+        event.stopPropagation();
+        this.uiElementStates.compactView = !this.uiElementStates.compactView;
+        this.visibleCalendar.resetRttsMonths("selected");
+        this.hideDrawers();
+        this.render(true);
     }
 
     /**
@@ -826,7 +843,7 @@ export default class MainApp extends FormApplication {
                                     return u.isGM && u.active;
                                 })
                             ) {
-                                GameSettings.UiNotification((<Game>game).i18n.localize("FSC.Warn.Calendar.NotGM"), "warn");
+                                ui.notifications?.warn("FSC.Warn.Calendar.NotGM", { localize: true });
                             } else {
                                 const socketData = { calendarId: calendarId };
                                 GameSockets.emit({ type: SocketTypes.setActiveCalendar, data: socketData }).catch(Logger.error);
@@ -958,7 +975,7 @@ export default class MainApp extends FormApplication {
                             return u.isGM && u.active;
                         })
                     ) {
-                        GameSettings.UiNotification((<Game>game).i18n.localize("FSC.Warn.Calendar.NotGM"), "warn");
+                        ui.notifications?.warn("FSC.Warn.Calendar.NotGM", { localize: true })
                     } else {
                         const socketData = { type: DateTimeChangeSocketTypes.changeDateTime, interval: interval };
                         GameSockets.emit({ type: SocketTypes.dateTimeChange, data: socketData }).catch(Logger.error);
@@ -975,7 +992,7 @@ export default class MainApp extends FormApplication {
                         return u.isGM && u.active;
                     })
                 ) {
-                    GameSettings.UiNotification((<Game>game).i18n.localize("FSC.Warn.Calendar.NotGM"), "warn");
+                    ui.notifications?.warn("FSC.Warn.Calendar.NotGM", { localize: true });
                 } else {
                     const socketData = {
                         type: DateTimeChangeSocketTypes.advanceTimeToPreset,
@@ -1057,7 +1074,7 @@ export default class MainApp extends FormApplication {
                     return u.isGM && u.active;
                 })
             ) {
-                GameSettings.UiNotification((<Game>game).i18n.localize("FSC.Warn.Calendar.NotGM"), "warn");
+                ui.notifications?.warn("FSC.Warn.Calendar.NotGM", { localize: true });
             } else {
                 const socketData = { type: DateTimeChangeSocketTypes.setDate, interval: { year: year, month: monthIndex, day: dayIndex } };
                 GameSockets.emit({ type: SocketTypes.dateTimeChange, data: socketData }).catch(Logger.error);
@@ -1251,16 +1268,8 @@ export default class MainApp extends FormApplication {
      * Starts the built-in timekeeper
      */
     startTime() {
-        const activeScene = GameSettings.GetSceneForCombatCheck();
-        const combats = (<Game>game).combats;
-        if (
-            combats &&
-            combats.size > 0 &&
-            combats.find((g) => {
-                return g.started && ((activeScene !== null && g.scene && g.scene.id === activeScene.id) || activeScene === null);
-            })
-        ) {
-            GameSettings.UiNotification((<Game>game).i18n.localize("FSC.Warn.Time.ActiveCombats"), "warn");
+        if (GameSettings.shouldPauseForCombat()) {
+            ui.notifications?.warn("FSC.Warn.Time.ActiveCombats", { localize: true });
         } else if (
             this.activeCalendar.generalSettings.gameWorldTimeIntegration === GameWorldTimeIntegrations.None ||
             this.activeCalendar.generalSettings.gameWorldTimeIntegration === GameWorldTimeIntegrations.Self ||
@@ -1332,7 +1341,7 @@ export default class MainApp extends FormApplication {
                         return u.isGM && u.active;
                     })
                 ) {
-                    GameSettings.UiNotification((<Game>game).i18n.localize("FSC.Warn.Calendar.NotGM"), "warn");
+                    ui.notifications?.warn("FSC.Warn.Calendar.NotGM", { localize: true });
                 } else {
                     const socketData = { calendarId: this.visibleCalendar.id, date: this.visibleCalendar.getDateTime(), newOrder: noteIDOrder };
                     GameSockets.emit({ type: SocketTypes.noteUpdate, data: socketData }).catch(Logger.error);

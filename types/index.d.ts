@@ -16,13 +16,18 @@ import {
     NoteReminderNotificationType,
     NoteRepeat,
     PredefinedCalendars,
-    PresetTimeOfDay, RoadToTheSkyMonthIds, RoadToTheSkyMoonIds,
+    PresetTimeOfDay,
+    SettingNames,
+    RoadToTheSkyMonthIds, 
+    RoadToTheSkyMoonIds,
     SimpleCalendarHooks,
     SocketTypes,
     TimeKeeperStatus,
     YearNamingRules
 } from "../src/constants";
 import NoteStub from "../src/classes/notes/note-stub";
+import MainApp from "../src/classes/applications/main-app";
+import { NoteSheet } from "../src/classes/notes/note-sheet";
 
 declare global {
     /**
@@ -98,7 +103,7 @@ declare global {
                 macro: string | null = null,
                 userVisibility: string[] = [],
                 remindUsers: string[] = []
-            ): Promise<StoredDocument<JournalEntry> | null>;
+            ): Promise<JournalEntry.Stored | null>;
 
             /**
              * Add a custom button to the right side of the calendar (When in full view). The button will be added below the Note Search button.
@@ -1032,7 +1037,7 @@ declare global {
              * SimpleCalendar.api.getNotes();
              *```
              */
-            export function getNotes(calendarId: string = "active"): (StoredDocument<JournalEntry> | undefined)[];
+            export function getNotes(calendarId: string = "active"): (JournalEntry.Stored | undefined)[];
 
             /**
              * Gets all notes that the current user is able to see for the specified date from the specified calendar.
@@ -1054,7 +1059,7 @@ declare global {
                 month: number,
                 day: number,
                 calendarId: string = "active"
-            ): (StoredDocument<JournalEntry> | undefined)[];
+            ): (JournalEntry.Stored | undefined)[];
 
             /**
              * Get the details about how time is configured for the specified calendar.
@@ -1887,7 +1892,7 @@ declare global {
             show: boolean;
             _id: string;
             name: string;
-            type: string;
+            type: BaseJournalEntryPage.SubType;
             text?: { content: string };
             src?: string;
             image?: { caption: string };
@@ -2647,5 +2652,77 @@ declare global {
          * ![Display a custom colored Icon](media://sc-icon-example-color.png)
          */
         "sc-icon"
+    }
+
+    interface FlagConfig {
+        JournalEntry: {
+            "foundryvtt-simple-calendar": {
+                noteData?: SimpleCalendar.NoteData;
+            }
+        };
+        Folder: {
+            "foundryvtt-simple-calendar": {
+                root?: boolean;
+            }
+        };
+        ChatMessage: {
+            "foundryvtt-simple-calendar": {
+                "sc-timestamps"?: { id: string; timestamp: number };
+            }
+        }
+    }
+
+    interface SettingConfig {
+        [key: `foundryvtt-simple-calendar.${string}.theme`]: string;
+        "foundryvtt-simple-calendar.theme": string;
+        "foundryvtt-simple-calendar.open-on-load": boolean;
+        "foundryvtt-simple-calendar.open-compact": boolean;
+        "foundryvtt-simple-calendar.remember-position": boolean;
+        "foundryvtt-simple-calendar.remember-compact-position": boolean;
+        "foundryvtt-simple-calendar.app-position": Record<string, unknown>;
+        "foundryvtt-simple-calendar.app-compact-position": Record<string, unknown>;
+        "foundryvtt-simple-calendar.note-reminder-notification": string;
+        "foundryvtt-simple-calendar.note-list-open-direction": string;
+        "foundryvtt-simple-calendar.always-show-note-list": boolean;
+        "foundryvtt-simple-calendar.persistent-open": boolean;
+
+        "foundryvtt-simple-calendar.compact-view-scale": number;
+        "foundryvtt-simple-calendar.calendar-main-app": unknown;
+        "foundryvtt-simple-calendar.calendar-configuration-menu": unknown;
+        "foundryvtt-simple-calendar.calendar-configuration": unknown[];
+        "foundryvtt-simple-calendar.active-calendar": string;
+        "foundryvtt-simple-calendar.global-configuration": Record<string, unknown>;
+
+        "foundryvtt-simple-calendar.year-config": Record<string, unknown>;
+        "foundryvtt-simple-calendar.weekday-config": unknown[];
+        "foundryvtt-simple-calendar.month-config": unknown[];
+        "foundryvtt-simple-calendar.current-date": Record<string, unknown>;
+        "foundryvtt-simple-calendar.notes": unknown[];
+        "foundryvtt-simple-calendar.allow-players-add-notes": unknown;
+        "foundryvtt-simple-calendar.default-note-visibility": boolean;
+        "foundryvtt-simple-calendar.leap-year-rule": Record<string, unknown>;
+        "foundryvtt-simple-calendar.time-configuration": Record<string, unknown>;
+        "foundryvtt-simple-calendar.general-configuration": Record<string, unknown>;
+        "foundryvtt-simple-calendar.season-configuration": unknown[];
+        "foundryvtt-simple-calendar.moon-configuration": unknown[];
+        "foundryvtt-simple-calendar.note-categories": unknown[];
+    }
+}
+
+declare module "@league-of-foundry-developers/foundry-vtt-types/configuration" {
+    namespace Hooks {
+        interface HookConfig {
+            "simple-calendar-date-time-change": (...args: unknown[]) => void,
+            "simple-calendar-clock-start-stop": (...args: unknown[]) => void,
+            "simple-calendar-primary-gm": (...args: unknown[]) => void,
+            "simple-calendar-ready": (...args: unknown[]) => void,
+            "simple-calendar-init": (...args: unknown[]) => void,
+            "renderMainApp": (sheet: MainApp) => void;
+            "renderNoteSheet": (sheet: NoteSheet) => void;
+            "closeWorldClockSettings": () => void;
+
+            // These core hooks are not in the foundry types at this time
+            getSceneControlButtons: (controls: Record<string, object>) => void;
+        }
     }
 }

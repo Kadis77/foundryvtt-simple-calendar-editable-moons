@@ -43,26 +43,17 @@ export default class NoteManager {
      * Checks to see if the journal director for SC notes exists and creates it if it does not
      */
     public async createJournalDirectory() {
-        const folders = (<Game>game).folders;
-        if (folders) {
-            this.noteDirectory = folders.find((f) => {
-                return f.name === NotesDirectoryName && f.type === "JournalEntry";
-            });
-            if (!this.noteDirectory && GameSettings.IsGm()) {
-                await Folder.create({
-                    name: NotesDirectoryName,
-                    type: "JournalEntry",
-                    parent: null,
-                    flags: {
-                        [ModuleName]: {
-                            root: true
-                        }
+        this.noteDirectory = game.folders?.find((f) => f.type === "JournalEntry" && !!f.getFlag(ModuleName, "root"));
+        if (!this.noteDirectory && game.user?.isGM) {
+            this.noteDirectory = await Folder.create({
+                name: NotesDirectoryName,
+                type: "JournalEntry",
+                flags: {
+                    [ModuleName]: {
+                        root: true
                     }
-                });
-                this.noteDirectory = folders.find((f) => {
-                    return f.name === NotesDirectoryName && f.type === "JournalEntry";
-                });
-            }
+                }
+            });
         }
     }
 
@@ -102,11 +93,16 @@ export default class NoteManager {
         calendar: Calendar,
         renderSheet: boolean = true,
         updateMain: boolean = true
-    ): Promise<StoredDocument<JournalEntry> | null> {
-        const perms: Partial<Record<string, 0 | 1 | 2 | 3>> = {};
-        (<Game>game).users?.forEach((u) => {
-            return (perms[u.id] = (<Game>game).user?.id === u.id ? 3 : calendar.generalSettings.noteDefaultVisibility ? 2 : 0);
-        });
+    ): Promise<JournalEntry.Stored | null> {
+        const perms: Record<string, CONST.DOCUMENT_OWNERSHIP_LEVELS> = {};
+        for (const user of game.users ?? []) {
+            perms[user.id] =
+                game.user?.id === user.id
+                    ? CONST.DOCUMENT_OWNERSHIP_LEVELS.OWNER
+                    : calendar.generalSettings.noteDefaultVisibility
+                        ? CONST.DOCUMENT_OWNERSHIP_LEVELS.OBSERVER
+                        : CONST.DOCUMENT_OWNERSHIP_LEVELS.NONE;
+        }
         const newJE = await JournalEntry.create({
             name: title,
             folder: this.noteDirectory?.id,
@@ -431,8 +427,8 @@ export default class NoteManager {
                         for (let p = 0; p < pages.length; p++) {
                             let content = pages[p].name || "";
                             if (pages[p].type === "text") {
-                                const tmp = document.createElement("DIV");
-                                tmp.innerHTML = pages[p].text.content;
+                                const tmp = document.createElement("div");
+                                tmp.innerHTML = String(pages[p].text.content);
                                 content += ` ${(tmp.textContent || tmp.innerText || "").replace(/\r?\n|\r/g, " ")}`;
                             }
                             docCont.push(content);

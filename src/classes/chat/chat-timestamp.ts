@@ -25,7 +25,7 @@ export class ChatTimestamp {
             if (!Object.prototype.hasOwnProperty.call(messageFlags, ModuleName)) {
                 messageFlags[ModuleName] = {};
             }
-            messageFlags[ModuleName]["sc-timestamps"] = flagData;
+            messageFlags[ModuleName] ??= {};
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             //@ts-ignore
             chatMessage.updateSource({ flags: messageFlags });

@@ -28,8 +28,6 @@ import {Hook} from "../api/hook";
 import PF1E from "../systems/pf1e";
 import {RoadToTheSkyMoon} from "./moon-rtts";
 import RoadToTheSkyMonth from "./month-rtts";
-import * as sea from "node:sea";
-import {Set} from "@league-of-foundry-developers/foundry-vtt-types/src/foundry/client/pixi/core/interaction/targets";
 
 export default class Calendar extends ConfigurationItemBase {
     /**
@@ -1180,10 +1178,11 @@ export default class Calendar extends ConfigurationItemBase {
      * @param {Combat} combat The current active combat
      */
     processOwnCombatRoundTime(combat: Combat) {
+        console.log("processOwnCombatRoundTime");
         const roundSeconds = SC.globalConfiguration.secondsInCombatRound;
         let roundsPassed = 1;
 
-        if (Object.prototype.hasOwnProperty.call(combat, "previous") && combat["previous"].round) {
+        if (combat["previous"]?.round) {
             roundsPassed = combat.round - combat["previous"].round;
         } else if (PF1E.isPF1E) {
             roundsPassed = 0;
