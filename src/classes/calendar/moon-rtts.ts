@@ -110,7 +110,6 @@ export class RoadToTheSkyMoon extends ConfigurationItemBase {
         for (let i = 0; i < this.cycleLengths.length; i++) {
             let dateString = "TBD";
             if (this.fullMoonDates.length > i && this.fullMoonDates[i]) {
-                //console.log(JSON.stringify(this.fullMoonDates[i]));
                 dateString = (this.fullMoonDates[i].day + 1) + "/" + (this.fullMoonDates[i].month + 1) + "/" + this.fullMoonDates[i].year;
             }
             cycles.push(
@@ -126,9 +125,9 @@ export class RoadToTheSkyMoon extends ConfigurationItemBase {
             name: this.name,
             cycles: cycles,
             firstFullMoon: {
-                year: 420,
-                month: 0,
-                day: 0
+                year: this.firstFullMoon.year,
+                month: this.firstFullMoon.month,
+                day: this.firstFullMoon.day
             },
             color: this.color,
         };
@@ -146,9 +145,9 @@ export class RoadToTheSkyMoon extends ConfigurationItemBase {
             this.cycleLengths = config.cycleLengths;
             this.fullMoonDates = config.fullMoonDates;
             this.firstFullMoon = {
-                year: 420,
-                month: 0,
-                day: 0
+                year: config.firstFullMoon?.year ?? 420,
+                month: config.firstFullMoon?.month ?? 0,
+                day: config.firstFullMoon?.day ?? 0
             };
             this.color = RoadToTheSkyMoonConfigs[this.rttsMoonId].color;
         }
@@ -200,10 +199,6 @@ export class RoadToTheSkyMoon extends ConfigurationItemBase {
         currentCycleMarkerDays[2] = Math.ceil(currentCycleLength / 2);
         currentCycleMarkerDays[3] = currentCycleLength - Math.floor(Math.floor(currentCycleLength / 2) / 2);
         
-        if (currentCycleLength > 10) {
-            let i = 1;
-        }
-
         // Find our day
         if (daysIntoCurrentCycle == currentCycleMarkerDays[0]) {
             // full
@@ -247,9 +242,10 @@ export class RoadToTheSkyMoon extends ConfigurationItemBase {
                 : property === "selected"
                     ? calendar.year.selectedYear
                     : calendar.year.visibleYear;
-        const monthIndex = calendar.getRttsMonthIndex(property) % 12;
-        if (monthIndex > -1) {
-            const dayIndex = property !== "visible" ? calendar.months[monthIndex].getDayIndex(property) : dayToUse;
+        const rttsMonthIndex = calendar.getRttsMonthIndex(property);
+        const monthIndex = rttsMonthIndex % 12;
+        if (rttsMonthIndex > -1) {
+            const dayIndex = property !== "visible" ? calendar.rttsMonths[rttsMonthIndex].getDayIndex(property) : dayToUse;
             return this.getDateMoonPhase(calendar, yearNum, monthIndex, dayIndex);
         }
         return this.moonPhaseFromConfig(RoadToTheSkyMoonPhaseIds.full, 1);
@@ -266,7 +262,6 @@ export class RoadToTheSkyMoon extends ConfigurationItemBase {
     }
 
     recalculateFullMoonDates(calendar: Calendar) {
-        //console.log("about to recalculate start dates for moon " + this.name);
         this.fullMoonDates = [];
         // If this is the harvest moon, it will always be the first of the month.
         if (this.rttsMoonId == RoadToTheSkyMoonIds.harvest) {
@@ -295,7 +290,6 @@ export class RoadToTheSkyMoon extends ConfigurationItemBase {
             }
         }
 
-        //console.log("finished! dates are " + JSON.stringify(this.fullMoonDates));
     }
 
 
@@ -371,7 +365,7 @@ export class RoadToTheSkyMoon extends ConfigurationItemBase {
         if (calendar && (!initialLoad || (initialLoad && calendar.generalSettings.postNoteRemindersOnFoundryLoad)) && isPrimaryGM()) {
             ChatMessage.create({
                 speaker: { alias: "Reminder" },
-                content: `<div style="display: flex;margin-bottom: 0.5rem;"><div class="note-category"><span class="fa fa-calendar"></span> ${reminderText}</div></div>`
+                content: `<div style="display: flex;margin-bottom: 0.5rem;"><div class="note-category"><span class="fa-solid fa-calendar"></span> ${reminderText}</div></div>`
             }).catch(Logger.error);
             return true;
         }

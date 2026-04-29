@@ -271,8 +271,6 @@ export function IsDayBetweenDates(
     let startRttsMonthIndex = calendar.getRttsMonthIndexFromDate(startDate.year, startDate.month);
     let endRttsMonthIndex = calendar.getRttsMonthIndexFromDate(endDate.year, endDate.month);
     
-    //console.log("check/start/end dates: " + JSON.stringify(checkDate) + "/" + JSON.stringify(startDate) + "/" + JSON.stringify(endDate));
-    //console.log("check/start/end dates rtts month indexes: " + JSON.stringify(checkRttsMonthIndex) + "/" + JSON.stringify(startRttsMonthIndex) + "/" + JSON.stringify(endRttsMonthIndex));
     
     const checkSeconds = RttsToSeconds(calendar, checkRttsMonthIndex, checkDate.day, false);
     const startSeconds = RttsToSeconds(calendar, startRttsMonthIndex, startDate.day, false);
@@ -287,7 +285,6 @@ export function IsDayBetweenDates(
     } else if (checkSeconds < endSeconds && checkSeconds > startSeconds) {
         between = DateRangeMatch.Middle;
     }
-    //console.log("IsDayBetweenDates: "+ between);
     return between;
 }
 
@@ -361,15 +358,11 @@ export function TimestampToDateData(seconds: number, calendar: Calendar): Simple
     });
     result.showWeekdayHeadings = calendar.year.showWeekdayHeadings;
     result.isLeapYear = calendar.year.leapYearRule.isLeapYear(result.year);
-    // console.log("result.sunrise before, result=" + JSON.stringify(result) +",datetime=" + JSON.stringify(dateTime));
     result.sunrise = calendar.getSunriseSunsetTime(result.year, result.month, result.day, true);
-    // console.log("result.sunrise after");
     result.sunset = calendar.getSunriseSunsetTime(result.year, result.month, result.day, false);
-    // console.log("result.midday before");
     result.midday =
         DateToTimestamp({ year: result.year, month: result.month, day: result.day, hour: 0, minute: 0, seconds: 0 }, calendar) +
         Math.floor(calendar.time.secondsPerDay / 2);
-    // console.log("result.midday after");
     // Display Stuff
     result.display.year = dateTime.year.toString();
     result.display.yearName = calendar.year.getYearName(result.year);
@@ -404,7 +397,6 @@ export function DateToTimestamp(date: SimpleCalendar.DateTimeParts, calendar: Ca
     const clone = calendar.clone(false);
     const mergedDate = MergeDateTimeObject(date, null, clone);
     const rttsMonthIndex = calendar.getRttsMonthIndexFromDate(mergedDate.year, mergedDate.month);
-    // console.log("DateToTimestamp: about to call with rttsMonthIndex=" + rttsMonthIndex + ",date=" + JSON.stringify(date) + ",mergedDate=" + JSON.stringify(mergedDate));
     clone.rttsUpdateMonth(rttsMonthIndex, "current", true, mergedDate.day, false);
     clone.year.numericRepresentation = mergedDate.year;
     clone.time.setTime(mergedDate.hour, mergedDate.minute, mergedDate.seconds);

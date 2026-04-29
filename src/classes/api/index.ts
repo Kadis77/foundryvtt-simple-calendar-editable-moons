@@ -2051,7 +2051,6 @@ export function timestampPlusInterval(currentSeconds: number, interval: SimpleCa
 export function timestampToDate(seconds: number, calendarId: string = "active"): SimpleCalendar.DateData | null {
     const cal = calendarId === "active" ? CalManager.getActiveCalendar() : CalManager.getCalendar(calendarId);
     if (cal) {
-        // console.log("timestampToDate");
         return TimestampToDateData(seconds, cal);
     } else {
         Logger.error(`SimpleCalendar.api.stopClock - Unable to find a calendar with the passed in ID of "${calendarId}"`);
