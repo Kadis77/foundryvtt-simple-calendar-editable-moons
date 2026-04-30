@@ -21,15 +21,14 @@ export function FormatDateTime(date: SimpleCalendar.DateTime, mask: string, cale
     
     const formatFlags: Record<string, (dateObj: SimpleCalendar.DateTime) => string> = {
         D: (dateObj: SimpleCalendar.DateTime) => {
-            return String(calendar.months[dateObj.month]?.days[dateObj.day]?.numericRepresentation || 0);
+            return String(calendar.rttsMonths[rttsMonthIndex]?.days[dateObj.day]?.numericRepresentation || 0);
         },
         DD: (dateObj: SimpleCalendar.DateTime) => {
-            return PadNumber(calendar.months[dateObj.month]?.days[dateObj.day]?.numericRepresentation || 0);
+            return PadNumber(calendar.rttsMonths[rttsMonthIndex]?.days[dateObj.day]?.numericRepresentation || 0);
         },
         DO: (dateObj: SimpleCalendar.DateTime) => {
-            return `${String(calendar.months[dateObj.month]?.days[dateObj.day]?.numericRepresentation || 0)}${ordinalSuffix(
-                calendar.months[dateObj.month]?.days[dateObj.day]?.numericRepresentation | 0
-            )}`;
+            const dayNum = calendar.rttsMonths[rttsMonthIndex]?.days[dateObj.day]?.numericRepresentation || 0;
+            return `${String(dayNum)}${ordinalSuffix(dayNum)}`;
         },
         d: (dateObj: SimpleCalendar.DateTime) => {
             return String(calendar.weekdays[calendar.rttsDayOfTheWeek(rttsMonthIndex, dateObj.day)]?.numericRepresentation || 0);
@@ -44,16 +43,16 @@ export function FormatDateTime(date: SimpleCalendar.DateTime, mask: string, cale
             return `${calendar.weekdays[calendar.rttsDayOfTheWeek(rttsMonthIndex, dateObj.day)]?.name || ""}`;
         },
         M: (dateObj: SimpleCalendar.DateTime) => {
-            return String(calendar.months[dateObj.month]?.numericRepresentation || 0);
+            return String(dateObj.month + 1);
         },
         MM: (dateObj: SimpleCalendar.DateTime) => {
-            return PadNumber(calendar.months[dateObj.month]?.numericRepresentation || 0);
+            return PadNumber(dateObj.month + 1);
         },
-        MMM: (dateObj: SimpleCalendar.DateTime) => {
-            return calendar.months[dateObj.month]?.abbreviation || "";
+        MMM: () => {
+            return calendar.rttsMonths[rttsMonthIndex]?.abbreviation || "";
         },
-        MMMM: (dateObj: SimpleCalendar.DateTime) => {
-            return calendar.months[dateObj.month]?.name || "";
+        MMMM: () => {
+            return calendar.rttsMonths[rttsMonthIndex]?.name || "";
         },
         YN: (dateObj: SimpleCalendar.DateTime) => {
             return calendar.year.getYearName(dateObj.year);
@@ -346,9 +345,8 @@ export function TimestampToDateData(seconds: number, calendar: Calendar): Simple
     result.second = dateTime.seconds;
 
     const rttsMonth = calendar.rttsMonths[rttsMonthIndex];
-    const month = calendar.months[result.month];
     const day = rttsMonth.days[dateTime.day];
-    result.dayOffset = month.numericRepresentationOffset;
+    result.dayOffset = 0;
     result.yearZero = calendar.year.yearZero;
     
     result.dayOfTheWeek = calendar.rttsDayOfTheWeek(rttsMonthIndex, result.day);
@@ -368,8 +366,8 @@ export function TimestampToDateData(seconds: number, calendar: Calendar): Simple
     result.display.yearName = calendar.year.getYearName(result.year);
     result.display.yearPrefix = calendar.year.prefix;
     result.display.yearPostfix = calendar.year.postfix;
-    result.display.month = month.numericRepresentation.toString();
-    result.display.monthName = month.name;
+    result.display.month = (result.month + 1).toString();
+    result.display.monthName = rttsMonth.name;
     if (calendar.weekdays.length > result.dayOfTheWeek) {
         result.display.weekday = calendar.weekdays[result.dayOfTheWeek].name;
     }

@@ -77,7 +77,7 @@ export default class CalendarFull {
             options.showYear = false;
             options.allowChangeMonth = false;
             const origId = options.id;
-            for (let i = 0; i < calendar.months.length; i++) {
+            for (let i = 0; i < 12; i++) {
                 options.date = {
                     year: vYear,
                     month: i,
@@ -119,7 +119,7 @@ export default class CalendarFull {
         let weekdayDescriptions: string[] = [];
 
         if (options.date) {
-            if (options.date.month >= 0 && options.date.month < calendar.months.length) {
+            if (options.date.month >= 0 && options.date.month < 12) {
                 vOldMonthIndex = options.date.month;
             }
             vYear = options.date.year;
@@ -138,11 +138,11 @@ export default class CalendarFull {
             ssYear = options.selectedDates.start.year;
             seYear = options.selectedDates.end.year;
             ssMonth =
-                options.selectedDates.start.month > 0 && options.selectedDates.start.month < calendar.months.length
+                options.selectedDates.start.month > 0 && options.selectedDates.start.month < 12
                     ? options.selectedDates.start.month
                     : 0;
             seMonth =
-                options.selectedDates.end.month > 0 && options.selectedDates.end.month < calendar.months.length ? options.selectedDates.end.month : 0;
+                options.selectedDates.end.month > 0 && options.selectedDates.end.month < 12 ? options.selectedDates.end.month : 0;
             ssDay = options.selectedDates.start.day || 0;
             seDay = options.selectedDates.end.day || 0;
         } else {
@@ -162,7 +162,7 @@ export default class CalendarFull {
             calendarStyle = `border-color: ${season.color};`;
         }
 
-        const monthDescription = calendar.months[vOldMonthIndex || 0].description;
+        const monthDescription = calendar.rttsMonths[vRttsMonthIndex]?.description || "";
         const showMonthClickable = monthDescription && options.showDescriptions;
         const showSeasonClickable = seasonDescription && options.showDescriptions;
 
@@ -489,27 +489,23 @@ export default class CalendarFull {
                                 if (clickType === CalendarClickEvents.previous || clickType === CalendarClickEvents.next) {
                                     let loop = true;
                                     let loopCount = 0;
-                                    while (loop && loopCount < calendar.months.length) {
+                                    while (loop && loopCount < 12) {
                                         if (clickType === CalendarClickEvents.previous) {
                                             if (monthIndex === 0) {
-                                                monthIndex = calendar.months.length - 1;
+                                                monthIndex = 11;
                                                 yearNumber--;
                                             } else {
                                                 monthIndex--;
                                             }
                                         } else {
-                                            if (monthIndex === calendar.months.length - 1) {
+                                            if (monthIndex === 11) {
                                                 monthIndex = 0;
                                                 yearNumber++;
                                             } else {
                                                 monthIndex++;
                                             }
                                         }
-                                        const isLeapYear = calendar.year.leapYearRule.isLeapYear(yearNumber);
-                                        if (
-                                            (isLeapYear && calendar.months[monthIndex].numberOfLeapYearDays > 0) ||
-                                            (!isLeapYear && calendar.months[monthIndex].numberOfDays > 0)
-                                        ) {
+                                        if (calendar.rttsMonths[calendar.getRttsMonthIndexFromDate(yearNumber, monthIndex)].numberOfDays > 0) {
                                             loop = false;
                                         }
                                         loopCount++;
@@ -794,36 +790,6 @@ export default class CalendarFull {
      * @param lastDayOfWeek If this day is the last day of the week
      * @param lastWeekOfMonth if this is the last week of the month
      */
-    public static MoonPhaseIcons(
-        calendar: Calendar,
-        visibleYear: number,
-        visibleMonthIndex: number,
-        dayIndex: number,
-        lastDayOfWeek: boolean = false,
-        lastWeekOfMonth: boolean = false
-    ): string {
-        let html;
-        const moonHtml: string[] = [];
-        for (let i = 0; i < calendar.moons.length; i++) {
-            const mp = calendar.moons[i].getDateMoonPhase(calendar, visibleYear, visibleMonthIndex, dayIndex);
-            const d = calendar.months[visibleMonthIndex].days[dayIndex];
-            if (mp && (mp.singleDay || d.selected || d.current)) {
-                const moon = GetIcon(mp.icon, "#000000", calendar.moons[i].color);
-                moonHtml.push(`<span class="fsc-moon-phase ${mp.icon}" data-tooltip="${calendar.moons[i].name} - ${mp.name}">${moon}</span>`);
-            }
-        }
-        if (moonHtml.length < 3) {
-            html = moonHtml.join("");
-        } else {
-            html = `<div class="fsc-moon-group-wrapper">${
-                moonHtml[0]
-            }<span class="fsc-moon-phase fa fa-caret-down"></span><div class="fsc-moon-group ${lastDayOfWeek ? "fsc-left" : "fsc-right"} ${
-                lastWeekOfMonth ? "fsc-bottom" : "fsc-top"
-            }">${moonHtml.join("")}</div></div>`;
-        }
-        return html;
-    }
-
     /**
      * Gets the icons for all RTTS moon phases for the passed in day from the passed in calendar and generates the HTML
      * @param {Calendar} calendar The calendar to pull data from

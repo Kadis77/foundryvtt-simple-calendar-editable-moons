@@ -805,7 +805,7 @@ export class NoteSheet extends JournalSheet {
                     //    delete options["2"];
                     //    delete options["3"];
                     //} else 
-                    if (daysBetween >= calendar.months[noteData.startDate.month].days.length) {
+                    if (daysBetween >= calendar.rttsMonths[calendar.getRttsMonthIndexFromDate(noteData.startDate.year, noteData.startDate.month)].days.length) {
                         delete options["1"];
                         delete options["2"];
                     } else if (daysBetween >= calendar.weekdays.length) {

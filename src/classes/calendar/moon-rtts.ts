@@ -1,4 +1,4 @@
-import {Icons, RoadToTheSkyMoonConfigs, RoadToTheSkyMoonIds, RoadToTheSkyMoonPhaseIds} from "../../constants";
+import {Icons, MoonYearResetOptions, RoadToTheSkyMoonConfigs, RoadToTheSkyMoonIds, RoadToTheSkyMoonPhaseIds} from "../../constants";
 import ConfigurationItemBase from "../configuration/configuration-item-base";
 import Calendar from "./index";
 import {SimpleCalendar} from "../../../types";
@@ -358,6 +358,43 @@ export class RoadToTheSkyMoon extends ConfigurationItemBase {
             singleDay: false,
             icon: Icons.NewMoon
         }
+    }
+
+    /**
+     * Maps this RTTS moon to the standard SimpleCalendar.MoonData API shape.
+     * cycleLength uses the most recent cycle; phases are computed from that cycle length.
+     */
+    public toMoonData(calendar: Calendar): SimpleCalendar.MoonData {
+        const cycleLength = this.cycleLengths.length > 0 ? this.cycleLengths[this.cycleLengths.length - 1] : 30;
+        const halfCycle = Math.ceil(cycleLength / 2);
+        const firstQuarter = Math.ceil(halfCycle / 2);
+        const thirdQuarter = cycleLength - Math.floor(halfCycle / 2);
+        const phases: SimpleCalendar.MoonPhase[] = [
+            this.moonPhaseFromConfig(RoadToTheSkyMoonPhaseIds.full, 1),
+            this.moonPhaseFromConfig(RoadToTheSkyMoonPhaseIds.waningG, firstQuarter - 1),
+            this.moonPhaseFromConfig(RoadToTheSkyMoonPhaseIds.waningH, 1),
+            this.moonPhaseFromConfig(RoadToTheSkyMoonPhaseIds.waningC, halfCycle - firstQuarter - 1),
+            this.moonPhaseFromConfig(RoadToTheSkyMoonPhaseIds.new, 1),
+            this.moonPhaseFromConfig(RoadToTheSkyMoonPhaseIds.waxingC, thirdQuarter - halfCycle - 1),
+            this.moonPhaseFromConfig(RoadToTheSkyMoonPhaseIds.waxingH, 1),
+            this.moonPhaseFromConfig(RoadToTheSkyMoonPhaseIds.waxingG, cycleLength - thirdQuarter - 1),
+        ];
+        return {
+            id: this.id,
+            name: this.name,
+            color: this.color,
+            cycleLength,
+            cycleDayAdjust: 0,
+            firstNewMoon: {
+                yearReset: MoonYearResetOptions.None,
+                yearX: 0,
+                year: this.firstFullMoon.year,
+                month: this.firstFullMoon.month,
+                day: this.firstFullMoon.day,
+            },
+            phases,
+            currentPhase: this.getMoonPhase(calendar),
+        };
     }
 
     public pushFullMoonChatMessage(calendar: Calendar, initialLoad: boolean): boolean {

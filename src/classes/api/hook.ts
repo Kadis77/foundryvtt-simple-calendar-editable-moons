@@ -15,27 +15,12 @@ export class Hook {
         if (hook === SimpleCalendarHooks.DateTimeChange) {
             data["date"] = TimestampToDateData(calendar.toSeconds(), calendar);
             data["diff"] = param;
-            data["moons"] = [];
             data["rttsMoons"] = [];
-
-            for (let i = 0; i < calendar.moons.length; i++) {
-                const phase = calendar.moons[i].getMoonPhase(calendar);
-                data.moons.push({
-                    name: calendar.moons[i].name,
-                    color: calendar.moons[i].color,
-                    cycleLength: calendar.moons[i].cycleLength,
-                    cycleDayAdjust: calendar.moons[i].cycleDayAdjust,
-                    currentPhase: phase
-                });
-            }
             for (let i = 0; i < calendar.rttsMoons.length; i++) {
-                const phase = calendar.rttsMoons[i].getMoonPhase(calendar);
-                data.rttsMoons.push({
-                    name: calendar.rttsMoons[i].name,
-                    color: calendar.rttsMoons[i].color,
-                    currentPhase: phase
-                });
+                data.rttsMoons.push(calendar.rttsMoons[i].toMoonData(calendar));
             }
+            // moons is an alias for rttsMoons for backwards compatibility with external listeners
+            data["moons"] = data["rttsMoons"];
         } else if (hook === SimpleCalendarHooks.ClockStartStop) {
             const status = calendar.timeKeeper.getStatus();
             data = {

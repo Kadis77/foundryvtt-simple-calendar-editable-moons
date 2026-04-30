@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run:*)",
+      "Bash(ln -s \"/Users/felicityrogers/Documents/GitHub/foundryvtt-simple-calendar-editable-moons/dist\" \"/Users/Users/felicityrogers/Library/Application Support/FoundryVTT/Data/modules/foundryvtt-simple-calendar\")",
+      "Bash(ln -s /Users/felicityrogers/Documents/GitHub/foundryvtt-simple-calendar-editable-moons/dist '__TRACKED_VAR__/Library/Application Support/FoundryVTT/Data/modules/foundryvtt-simple-calendar')",
+      "WebSearch",
+      "WebFetch(domain:foundryvtt.com)",
+      "WebFetch(domain:www.foundryvtt.store)",
+      "Read(//Users/felicityrogers/Library/Application Support/Foundry Virtual Tabletop/**)",
+      "Read(//Applications/FoundryVTT.app/**)",
+      "Read(//Users/felicityrogers/Applications/**)",
+      "Read(//Applications/**)",
+      "Bash(grep -n \"Hooks\\\\$1.callAll\\\\\\(\\\\`render\" \"/Applications/Foundry Virtual Tabletop.app/Contents/Resources/app/public/scripts/foundry.mjs\")",
+      "Bash(sed -i '' 's/class=\"fa fa-times\"/class=\"fa-solid fa-times\"/g; s/class=\"fa fa-clock\"/class=\"fa-solid fa-clock\"/g' /Users/felicityrogers/Documents/GitHub/foundryvtt-simple-calendar-editable-moons/src/classes/date-selector/index.ts)",
+      "Bash(sed -i '' 's/class=\"fa fa-calendar\"/class=\"fa-solid fa-calendar\"/g' /Users/felicityrogers/Documents/GitHub/foundryvtt-simple-calendar-editable-moons/src/classes/notes/note-stub.ts /Users/felicityrogers/Documents/GitHub/foundryvtt-simple-calendar-editable-moons/src/classes/calendar/moon-rtts.ts)",
+      "Bash(sed -i '' 's/icon: \"fa fa-calendar\"/icon: \"fa-solid fa-calendar\"/g; s/icon: \"fa fa-cog\"/icon: \"fa-solid fa-gear\"/g' /Users/felicityrogers/Documents/GitHub/foundryvtt-simple-calendar-editable-moons/src/classes/foundry-interfacing/game-settings-registration.ts)",
+      "Bash(sed -i '' 's/class=\"fas fa-trash\"/class=\"fa-solid fa-trash\"/g; s/class=\"fas fa-save\"/class=\"fa-solid fa-floppy-disk\"/g; s/class=\"fas fa-times\"/class=\"fa-solid fa-times\"/g' /Users/felicityrogers/Documents/GitHub/foundryvtt-simple-calendar-editable-moons/src/classes/notes/note-sheet.ts)",
+      "Bash(git rm:*)",
+      "Bash(npx jest:*)"
+    ]
+  }
+}

@@ -706,13 +706,14 @@ export function formatDateTime(
     if (activeCalendar) {
         const year = date.year ? date.year : 0;
         let monthIndex = date.month && date.month >= 0 ? date.month : 0;
-        if (monthIndex >= activeCalendar.months.length) {
-            monthIndex = activeCalendar.months.length - 1;
+        if (monthIndex >= 12) {
+            monthIndex = 11;
         }
-        const month = activeCalendar.months[monthIndex];
+        const rttsMonthLinearIndex = activeCalendar.getRttsMonthIndexFromDate(year, monthIndex);
+        const rttsMonth = activeCalendar.rttsMonths[rttsMonthLinearIndex];
         let dayIndex = date.day && date.day >= 0 ? date.day : 0;
-        if (dayIndex >= month.days.length) {
-            dayIndex = month.days.length - 1;
+        if (rttsMonth && dayIndex >= rttsMonth.days.length) {
+            dayIndex = rttsMonth.days.length - 1;
         }
         let hour = date.hour && date.hour >= 0 ? date.hour : 0;
         if (hour >= activeCalendar.time.hoursInDay) {
@@ -986,9 +987,19 @@ export function getAllCalendars(): SimpleCalendar.CalendarData[] {
 export function getAllMonths(calendarId: string = "active"): SimpleCalendar.MonthData[] {
     const cal = calendarId === "active" ? CalManager.getActiveCalendar() : CalManager.getCalendar(calendarId);
     if (cal) {
-        return cal.months.map((m) => {
-            return m.toConfig();
-        });
+        return cal.rttsMonths.map((rm, i) => ({
+            id: rm.id,
+            name: rm.name,
+            description: "",
+            abbreviation: rm.abbreviation,
+            numericRepresentation: (i % 12) + 1,
+            numericRepresentationOffset: 0,
+            numberOfDays: rm.numberOfDays,
+            numberOfLeapYearDays: rm.numberOfDays,
+            intercalary: false,
+            intercalaryInclude: false,
+            startingWeekday: null,
+        }));
     } else {
         Logger.error(`SimpleCalendar.api.getAllMonths - Unable to find a calendar with the passed in ID of "${calendarId}"`);
         return [];
@@ -1083,11 +1094,7 @@ export function getAllMonths(calendarId: string = "active"): SimpleCalendar.Mont
 export function getAllMoons(calendarId: string = "active"): SimpleCalendar.MoonData[] {
     const activeCalendar = calendarId === "active" ? CalManager.getActiveCalendar() : CalManager.getCalendar(calendarId);
     if (activeCalendar) {
-        return activeCalendar.moons.map((m) => {
-            const c = m.toConfig();
-            c.currentPhase = m.getMoonPhase(activeCalendar);
-            return c;
-        });
+        return activeCalendar.rttsMoons.map((m) => m.toMoonData(activeCalendar));
     } else {
         Logger.error(`SimpleCalendar.api.getAllMoons - Unable to find a calendar with the passed in ID of "${calendarId}"`);
         return [];
@@ -1965,10 +1972,9 @@ export function timestampPlusInterval(currentSeconds: number, interval: SimpleCa
             clone.changeYear(interval.year, "current");
         }
         if (interval.month) {
-            //If a large number of months are passed in then
-            if (interval.month > clone.months.length) {
-                const years = Math.floor(interval.month / clone.months.length);
-                interval.month = interval.month - years * clone.months.length;
+            if (interval.month > 12) {
+                const years = Math.floor(interval.month / 12);
+                interval.month = interval.month - years * 12;
                 clone.changeYear(years, "current");
             }
             clone.changeMonth(interval.month, "current");

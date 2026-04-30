@@ -8,12 +8,10 @@ import {
     TimeKeeperStatus
 } from "../../constants";
 import Year from "./year";
-import Month from "./month";
 import {Logger} from "../logging";
 import {GameSettings} from "../foundry-interfacing/game-settings";
 import {Weekday} from "./weekday";
 import Season from "./season";
-import Moon from "./moon";
 import GeneralSettings from "../configuration/general-settings";
 import ConfigurationItemBase from "../configuration/configuration-item-base";
 import Renderer from "../renderer";
@@ -42,10 +40,6 @@ export default class Calendar extends ConfigurationItemBase {
      */
     year: Year;
     /**
-     * A list of all the months for this calendar
-     */
-    months: Month[] = [];
-    /**
      * A list of all the RTTS months for this calendar
      */
     rttsMonths: RoadToTheSkyMonth[] = [];
@@ -61,10 +55,6 @@ export default class Calendar extends ConfigurationItemBase {
      * All the RTTS moons for this calendar
      */
     rttsMoons: RoadToTheSkyMoon[] = [];
-    /**
-     * All the moons for this calendar
-     */
-    moons: Moon[] = [];
     /**
      * The time object responsible for all time related functionality
      */
@@ -126,9 +116,6 @@ export default class Calendar extends ConfigurationItemBase {
         c.rttsMonths = this.rttsMonths.map((m) => {
             return m.clone();
         });
-        c.months = this.months.map((m) => {
-            return m.clone();
-        });
         c.weekdays = this.weekdays.map((w) => {
             return w.clone();
         });
@@ -136,9 +123,6 @@ export default class Calendar extends ConfigurationItemBase {
             return s.clone();
         });
         c.rttsMoons = this.rttsMoons.map((m) => {
-            return m.clone();
-        });
-        c.moons = this.moons.map((m) => {
             return m.clone();
         });
         c.time = this.time.clone();
@@ -208,14 +192,8 @@ export default class Calendar extends ConfigurationItemBase {
             rttsMonths: this.rttsMonths.map((m) => {
                 return m.toConfig();
             }),
-            months: this.months.map((m) => {
-                return m.toConfig();
-            }),
             rttsMoons: this.rttsMoons.map((r) => {
                 return r.toConfig();
-            }),
-            moons: this.moons.map((m) => {
-                return m.toConfig();
             }),
             noteCategories: this.noteCategories,
             seasons: this.seasons.map((s) => {
@@ -251,12 +229,6 @@ export default class Calendar extends ConfigurationItemBase {
             this.year = new Year(0);
         }
 
-        // RTTS: Add hardcoded RTTS months
-        this.months = [];
-        for (let i = 0; i < RoadToTheSkyMonthConfigs.length; i++) {
-            this.months.push(new Month(RoadToTheSkyMonthConfigs[i].name, i, 0, 30, 0, 0));
-        }
-        
         const configWeekdays: SimpleCalendar.WeekdayData[] | undefined = config.weekdays || config.weekdaySettings;
         if (Array.isArray(configWeekdays)) {
             this.weekdays = [];
@@ -335,16 +307,6 @@ export default class Calendar extends ConfigurationItemBase {
         }
         this.onRttsMonthDeleted();
         
-        const configMoons: SimpleCalendar.MoonData[] | undefined = config.moons || config.moonSettings;
-        if (Array.isArray(configMoons)) {
-            this.moons = [];
-            for (let i = 0; i < configMoons.length; i++) {
-                const newW = new Moon();
-                newW.loadFromSettings(configMoons[i]);
-                this.moons.push(newW);
-            }
-        }
-
         if (config.general) {
             this.generalSettings.loadFromSettings(config.general);
         } else if (config.generalSettings) {

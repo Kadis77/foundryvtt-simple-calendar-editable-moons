@@ -14,6 +14,16 @@ const config: Config.InitialOptions = {
     collectCoverage: true,
     coverageDirectory: './coverage',
     resetMocks: true,
-    restoreMocks: true
+    restoreMocks: true,
+    setupFiles: ['<rootDir>/src/__tests__/setup.ts'],
+    globals: {
+        'ts-jest': {
+            diagnostics: false,
+            tsconfig: {
+                module: 'commonjs',
+                moduleResolution: 'node',
+            }
+        }
+    }
 };
 export default config;

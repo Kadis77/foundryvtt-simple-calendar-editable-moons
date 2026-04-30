@@ -403,29 +403,26 @@ export default class NoteStub {
                         startDay = (rttsVisibleMonthDay.day || 0) - noteStartDiff;
                         endDay = (rttsVisibleMonthDay.day || 0) + noteEndDiff;
                         let safetyCount = 0;
-                        while (startDay < 0 && safetyCount < calendar.months.length) {
+                        while (startDay < 0 && safetyCount < 12) {
                             startMonth--;
                             if (startMonth < 0) {
                                 startYear--;
-                                startMonth = calendar.months.length - 1;
+                                startMonth = 11;
                             }
-                            const isLeapYear = calendar.year.leapYearRule.isLeapYear(startYear);
-                            startDay = calendar.months[startMonth][isLeapYear ? "numberOfLeapYearDays" : "numberOfDays"] + startDay;
+                            startDay = calendar.rttsMonths[calendar.getRttsMonthIndexFromDate(startYear, startMonth)].numberOfDays + startDay;
                             safetyCount++;
                         }
 
-                        let endIsLeapYear = calendar.year.leapYearRule.isLeapYear(endYear);
                         safetyCount = 0;
                         while (
-                            endDay >= calendar.months[endMonth][endIsLeapYear ? "numberOfLeapYearDays" : "numberOfDays"] &&
-                            safetyCount < calendar.months.length
+                            endDay >= calendar.rttsMonths[calendar.getRttsMonthIndexFromDate(endYear, endMonth)].numberOfDays &&
+                            safetyCount < 12
                         ) {
-                            endDay = endDay - calendar.months[endMonth][endIsLeapYear ? "numberOfLeapYearDays" : "numberOfDays"];
+                            endDay = endDay - calendar.rttsMonths[calendar.getRttsMonthIndexFromDate(endYear, endMonth)].numberOfDays;
                             endMonth++;
-                            if (endMonth >= calendar.months.length) {
+                            if (endMonth >= 12) {
                                 endYear++;
                                 endMonth = 0;
-                                endIsLeapYear = calendar.year.leapYearRule.isLeapYear(endYear);
                             }
                             safetyCount++;
                         }
@@ -438,28 +435,26 @@ export default class NoteStub {
                     if (noteData.startDate.month !== noteData.endDate.month) {
                         if (noteData.startDate.day <= (rttsVisibleMonthDay.day || 0)) {
                             endMonth = ((rttsVisibleMonthDay.month ?? 0) % 12 || 0) + 1;
-                            if (endMonth >= calendar.months.length) {
+                            if (endMonth >= 12) {
                                 endMonth = 0;
                                 endYear = currentVisibleYear + 1;
                             }
                         } else if (noteData.endDate.day >= (rttsVisibleMonthDay.day || 0)) {
                             startMonth = ((rttsVisibleMonthDay.month ?? 0) % 12 || 0) - 1;
                             if (startMonth < 0) {
-                                startMonth = calendar.months.length - 1;
+                                startMonth = 11;
                                 startYear = currentVisibleYear - 1;
                             }
                         }
                     }
                     // Check if the selected start day is more days than the current month has, if so adjust the end day to the max number of day.
-                    if (noteData.startDate.day >= calendar.months[startMonth].days.length) {
-                        const isLeapYear = calendar.year.leapYearRule.isLeapYear(startYear);
-                        startDay = (isLeapYear ? calendar.months[startMonth].numberOfLeapYearDays : calendar.months[startMonth].numberOfDays) - 1;
+                    if (noteData.startDate.day >= calendar.rttsMonths[calendar.getRttsMonthIndexFromDate(startYear, startMonth)].days.length) {
+                        startDay = calendar.rttsMonths[calendar.getRttsMonthIndexFromDate(startYear, startMonth)].numberOfDays - 1;
                     }
 
                     // Check if the selected end day is more days than the current month has, if so adjust the end day to the max number of day.
-                    if (noteData.endDate.day >= calendar.months[endMonth].days.length) {
-                        const isLeapYear = calendar.year.leapYearRule.isLeapYear(endYear);
-                        endDay = (isLeapYear ? calendar.months[endMonth].numberOfLeapYearDays : calendar.months[endMonth].numberOfDays) - 1;
+                    if (noteData.endDate.day >= calendar.rttsMonths[calendar.getRttsMonthIndexFromDate(endYear, endMonth)].days.length) {
+                        endDay = calendar.rttsMonths[calendar.getRttsMonthIndexFromDate(endYear, endMonth)].numberOfDays - 1;
                     }
                 } else if (noteData.repeats === NoteRepeat.Yearly) {
                     if (noteData.startDate.year !== noteData.endDate.year) {
@@ -540,10 +535,10 @@ export default class NoteStub {
                     let sYear = year;
                     let eYear = year;
                     if (adjustedStartMonth < 0) {
-                        adjustedStartMonth = calendar.months.length - 1;
+                        adjustedStartMonth = 11;
                         sYear--;
                     }
-                    if (adjustedEndMonth >= calendar.months.length) {
+                    if (adjustedEndMonth >= 12) {
                         adjustedEndMonth = 0;
                         eYear++;
                     }

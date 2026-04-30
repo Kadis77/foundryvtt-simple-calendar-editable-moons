@@ -888,7 +888,7 @@ export default class MainApp extends FormApplication {
             options.selectedDates &&
             options.selectedDates.start.day >= 0 &&
             options.selectedDates.start.month >= 0 &&
-            options.selectedDates.start.month < this.visibleCalendar.months.length
+            options.selectedDates.start.month < 12
         ) {
             const selectedDay = options.selectedDates.start.day;
             let allReadySelected = false;
