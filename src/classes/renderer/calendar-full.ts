@@ -7,6 +7,7 @@ import {
     CalendarClickEvents,
     CalendarViews,
     DateRangeMatch,
+    Icons,
     NoteRepeat,
     PresetTimeOfDay, RoadToTheSkyMonthConfigs,
     RttsYearNames
@@ -58,18 +59,18 @@ export default class CalendarFull {
             
             // RTTS: Check if the forward/backward month controls should be enabled
             let visibleMonthIndex = calendar.getRttsMonthIndex("visible");
-            let canChangeMonthForward = visibleMonthIndex <= calendar.rttsMonths.length - 1;
+            let canChangeMonthForward = visibleMonthIndex < calendar.rttsMonths.length - 1;
             let canChangeMonthBack = visibleMonthIndex > 0;
             
             if (options.allowChangeMonth) {
                 if (canChangeMonthBack) {
-                    HTML += `<a class="fa fa-chevron-left" data-tooltip="${GameSettings.Localize("FSC.ChangePreviousMonth")}"></a>`;
+                    HTML += `<a class="fsc-icon-nav fsc-nav-prev" data-tooltip="${GameSettings.Localize("FSC.ChangePreviousMonth")}">${GetIcon(Icons.ChevronLeft)}</a>`;
                 }
             }
             HTML += `<span>${vYear}</span>`;
             if (options.allowChangeMonth) {
                 if (canChangeMonthForward) {
-                    HTML += `<a class="fa fa-chevron-right" data-tooltip="${GameSettings.Localize("FSC.ChangeNextMonth")}"></a>`;
+                    HTML += `<a class="fsc-icon-nav fsc-nav-next" data-tooltip="${GameSettings.Localize("FSC.ChangeNextMonth")}">${GetIcon(Icons.ChevronRight)}</a>`;
                 }
             }
             HTML += "</div>";
@@ -181,7 +182,7 @@ export default class CalendarFull {
         let canChangeMonthBack = vRttsMonthIndex > 0;
         
         if (options.allowChangeMonth && canChangeMonthBack) {
-            html += `<a class="fa fa-chevron-left" data-tooltip="${GameSettings.Localize("FSC.ChangePreviousMonth")}"></a>`;
+            html += `<a class="fsc-icon-nav fsc-nav-prev" data-tooltip="${GameSettings.Localize("FSC.ChangePreviousMonth")}">${GetIcon(Icons.ChevronLeft)}</a>`;
         } else {
             html += `<span></span>`;
         }
@@ -199,7 +200,7 @@ export default class CalendarFull {
             { year: options.editYear }
         )}</span>`;
         if (options.allowChangeMonth && canChangeMonthForward) {
-            html += `<a class="fa fa-chevron-right" data-tooltip="${GameSettings.Localize("FSC.ChangeNextMonth")}"></a>`;
+            html += `<a class="fsc-icon-nav fsc-nav-next" data-tooltip="${GameSettings.Localize("FSC.ChangeNextMonth")}">${GetIcon(Icons.ChevronRight)}</a>`;
         } else {
             html += `<span></span>`;
         }
@@ -326,9 +327,9 @@ export default class CalendarFull {
                 const canChangeTime = canUser((<Game>game).user, SC.globalConfiguration.permissions.changeDateTime);
                 const canAddNote = canUser((<Game>game).user, SC.globalConfiguration.permissions.addNotes);
                 html += `<div class="fsc-context-menu fsc-hide" data-type="day"><div class="fsc-day-context-list" data-date=""><div class="fsc-context-list-title"></div>`;
-                html += `<div class="fsc-context-list-expand fsc-sunrise-sunset"><span class="fa fa-sun"></span>${GameSettings.Localize(
+                html += `<div class="fsc-context-list-expand fsc-sunrise-sunset"><span class="fa-solid fa-sun"></span>${GameSettings.Localize(
                     "FSC.Configuration.Season.SunriseSunset"
-                )}<span class="fa fa-caret-right"></span><div class="fsc-context-list-sub-menu"><div class="fsc-context-list-text"><strong>${GameSettings.Localize(
+                )}<span class="fa-solid fa-caret-right"></span><div class="fsc-context-list-sub-menu"><div class="fsc-context-list-text"><strong>${GameSettings.Localize(
                     "FSC.Sunrise"
                 )}</strong>: <span class="fsc-sunrise"></span></div><div class="fsc-context-list-text"><strong>${GameSettings.Localize(
                     "FSC.Sunset"
@@ -336,12 +337,12 @@ export default class CalendarFull {
                 if (canChangeTime || canAddNote) {
                     html += `<div class="fsc-context-list-break"></div>`;
                     if (canChangeTime) {
-                        html += `<div class="fsc-context-list-action" data-action="current"><span class="fa fa-calendar-check"></span>${GameSettings.Localize(
+                        html += `<div class="fsc-context-list-action" data-action="current"><span class="fa-solid fa-calendar-check"></span>${GameSettings.Localize(
                             "FSC.SetCurrentDate"
                         )}</div>`;
                     }
                     if (canAddNote) {
-                        html += `<div class="fsc-context-list-action" data-action="note"><span class="fa fa-sticky-note"></span>${GameSettings.Localize(
+                        html += `<div class="fsc-context-list-action" data-action="note"><span class="fa-solid fa-sticky-note"></span>${GameSettings.Localize(
                             "FSC.Notes.AddNew"
                         )}</div>`;
                     }
@@ -373,7 +374,7 @@ export default class CalendarFull {
     ) {
         const calendarElement = document.getElementById(calendarId);
         if (calendarElement) {
-            const prev = <HTMLElement>calendarElement.querySelector(".fsc-calendar-header .fsc-current-date .fa-chevron-left");
+            const prev = <HTMLElement>calendarElement.querySelector(".fsc-nav-prev");
             if (prev) {
                 prev.addEventListener(
                     "click",
@@ -384,7 +385,7 @@ export default class CalendarFull {
                     })
                 );
             }
-            const next = <HTMLElement>calendarElement.querySelector(".fsc-calendar-header .fsc-current-date .fa-chevron-right");
+            const next = <HTMLElement>calendarElement.querySelector(".fsc-nav-next");
             if (next) {
                 next.addEventListener(
                     "click",
@@ -809,22 +810,21 @@ export default class CalendarFull {
     ): string {
         let html;
         const moonHtml: string[] = [];
+        const d = calendar.rttsMonths[calendar.getRttsMonthIndexFromDate(visibleYear, visibleMonthIndex)].days[dayIndex];
         for (let i = 0; i < calendar.rttsMoons.length; i++) {
             const mp = calendar.rttsMoons[i].getDateMoonPhase(calendar, visibleYear, visibleMonthIndex, dayIndex);
-            const d = calendar.rttsMonths[calendar.getRttsMonthIndexFromDate(visibleYear, visibleMonthIndex)].days[dayIndex];
-            if (mp && (mp.singleDay || d.selected || d.current)) {
+            if (mp && (mp.singleDay || d.selected)) {
                 const moon = GetIcon(mp.icon, "#000000", calendar.rttsMoons[i].color);
                 moonHtml.push(`<span class="fsc-moon-phase ${mp.icon}" data-tooltip="${calendar.rttsMoons[i].name} - ${mp.name}">${moon}</span>`);
             }
         }
-        if (moonHtml.length < 3) {
+        if (moonHtml.length <= 2) {
             html = moonHtml.join("");
         } else {
-            html = `<div class="fsc-moon-group-wrapper">${
-                moonHtml[0]
-            }<span class="fsc-moon-phase fa fa-caret-down"></span><div class="fsc-moon-group ${lastDayOfWeek ? "fsc-left" : "fsc-right"} ${
-                lastWeekOfMonth ? "fsc-bottom" : "fsc-top"
-            }">${moonHtml.join("")}</div></div>`;
+            const topBottom = lastWeekOfMonth ? "fsc-bottom" : "fsc-top";
+            const leftRight = lastDayOfWeek ? "fsc-left" : "fsc-right";
+            // Show first moon inline, second moon has the group caret with all moons in dropdown
+            html = `${moonHtml[0]}<div class="fsc-moon-group-wrapper">${moonHtml[1]}<span class="fsc-moon-caret">${GetIcon(Icons.CaretDown)}</span><div class="fsc-moon-group ${topBottom} ${leftRight}">${moonHtml.join("")}</div></div>`;
         }
         return html;
     }

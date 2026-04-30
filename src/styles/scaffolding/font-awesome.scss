@@ -1,13 +1,2 @@
-@import "src/styles/variables";
-// Some systems break font-awesome styling, this will force the styles to use the correct font.
-.simple-calendar{
-  .fa, .fas, .fa-solid{
-    font-family: $icon-font-family;
-  }
-  .fa-classic,.fa-light,.fa-regular,.fa-solid,.fa-thin,.fal,.far,.fas,.fat {
-    font-family: $icon-font-family;
-  }
-  .fa-brands,.fab {
-    font-family: $icon-font-family-brands;
-  }
-}
+// Font Awesome overrides removed — Foundry v14 loads FA6 Free directly.
+// All module icons now use inline SVG via GetIcon() instead of FA classes.

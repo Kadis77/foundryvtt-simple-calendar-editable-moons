@@ -1226,7 +1226,7 @@ export default class MainApp extends FormApplication {
                     if (action === "showPlayers") {
                         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                         //@ts-ignore
-                        Journal.showDialog(journalEntry).catch((e) => {
+                        foundry.documents.collections.Journal.showDialog(journalEntry).catch((e) => {
                             return console.error(e);
                         });
                     } else if (action === "delete") {

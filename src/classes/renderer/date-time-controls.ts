@@ -22,17 +22,17 @@ export class DateTimeControls {
         let html = '<div class="fsc-controls fsc-unit-controls">';
         if (options.displayType === CompactViewDateTimeControlDisplay.Full) {
             html += `<div class="fsc-control-group">
-                        <button class="fsc-control fsc-primary" data-tooltip="${GameSettings.Localize("FSC.MoveBackwardFive")}" data-type="${options
-                            .fullDisplay?.unit}" data-amount="-5"><span class="fa fa-angle-double-left"></span></button>
-                        <button class="fsc-control fsc-primary" data-tooltip="${GameSettings.Localize("FSC.MoveBackwardOne")}" data-type="${options
-                            .fullDisplay?.unit}" data-amount="-1"><span class="fa fa-angle-left"></span></button>
+                        <button class="fsc-control fsc-primary fsc-icon-btn" data-tooltip="${GameSettings.Localize("FSC.MoveBackwardFive")}" data-type="${options
+                            .fullDisplay?.unit}" data-amount="-5">${GetIcon(Icons.AngleDoubleLeft)}</button>
+                        <button class="fsc-control fsc-primary fsc-icon-btn" data-tooltip="${GameSettings.Localize("FSC.MoveBackwardOne")}" data-type="${options
+                            .fullDisplay?.unit}" data-amount="-1">${GetIcon(Icons.AngleLeft)}</button>
                         <button class="fsc-control fsc-primary fsc-selector" data-unit="time">${GameSettings.Localize(
                             options.fullDisplay?.unitText || ""
-                        )}&nbsp;</button>
-                        <button class="fsc-control fsc-primary" data-tooltip="${GameSettings.Localize("FSC.MoveForwardOne")}" data-type="${options
-                            .fullDisplay?.unit}" data-amount="1"><span class="fa fa-angle-right"></span></button>
-                        <button class="fsc-control fsc-primary" data-tooltip="${GameSettings.Localize("FSC.MoveForwardFive")}" data-type="${options
-                            .fullDisplay?.unit}" data-amount="5"><span class="fa fa-angle-double-right"></span></button>
+                        )}&nbsp;${GetIcon(Icons.CaretDown)}</button>
+                        <button class="fsc-control fsc-primary fsc-icon-btn" data-tooltip="${GameSettings.Localize("FSC.MoveForwardOne")}" data-type="${options
+                            .fullDisplay?.unit}" data-amount="1">${GetIcon(Icons.AngleRight)}</button>
+                        <button class="fsc-control fsc-primary fsc-icon-btn" data-tooltip="${GameSettings.Localize("FSC.MoveForwardFive")}" data-type="${options
+                            .fullDisplay?.unit}" data-amount="5">${GetIcon(Icons.AngleDoubleRight)}</button>
                         <ul class="fsc-unit-list fsc-time-units fsc-primary ${options.fullDisplay?.dateTimeUnitOpen ? "fsc-open" : "fsc-closed"}">`;
             if (options.showTimeControls) {
                 html += `<li class="${options.fullDisplay?.unit === "seconds" ? "fsc-selected" : ""}" data-unit="seconds">${GameSettings.Localize(

@@ -367,7 +367,59 @@ export enum Icons {
     /** The icon that represents the season fall */
     Fall = "fall",
     /** The icon that represents the season winter */
-    Winter = "winter"
+    Winter = "winter",
+    /** Left chevron arrow */
+    ChevronLeft = "chevron-left",
+    /** Right chevron arrow */
+    ChevronRight = "chevron-right",
+    /** Single left angle arrow */
+    AngleLeft = "angle-left",
+    /** Single right angle arrow */
+    AngleRight = "angle-right",
+    /** Double left angle arrow */
+    AngleDoubleLeft = "angle-double-left",
+    /** Double right angle arrow */
+    AngleDoubleRight = "angle-double-right",
+    /** Sticky note / journal page */
+    StickyNote = "sticky-note",
+    /** Magnifying glass / search */
+    Search = "search",
+    /** Calendar grid */
+    Calendar = "calendar",
+    /** Calendar with checkmark */
+    CalendarCheck = "calendar-check",
+    /** Calendar with highlighted day */
+    CalendarDay = "calendar-day",
+    /** Gear / settings cog */
+    Gear = "gear",
+    /** Bell / notification */
+    Bell = "bell",
+    /** Plus / add */
+    Plus = "plus",
+    /** X / close / times */
+    Times = "times",
+    /** Caret pointing down */
+    CaretDown = "caret-down",
+    /** Checkmark */
+    Check = "check",
+    /** Eye / visibility */
+    Eye = "eye",
+    /** Trash / delete */
+    Trash = "trash",
+    /** Pen to square / edit */
+    Pen = "pen",
+    /** Pencil / author */
+    Pencil = "pencil",
+    /** Play triangle */
+    Play = "play",
+    /** Pause bars */
+    Pause = "pause",
+    /** Stop square */
+    Stop = "stop",
+    /** Vertical arrows / reorder */
+    ArrowsV = "arrows-v",
+    /** Scroll / macro */
+    Scroll = "scroll"
 }
 
 /**

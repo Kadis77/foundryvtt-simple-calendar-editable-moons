@@ -86,12 +86,16 @@
             .fsc-moon-group-wrapper{
               display: flex;
               margin-right: pxToRem(-7);
-              .fa{
-                font-size: pxToRem(11);
+              .fsc-moon-caret{
                 margin-left: pxToRem(-5);
                 margin-top: pxToRem(5);
                 z-index: 1;
                 text-shadow: -3px -1px var(--cal-moon-text-shadow);
+                svg{
+                  width: pxToRem(8);
+                  height: pxToRem(8);
+                  fill: currentColor;
+                }
               }
               .fsc-moon-group{
                 display: none;
@@ -99,7 +103,7 @@
             }
 
             .fsc-moon-phase{
-              height: pxToRem(16);
+              height: pxToRem(12);
               margin-top: pxToRem(2);
             }
             svg{

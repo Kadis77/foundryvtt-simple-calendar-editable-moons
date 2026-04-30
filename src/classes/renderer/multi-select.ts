@@ -30,7 +30,7 @@ export default class MultiSelect {
         let html = `<div class="fsc-multiselect"><input class="fsc-multiselect-id" id="${options.id}" value="${selectedValues}" type="hidden" />`;
         html += `<input class="fsc-render-options" type="hidden" value="${encodeURIComponent(JSON.stringify(options))}"/>`;
 
-        html += `<button><div class="fsc-selected-options">${selectedText}</div><i class="fa fa-chevron-down"></i></button><ul class="fsc-multi-select-options ${
+        html += `<button><div class="fsc-selected-options">${selectedText}</div><i class="fa-solid fa-chevron-down"></i></button><ul class="fsc-multi-select-options ${
             open ? "fsc-show" : ""
         }">`;
         for (let i = 0; i < options.options.length; i++) {

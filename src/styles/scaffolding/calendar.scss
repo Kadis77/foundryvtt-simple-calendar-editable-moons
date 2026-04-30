@@ -107,6 +107,22 @@
         margin: 2px pxToRem(5) 0;
       }
 
+      a.fsc-icon-nav{
+        display: inline-flex;
+        align-items: center;
+        cursor: pointer;
+        svg{
+          width: pxToRem(10);
+          height: pxToRem(16);
+          fill: currentColor;
+          stroke: none;
+          pointer-events: none;
+        }
+        &:hover{
+          text-shadow: 0 0 8px currentColor;
+        }
+      }
+
       .fsc-month-year{
         text-align: center;
         input[type="number"] {
@@ -272,11 +288,16 @@
             .fsc-moon-group-wrapper{
               display: flex;
               margin-right: pxToRem(-6);
-              .fa{
+              .fsc-moon-caret{
                 margin-left: pxToRem(-7);
                 margin-top: 3px;
                 z-index: 1;
                 text-shadow: -2px -1px 0px var(--cal-moon-text-shadow);
+                svg{
+                  width: pxToRem(8);
+                  height: pxToRem(8);
+                  fill: currentColor;
+                }
               }
               .fsc-moon-group{
                 display: none;

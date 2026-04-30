@@ -343,6 +343,10 @@ export default class Calendar extends ConfigurationItemBase {
             }
             else {
                 Logger.warn("Saved current RTTS month could not be found. Setting all to first month.");
+                const minYear = this.getMinDay().year;
+                this.year.numericRepresentation = minYear;
+                this.year.selectedYear = minYear;
+                this.year.visibleYear = minYear;
                 this.rttsMonths[0].current = true;
                 this.rttsMonths[0].visible = true;
                 this.rttsMonths[0].days[0].current = true;
@@ -551,6 +555,9 @@ export default class Calendar extends ConfigurationItemBase {
      * @param rttsMonthIndex
      */
     rttsDaysIntoWeeks(rttsMonthIndex: number): (boolean | SimpleCalendar.HandlebarTemplateData.Day)[][] {
+        if (rttsMonthIndex < 0 || rttsMonthIndex >= this.rttsMonths.length) {
+            return [];
+        }
         const weeks = [];
         const dayOfWeekOffset = this.rttsMonthStartingDayOfWeek(rttsMonthIndex);
         const days = this.rttsMonths[rttsMonthIndex].getDaysForTemplate();

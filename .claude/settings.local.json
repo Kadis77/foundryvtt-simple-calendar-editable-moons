@@ -17,7 +17,9 @@
       "Bash(sed -i '' 's/icon: \"fa fa-calendar\"/icon: \"fa-solid fa-calendar\"/g; s/icon: \"fa fa-cog\"/icon: \"fa-solid fa-gear\"/g' /Users/felicityrogers/Documents/GitHub/foundryvtt-simple-calendar-editable-moons/src/classes/foundry-interfacing/game-settings-registration.ts)",
       "Bash(sed -i '' 's/class=\"fas fa-trash\"/class=\"fa-solid fa-trash\"/g; s/class=\"fas fa-save\"/class=\"fa-solid fa-floppy-disk\"/g; s/class=\"fas fa-times\"/class=\"fa-solid fa-times\"/g' /Users/felicityrogers/Documents/GitHub/foundryvtt-simple-calendar-editable-moons/src/classes/notes/note-sheet.ts)",
       "Bash(git rm:*)",
-      "Bash(npx jest:*)"
+      "Bash(npx jest:*)",
+      "Bash(grep -o '\"fsc-[a-z]*\" \\\\${' dist/index.js)",
+      "Bash(grep -o '\\\\.fa,.fas,.fa-solid{[^}]*}' /Users/felicityrogers/Documents/GitHub/foundryvtt-simple-calendar-editable-moons/dist/styles/calendar.css)"
     ]
   }
 }
