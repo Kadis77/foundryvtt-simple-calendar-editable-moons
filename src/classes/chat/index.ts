@@ -16,7 +16,7 @@ export class Chat {
         return true;
     }
 
-    public static onRenderChatMessage(chatMessage: ChatMessage, html: JQuery, data: ChatMessage.MessageData): void {
+    public static onRenderChatMessage(chatMessage: ChatMessage, html: HTMLElement): void {
         ChatTimestamp.renderTimestamp(chatMessage, html);
     }
 }

@@ -46,11 +46,11 @@ export class ChatTimestamp {
         return formattedDateTime;
     }
 
-    public static renderTimestamp(chatMessage: ChatMessage, html: JQuery) {
+    public static renderTimestamp(chatMessage: ChatMessage, html: HTMLElement) {
         if (SC.globalConfiguration.inGameChatTimestamp) {
             const formattedDateTime = this.getFormattedChatTimestamp(chatMessage);
             if (formattedDateTime) {
-                const foundryTime = html[0].querySelector(".message-header .message-metadata .message-timestamp");
+                const foundryTime = html.querySelector(".message-header .message-metadata .message-timestamp");
                 if (foundryTime) {
                     (<HTMLElement>foundryTime).style.display = "none";
                     const newTime = document.createElement("time");

@@ -159,7 +159,9 @@ export default class NoteManager {
         if (!Object.prototype.hasOwnProperty.call(this.notes, calendarId)) {
             this.notes[calendarId] = [];
         }
-        this.notes[calendarId].push(new NoteStub(journalEntry.id || ""));
+        if (!this.notes[calendarId].some((n) => n.entryId === journalEntry.id)) {
+            this.notes[calendarId].push(new NoteStub(journalEntry.id || ""));
+        }
     }
 
     /**
